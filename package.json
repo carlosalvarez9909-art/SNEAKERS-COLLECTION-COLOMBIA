@@ -1,0 +1,7 @@
+{
+  "name": "sneakers-collection-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix \"SNK WEB PAGE CODE\" run dev"
+  }
+}
