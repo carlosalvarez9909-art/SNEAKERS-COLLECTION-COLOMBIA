@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/pago-resultado",
+      "destination": "/index.html"
+    }
+  ]
+}

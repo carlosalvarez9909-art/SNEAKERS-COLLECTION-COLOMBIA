@@ -1,0 +1,6 @@
+{
+  "name": "Sneakers Collection",
+  "description": "Una tienda y catálogo de zapatillas premium con scroll cinematográfico narrativo, multi-moneda, buscador instantáneo, favoritos y checkout.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
