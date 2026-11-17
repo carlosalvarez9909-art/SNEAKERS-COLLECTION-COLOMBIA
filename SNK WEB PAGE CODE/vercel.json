@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/pago-resultado",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]

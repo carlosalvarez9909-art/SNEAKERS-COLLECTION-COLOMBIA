@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from './_lib/vercel';
-import { getServerSupabase } from './_lib/supabase';
+import { getServerSupabase } from './_lib/supabase.js';
 
 type CheckoutItem = {
   productId: string;

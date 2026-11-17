@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from './_lib/vercel';
-import { getServerSupabase } from './_lib/supabase';
+import { getServerSupabase } from './_lib/supabase.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
