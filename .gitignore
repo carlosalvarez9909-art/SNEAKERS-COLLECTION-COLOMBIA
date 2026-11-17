@@ -1,0 +1,25 @@
+# Dependencias
+node_modules/
+
+# Builds
+dist/
+build/
+.vercel/
+.next/
+
+# Variables de entorno (nunca subir)
+.env
+.env.local
+.env.*.local
+*.local
+
+# Temporales de Word / Office
+~$*
+*.tmp
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+npm-debug.log*
