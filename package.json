@@ -2,6 +2,6 @@
   "name": "sneakers-collection-workspace",
   "private": true,
   "scripts": {
-    "dev": "npm --prefix \"SNK WEB PAGE CODE\" run dev"
+    "dev": "npm --prefix snk-web-page-code run dev"
   }
 }
