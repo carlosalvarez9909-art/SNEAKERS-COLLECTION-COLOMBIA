@@ -50,13 +50,9 @@ export const BrandRunway: React.FC = () => {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative min-h-[760px] overflow-hidden bg-black"
+      className="relative min-h-[760px] overflow-hidden bg-transparent"
     >
-      {/* Atmospheric red light */}
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-950/20 blur-[150px]" />
 
-      {/* Vignette */}
-      <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_center,transparent_25%,rgba(0,0,0,0.75)_100%)]" />
 
       {/* Header */}
       <div className="absolute left-8 top-12 z-20 md:left-16 md:top-16">

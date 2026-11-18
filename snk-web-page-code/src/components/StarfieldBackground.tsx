@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-const STAR_COUNT = 2600;
+const STAR_COUNT = 3200;
 const SPACE_COLOR = 0x050506;
 
 export function StarfieldBackground() {
@@ -44,7 +44,7 @@ export function StarfieldBackground() {
 
     for (let i = 0; i < STAR_COUNT; i += 1) {
       const offset = i * 3;
-      const brightness = 0.35 + Math.random() * 0.65;
+      const brightness = 0.6 + Math.random() * 0.4;
       const coolTint = Math.random() < 0.24;
 
       positions[offset] = (Math.random() * 2 - 1) * 80;
@@ -54,8 +54,8 @@ export function StarfieldBackground() {
       colors[offset] = brightness * (coolTint ? 0.82 : 0.92);
       colors[offset + 1] = brightness * (coolTint ? 0.9 : 0.94);
       colors[offset + 2] = brightness;
-      sizes[i] = 0.65 + Math.random() * 0.8;
-      opacities[i] = 0.24 + Math.random() * 0.42;
+      sizes[i] = 0.8 + Math.random() * 0.9;
+      opacities[i] = 0.45 + Math.random() * 0.5;
       twinklePhases[i] = Math.random() * Math.PI * 2;
       twinkleSpeeds[i] = 0.7 + Math.random() * 0.35;
     }
@@ -89,7 +89,7 @@ export function StarfieldBackground() {
           gl_PointSize = max(1.0, aSize * uPixelRatio * depthScale);
           gl_Position = projectionMatrix * viewPosition;
           vColor = color;
-          float twinkle = 1.0 + 0.07 * sin(uTime * aTwinkleSpeed + aTwinklePhase);
+          float twinkle = 1.0 + 0.18 * sin(uTime * aTwinkleSpeed + aTwinklePhase);
           vOpacity = aOpacity * twinkle;
         }
       `,
@@ -99,7 +99,7 @@ export function StarfieldBackground() {
 
         void main() {
           float radius = length(gl_PointCoord - vec2(0.5));
-          float edge = 1.0 - smoothstep(0.2, 0.5, radius);
+          float edge = 1.0 - smoothstep(0.12, 0.5, radius);
           float alpha = edge * vOpacity;
           if (alpha < 0.015) discard;
           gl_FragColor = vec4(vColor, alpha);
@@ -110,7 +110,7 @@ export function StarfieldBackground() {
       vertexColors: true,
       transparent: true,
       depthWrite: false,
-      blending: THREE.NormalBlending
+      blending: THREE.AdditiveBlending
     });
 
     starField.add(new THREE.Points(geometry, material));

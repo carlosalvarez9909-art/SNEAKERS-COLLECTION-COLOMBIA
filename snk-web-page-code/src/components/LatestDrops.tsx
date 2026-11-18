@@ -35,8 +35,6 @@ export const LatestDrops: React.FC = () => {
         }
       `}</style>
  
-      {/* Atmospheric glow */}
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-950/15 blur-[160px]" />
  
       {/* Header */}
       <div className="relative z-10 mx-auto flex max-w-7xl items-end justify-between px-4 sm:px-6 lg:px-8">
@@ -62,9 +60,13 @@ export const LatestDrops: React.FC = () => {
       </div>
  
       {/* Auto-scrolling track */}
-      <div className="relative mt-10">
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-black to-transparent sm:w-24" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-black to-transparent sm:w-24" />
+      <div
+        className="relative mt-10"
+        style={{
+          maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)'
+        }}
+      >
  
         <div className="drops-track flex w-max gap-5 px-4 sm:px-6 lg:px-8">
           {track.map((product, index) => {

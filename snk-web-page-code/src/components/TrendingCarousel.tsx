@@ -190,9 +190,6 @@ export const TrendingCarousel: React.FC = () => {
     <section
       className="trend-wall-section relative overflow-hidden py-20"
     >
-      {/* Pared de cemento negro */}
-      <div className="trend-wall-texture" />
-
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 flex flex-col gap-5 border-b border-white/5 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>

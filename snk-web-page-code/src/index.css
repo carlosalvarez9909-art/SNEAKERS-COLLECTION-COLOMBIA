@@ -433,7 +433,7 @@ select {
 /* ============ Tendencias Ahora ============ */
 
 .trend-wall-section {
-  background: #030303;
+  background: transparent;
 }
 
 .trend-wall-texture {
