@@ -99,7 +99,17 @@ export type ViewState =
   | { type: 'home' }
   | { type: 'brand'; brandId: string }
   | { type: 'product'; productId: string }
-  | { type: 'catalog'; filters?: { brandId?: string; isLimited?: boolean; isBestSeller?: boolean } }
+  | {
+      type: 'catalog';
+      filters?: {
+        brandId?: string;
+        isLimited?: boolean;
+        isBestSeller?: boolean;
+        isTrending?: boolean;
+        onSale?: boolean;
+        sortBy?: 'default' | 'price-asc' | 'price-desc' | 'rating' | 'discount';
+      };
+    }
   | { type: 'recommendations' }
   | { type: 'about' }
   | { type: 'favorites' }

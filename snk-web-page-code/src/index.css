@@ -622,3 +622,33 @@ select {
 .bg-black {
   background-color: var(--bg-base) !important;
 }
+/* ============ Recomendaciones: tarjetones y rankings ============ */
+
+.collection-tile-glow {
+  background: var(--tile-accent, #ffffff);
+}
+
+.collection-tile:hover {
+  box-shadow: 0 0 40px -12px var(--tile-accent, #ffffff);
+}
+
+.top-rank-number {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.22);
+  transition: -webkit-text-stroke-color 0.3s ease;
+}
+
+.group:hover .top-rank-number {
+  -webkit-text-stroke-color: rgba(255, 255, 255, 0.6);
+}
+
+/* ============ Carrusel de marcas ============ */
+
+.brand-wordmark {
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.75);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.group:hover .brand-wordmark {
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.45);
+}

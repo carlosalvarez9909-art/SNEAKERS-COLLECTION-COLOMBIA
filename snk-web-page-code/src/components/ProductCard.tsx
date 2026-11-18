@@ -2,7 +2,8 @@ import React, { useRef } from 'react';
 import { motion } from 'motion/react';
 import { Product } from '../types';
 import { useApp } from '../context/AppContext';
-import { Heart, Star, Eye } from 'lucide-react';
+import { Heart, Eye } from 'lucide-react';
+import { StarRating } from './StarRating';
 
 interface ProductCardProps {
   product: Product;
@@ -144,12 +145,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
                 {product.brandId}
               </span>
 
-              <div className="flex items-center space-x-1">
-                <Star className="h-3 w-3 fill-white text-white" />
-                <span className="text-[10px] font-mono font-medium text-white/80">
-                  {product.rating}
-                </span>
-              </div>
+            </div>
+
+            <div className="mt-2">
+              <StarRating rating={product.rating} reviewsCount={product.reviewsCount} />
             </div>
 
             <h3

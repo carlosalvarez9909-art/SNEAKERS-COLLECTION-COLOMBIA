@@ -12,6 +12,8 @@ import { AdminPanel } from './components/AdminPanel';
 import { ProductCard } from './components/ProductCard';
 import { OriginalLogo } from './components/OriginalLogo';
 import { StarfieldBackground } from './components/StarfieldBackground';
+import { RecommendationsView } from './components/RecommendationsView';
+import { BrandMarquee } from './components/BrandMarquee';
 import {
   ShieldCheck,
   Truck,
@@ -178,127 +180,6 @@ const FavoritesView: React.FC = () => {
             >
               Explorar Catálogo
             </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// "Recomendaciones" ahora se llama Collections: fondo espacial y tenis flotando.
-const RecommendationsView: React.FC = () => {
-  const { products, navigateTo, formatPrice } = useApp();
-  const [input, setInput] = useState('');
-  const [keywords, setKeywords] = useState<string[]>([]);
-
-  const addKeyword = () => {
-    const trim = input.trim();
-    if (!trim) return;
-    setKeywords(prev => (prev.includes(trim) ? prev : [...prev, trim]));
-    setInput('');
-  };
-
-  // Sin palabras clave se muestran los primeros modelos; con palabras clave se filtra.
-  const collectionProducts =
-    keywords.length > 0
-      ? products.filter(product => {
-          const haystack = `${product.name} ${product.description} ${product.technologies.join(' ')} ${product.materials.join(' ')} ${product.colors.map(c => c.name).join(' ')}`.toLowerCase();
-          return keywords.some(keyword => haystack.includes(keyword.toLowerCase()));
-        })
-      : products;
-
-  const visibleProducts = collectionProducts.slice(0, 9);
-
-  return (
-    <div
-      id="recommendations-page"
-      className="relative overflow-hidden bg-transparent text-white min-h-screen"
-    >
-      <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <SectionTitle
-          align="center"
-          title="Collections"
-          subtitle="Escribe palabras clave y presiona la barra espaciadora para encontrar tu par ideal."
-        />
-
-        {/* Buscador de palabras clave, sin caja: línea transparente */}
-        <div className="mx-auto mt-10 max-w-xl">
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === ' ' || e.key === 'Enter') {
-                e.preventDefault();
-                addKeyword();
-              }
-            }}
-            placeholder="ej. negro, talla 9, plano, casual..."
-            className="w-full rounded-full border border-white/10 bg-white/5 px-6 py-3.5 text-center text-sm text-white placeholder:text-neutral-500 backdrop-blur focus:border-white/30 focus:outline-none"
-          />
-
-          {keywords.length > 0 && (
-            <div className="mt-4 flex flex-wrap justify-center gap-2">
-              {keywords.map((word, idx) => (
-                <button
-                  key={`${word}-${idx}`}
-                  type="button"
-                  onClick={() => setKeywords(prev => prev.filter(item => item !== word))}
-                  className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-mono uppercase text-neutral-200 transition-colors hover:border-white/40"
-                  title="Quitar palabra"
-                >
-                  {word} ×
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Tenis flotando en el espacio, sin tarjetas */}
-        {visibleProducts.length > 0 ? (
-          <div className="mt-16 grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3">
-            {visibleProducts.map((product, index) => (
-              <button
-                key={product.id}
-                type="button"
-                onClick={() => navigateTo({ type: 'product', productId: product.id })}
-                className="group flex flex-col items-center text-center"
-              >
-                <div
-                  className="float-object"
-                  style={
-                    {
-                      '--dur': `${5 + (index % 4)}s`,
-                      '--delay': `${(index % 5) * -1.1}s`,
-                      '--tilt': `${index % 2 === 0 ? -6 : 6}deg`
-                    } as React.CSSProperties
-                  }
-                >
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="collection-float-img mx-auto h-40 w-auto max-w-full object-contain sm:h-56"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-
-                <h3 className="product-color-glow mt-6 font-sans text-sm font-black uppercase tracking-[-0.03em] text-white sm:text-lg">
-                  {product.name}
-                </h3>
-
-                <span className="mt-1 font-sans text-sm font-bold text-neutral-300">
-                  {formatPrice(product.basePrice * (1 - product.discount / 100))}
-                </span>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div className="mt-20 text-center">
-            <p className="text-xs font-mono uppercase tracking-[0.25em] text-neutral-500">
-              Sin coincidencias
-            </p>
-            <p className="mt-2 text-sm text-neutral-400">
-              Prueba con palabras como 'rojo', 'plano', 'talla 8', 'casual'.
-            </p>
           </div>
         )}
       </div>
@@ -516,6 +397,9 @@ function MainLayout() {
 
             {/* Tendencias del momento slider */}
             <TrendingCarousel />
+
+            {/* Carrusel de marcas */}
+            <BrandMarquee />
 
             <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
               <div className="mb-8">
