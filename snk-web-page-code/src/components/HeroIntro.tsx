@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { OriginalLogo } from './OriginalLogo';
 
 export const HeroIntro: React.FC = () => {
   const { banners, navigateTo, formatPrice, products } = useApp();
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [isIntroActive, setIsIntroActive] = useState(true);
 
   const activeBanners = banners.filter(b => b.active);
 
@@ -20,17 +18,11 @@ export const HeroIntro: React.FC = () => {
     return () => clearInterval(interval);
   }, [activeBanners.length]);
 
-  useEffect(() => {
-    const introTimer = window.setTimeout(() => setIsIntroActive(false), 3200);
-    return () => window.clearTimeout(introTimer);
-  }, []);
-
   if (activeBanners.length === 0) return null;
 
   const currentBanner = activeBanners[currentIdx];
   const linkedProduct = products.find(p => p.id === currentBanner.productId);
   const isVideoBanner = /\.mp4($|\?)/i.test(currentBanner.image);
-  const introSneakers = [currentBanner.image, activeBanners[1]?.image ?? currentBanner.image];
 
   const handleNext = () => {
     setCurrentIdx((prev) => (prev + 1) % activeBanners.length);
@@ -45,61 +37,6 @@ export const HeroIntro: React.FC = () => {
       
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.82)_0%,rgba(0,0,0,0.4)_38%,rgba(0,0,0,0.28)_100%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.7),transparent_35%,rgba(0,0,0,0.18)_100%)] pointer-events-none" />
-
-      <AnimatePresence>
-        {isIntroActive && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.7, ease: 'easeInOut' } }}
-            className="absolute inset-0 z-50 bg-black"
-          >
-            <div className="absolute inset-0 intro-rgb-glow" />
-            <motion.div
-              initial={{ opacity: 0, scale: 2.4, filter: 'blur(24px)' }}
-              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-              transition={{
-                duration: 1.1,
-                ease: [0.16, 1, 0.3, 1],
-                scale: {
-                  type: 'spring',
-                  damping: 14,
-                  stiffness: 90
-                }
-              }}
-              className="absolute inset-0 z-10 flex items-center justify-center"
-            >
-              <OriginalLogo size="lg" showTagline={true} className="intro-logo-layer" />
-            </motion.div>
-
-            {introSneakers.map((image, idx) => (
-              <motion.div
-                key={`${currentBanner.id}-${idx}`}
-                initial={{
-                  y: -220,
-                  x: idx === 0 ? -80 : 80,
-                  rotate: idx === 0 ? -18 : 18,
-                  opacity: 0,
-                  filter: 'blur(10px)'
-                }}
-                animate={{
-                  y: 0,
-                  x: 0,
-                  rotate: idx === 0 ? -10 : 10,
-                  opacity: 0.32,
-                  filter: 'blur(0px)'
-                }}
-                transition={{
-                  duration: 1.2,
-                  delay: 0.35 + idx * 0.2,
-                  ease: [0.22, 1, 0.36, 1]
-                }}
-                className={`intro-sneaker ${idx === 0 ? 'intro-sneaker-left' : 'intro-sneaker-right'}`}
-                style={{ backgroundImage: `url("${image}")` }}
-              />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <AnimatePresence mode="wait">
         <motion.div

@@ -94,36 +94,17 @@ select {
   opacity: 0.9;
 }
 
-.intro-rgb-glow {
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 52%);
-  box-shadow: inset 0 0 80px rgba(255,255,255,0.1);
+.splash-intro {
+  /* El negro puro del video se vuelve transparente y deja ver las estrellas */
+  mix-blend-mode: screen;
 }
 
-.intro-logo-layer {
-  transform: scale(1.08);
-  filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.2));
-}
-
-.intro-sneaker {
-  position: absolute;
-  bottom: 10%;
-  width: 42%;
-  height: 55%;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  filter: saturate(1.05) contrast(1.08);
+.splash-intro-video {
+  width: min(125vw, 78vh);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: #000;
   pointer-events: none;
-}
-
-.intro-sneaker-left {
-  left: 7%;
-  background-position: center center;
-}
-
-.intro-sneaker-right {
-  right: 7%;
-  background-position: center center;
 }
 
 .luxury-title {
