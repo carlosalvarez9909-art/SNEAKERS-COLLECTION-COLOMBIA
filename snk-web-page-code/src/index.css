@@ -1,5 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
+
+/* Cloister Black (Dieter Steffmann). Si el archivo no está en /public/fonts se usa UnifrakturMaguntia. */
+@font-face {
+  font-family: "Cloister Black";
+  src: url("/fonts/CloisterBlack.ttf") format("truetype");
+  font-display: swap;
+}
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -554,4 +561,21 @@ select {
   opacity: 1;
   transform: scale(1.04);
   filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.4));
+}
+
+/* ============ Footer ============ */
+.footer-logo {
+  /* El fondo negro de la imagen se funde con el fondo espacial */
+  mix-blend-mode: screen;
+}
+
+.footer-signature {
+  height: auto;
+  overflow: visible;
+}
+
+.footer-signature text {
+  font-family: "Cloister Black", "UnifrakturMaguntia", serif;
+  font-size: 140px;
+  fill: #d10a1f;
 }

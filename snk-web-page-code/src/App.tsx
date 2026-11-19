@@ -23,8 +23,12 @@ import {
   Heart,
   ShoppingBag,
   ArrowRight,
-  CornerDownRight
+  CornerDownRight,
+  MessageCircle,
+  AtSign,
+  Store
 } from 'lucide-react';
+import type { ViewState } from './types';
 import { motion, AnimatePresence } from 'motion/react';
 
 // Mismo formato de título para todas las secciones del sitio.
@@ -381,6 +385,19 @@ const PaymentResultView: React.FC = () => {
   );
 };
 
+const socialLinks = [
+  { label: 'Instagram', href: 'https://www.instagram.com/sneakerscollectionsc/', icon: AtSign },
+  { label: 'Facebook Marketplace', href: 'https://www.facebook.com/marketplace/profile/61592753193624/', icon: Store }
+];
+
+const footerLinks: { label: string; view: ViewState }[] = [
+  { label: 'Inicio', view: { type: 'home' } },
+  { label: 'Catálogo', view: { type: 'catalog' } },
+  { label: 'Recomendaciones', view: { type: 'recommendations' } },
+  { label: 'Sobre nosotros', view: { type: 'about' } },
+  { label: 'Tus favoritos', view: { type: 'favorites' } }
+];
+
 // Inner App Layout that can safely consume useApp context
 function MainLayout() {
   const { activeView, navigateTo, products } = useApp();
@@ -505,125 +522,125 @@ function MainLayout() {
         onClose={() => setIsCartOpen(false)}
       />
 
-      <footer className="border-t border-neutral-900 bg-transparent py-16 text-neutral-400 font-sans z-10">
+      <footer className="border-t border-neutral-900 bg-transparent pt-16 pb-10 text-neutral-400 font-sans z-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-10">
 
-            <div className="space-y-4 md:col-span-2">
-              <div className="flex items-start justify-start">
-                <OriginalLogo
-                  size="md"
-                  showTagline={true}
-                  className="!items-start !justify-start"
-                />
-              </div>
+            {/* Marca: logo, descripción y redes */}
+            <div className="flex flex-col items-center text-center md:col-span-5 md:items-start md:text-left">
+              <img
+                src="/intro/logo-footer.jpg"
+                alt="Sneakers Collection"
+                className="footer-logo h-36 w-auto cursor-pointer"
+                onClick={() => navigateTo({ type: 'home' })}
+              />
 
-              <p className="text-xs text-neutral-500 leading-relaxed max-w-sm">
-                Curaduría y despacho de calzado de colección limitado. Autenticidad certificada en cada costura, empacado bajo condiciones premium de conservación para coleccionistas y entusiastas exigentes.
+              <p className="mt-6 max-w-sm text-sm leading-relaxed text-neutral-400">
+                Tienda colombiana de sneakers de alta calidad. Seleccionamos cada par de Jordan,
+                Nike, Adidas, New Balance y más marcas para que encuentres tu estilo sin
+                complicaciones: compras en línea, pago seguro y envíos a todo el país, con
+                acompañamiento por WhatsApp de principio a fin.
               </p>
 
-              <div className="flex space-x-4 pt-1">
-                <div className="flex items-center space-x-1.5 text-[10px] font-mono uppercase text-amber-500">
-                  <ShieldCheck className="h-4.5 w-4.5" />
-                  <span>Autenticidad Verificada</span>
-                </div>
-
-                <div className="flex items-center space-x-1.5 text-[10px] font-mono uppercase text-amber-500">
-                  <Award className="h-4.5 w-4.5" />
-                  <span>Sello de Originalidad</span>
-                </div>
+              <div className="mt-6 flex flex-wrap justify-center gap-3 md:justify-start">
+                {socialLinks.map(({ label, href, icon: Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-white/80 transition-colors hover:border-white/40 hover:text-white"
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{label}</span>
+                  </a>
+                ))}
               </div>
             </div>
 
-            <div className="space-y-3.5">
-              <h4 className="text-[11px] font-mono tracking-widest text-white uppercase font-bold">
+            {/* Navegación */}
+            <div className="text-center md:col-span-3 md:text-left">
+              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-white">
                 Navegación
               </h4>
 
-              <ul className="space-y-2 text-xs">
-                <li>
-                  <button
-                    onClick={() => navigateTo({ type: 'home' })}
-                    className="hover:text-amber-500 transition-colors text-left flex items-center space-x-1"
-                  >
-                    <CornerDownRight className="h-3 w-3 text-neutral-700" />
-                    <span>Inicio Principal</span>
-                  </button>
-                </li>
-
-                <li>
-                  <button
-                    onClick={() => navigateTo({ type: 'catalog' })}
-                    className="hover:text-amber-500 transition-colors text-left flex items-center space-x-1"
-                  >
-                    <CornerDownRight className="h-3 w-3 text-neutral-700" />
-                    <span>Catálogo de Referencias</span>
-                  </button>
-                </li>
-
-                <li>
-                  <button
-                    onClick={() => navigateTo({ type: 'favorites' })}
-                    className="hover:text-amber-500 transition-colors text-left flex items-center space-x-1"
-                  >
-                    <CornerDownRight className="h-3 w-3 text-neutral-700" />
-                    <span>Tus Favoritos</span>
-                  </button>
-                </li>
-
-                <li>
-                  <button
-                    onClick={() => navigateTo({ type: 'admin' })}
-                    className="hover:text-amber-500 transition-colors text-left flex items-center space-x-1"
-                  >
-                    <CornerDownRight className="h-3 w-3 text-neutral-700" />
-                    <span>Panel de Control</span>
-                  </button>
-                </li>
+              <ul className="mt-5 space-y-3 text-sm">
+                {footerLinks.map(({ label, view }) => (
+                  <li key={label}>
+                    <button
+                      onClick={() => navigateTo(view)}
+                      className="text-neutral-400 transition-colors hover:text-white"
+                    >
+                      {label}
+                    </button>
+                  </li>
+                ))}
               </ul>
             </div>
 
-            <div className="space-y-3.5">
-              <h4 className="text-[11px] font-mono tracking-widest text-white uppercase font-bold">
-                Atención de Ventas
+            {/* Atención de ventas */}
+            <div className="text-center md:col-span-4 md:text-left">
+              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-white">
+                Atención de ventas
               </h4>
 
-              <ul className="space-y-2 text-xs text-neutral-500">
-                <li className="flex items-start space-x-2.5">
-                  <Truck className="h-4 w-4 text-neutral-700 shrink-0 mt-0.5" />
+              <ul className="mt-5 space-y-4 text-sm">
+                <li className="flex items-start justify-center gap-2.5 md:justify-start">
+                  <Truck className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
+                  <span>Envíos a todo Colombia con transportadoras aseguradas.</span>
+                </li>
+
+                <li className="flex items-start justify-center gap-2.5 md:justify-start">
+                  <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
                   <span>
-                    Despachos nacionales asegurados mediante transportadoras premium.
+                    WhatsApp:{' '}
+                    <a
+                      href="https://wa.me/573208646516"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-semibold text-white hover:underline"
+                    >
+                      +57 320 864 6516
+                    </a>
                   </span>
                 </li>
 
-                <li className="text-[10px] font-mono uppercase text-neutral-400">
-                  Soporte Telefónico / WhatsApp:
-                  <br />
-
+                <li className="flex items-start justify-center gap-2.5 md:justify-start">
+                  <AtSign className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
                   <a
-                    href="https://wa.me/573208646516"
+                    href="https://www.instagram.com/sneakerscollectionsc/"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-amber-500 hover:underline"
+                    className="hover:text-white hover:underline"
                   >
-                    +57 320 864 6516
+                    @sneakerscollectionsc
                   </a>
                 </li>
               </ul>
             </div>
-
           </div>
 
-          <div className="mt-12 border-t border-neutral-900 pt-8 flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono tracking-wider uppercase text-neutral-600 gap-4">
-            <p>
-              © {new Date().getFullYear()} Sneakers Collection. Todos los derechos reservados.
-            </p>
+          {/* Firma de la marca en letra gótica, roja y a lo ancho */}
+          <svg
+            className="footer-signature mt-16 block w-full select-none"
+            viewBox="0 0 1000 170"
+            role="img"
+            aria-label="Sneakers World."
+          >
+            <text
+              x="500"
+              y="128"
+              textAnchor="middle"
+              textLength="980"
+              lengthAdjust="spacingAndGlyphs"
+            >
+              Sneakers World.
+            </text>
+          </svg>
 
-            <p className="flex items-center gap-1.5">
-              <span>Hecho en Colombia</span>
-              <span>•</span>
-              <span>Autenticidad Garantizada</span>
-            </p>
+          <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-neutral-900 pt-8 text-xs text-neutral-600 sm:flex-row">
+            <p>© {new Date().getFullYear()} Sneakers Collection. Todos los derechos reservados.</p>
+            <p>Hecho en Colombia</p>
           </div>
         </div>
       </footer>
