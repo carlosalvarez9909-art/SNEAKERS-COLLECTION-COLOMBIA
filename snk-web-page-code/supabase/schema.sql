@@ -20,6 +20,10 @@ as $$
   );
 $$;
 
+-- Solo usuarios con sesión pueden consultar si son administradores.
+revoke execute on function public.is_admin() from public, anon;
+grant execute on function public.is_admin() to authenticated;
+
 create table if not exists public.brands (
   id text primary key,
   name text not null,
@@ -105,6 +109,10 @@ create table if not exists public.catalog_imports (
   id text primary key,
   imported_at timestamptz not null default now()
 );
+
+create index if not exists products_brand_id_idx on public.products (brand_id);
+create index if not exists banners_product_id_idx on public.banners (product_id);
+create index if not exists reviews_product_id_idx on public.reviews (product_id);
 
 alter table public.user_roles enable row level security;
 alter table public.brands enable row level security;
