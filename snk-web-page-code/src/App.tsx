@@ -12,6 +12,7 @@ import { AdminPanel } from './components/AdminPanel';
 import { ProductCard } from './components/ProductCard';
 import { OriginalLogo } from './components/OriginalLogo';
 import { StarfieldBackground } from './components/StarfieldBackground';
+import { SplashIntro } from './components/SplashIntro';
 import { RecommendationsView } from './components/RecommendationsView';
 import { BrandMarquee } from './components/BrandMarquee';
 import {
@@ -627,10 +628,24 @@ function MainLayout() {
 }
 
 export default function App() {
+  // La apertura con el logo se muestra al cargar la página (no al volver del pago).
+  const [splashPhase, setSplashPhase] = useState<'playing' | 'revealing' | 'done'>(() =>
+    window.location.pathname === '/pago-resultado' ? 'done' : 'playing'
+  );
+
   return (
     <>
       <StarfieldBackground />
-      <div className="relative z-10 min-h-screen">
+      {splashPhase !== 'done' && (
+        <SplashIntro
+          onReveal={() => setSplashPhase('revealing')}
+          onFinish={() => setSplashPhase('done')}
+        />
+      )}
+      <div
+        className="relative z-10 min-h-screen transition-opacity duration-500 ease-out"
+        style={{ opacity: splashPhase === 'playing' ? 0 : 1 }}
+      >
         <AppProvider>
           {window.location.pathname === '/pago-resultado'
             ? <PaymentResultView />
