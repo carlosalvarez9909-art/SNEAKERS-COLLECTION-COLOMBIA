@@ -21,6 +21,10 @@ export const SplashIntro: React.FC<SplashIntroProps> = ({ onReveal, onFinish }) 
   const callbacks = useRef({ onReveal, onFinish });
   callbacks.current = { onReveal, onFinish };
   const [isLeaving, setIsLeaving] = useState(false);
+  // El video se muestra solo cuando ya está reproduciendo, para que no salte de imagen.
+  const [isPlaying, setIsPlaying] = useState(false);
+  // Si el navegador no reproduce el video (p. ej. ahorro de batería), se muestra la imagen fija.
+  const [showFallback, setShowFallback] = useState(false);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -29,6 +33,9 @@ export const SplashIntro: React.FC<SplashIntroProps> = ({ onReveal, onFinish }) 
     // Algunos navegadores móviles ignoran autoplay; se intenta reproducir a mano.
     videoRef.current?.play().catch(() => undefined);
 
+    const fallbackTimer = window.setTimeout(() => {
+      if (videoRef.current?.paused) setShowFallback(true);
+    }, 700);
     const revealTimer = window.setTimeout(() => {
       setIsLeaving(true);
       callbacks.current.onReveal();
@@ -36,6 +43,7 @@ export const SplashIntro: React.FC<SplashIntroProps> = ({ onReveal, onFinish }) 
     const finishTimer = window.setTimeout(() => callbacks.current.onFinish(), SPLASH_MS);
 
     return () => {
+      window.clearTimeout(fallbackTimer);
       window.clearTimeout(revealTimer);
       window.clearTimeout(finishTimer);
       document.body.style.overflow = previousOverflow;
@@ -50,17 +58,22 @@ export const SplashIntro: React.FC<SplashIntroProps> = ({ onReveal, onFinish }) 
       transition={{ duration: (SPLASH_MS - REVEAL_MS) / 1000, ease: 'easeInOut' }}
       className="splash-intro fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
     >
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        poster="/intro/logo-intro-poster.jpg"
-        className="splash-intro-video"
-      >
-        <source src="/intro/logo-intro.mp4" type="video/mp4" />
-      </video>
+      {showFallback ? (
+        <img src="/intro/logo-intro-poster.jpg" alt="" className="splash-intro-video" />
+      ) : (
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          onPlaying={() => setIsPlaying(true)}
+          className="splash-intro-video transition-opacity duration-200"
+          style={{ opacity: isPlaying ? 1 : 0 }}
+        >
+          <source src="/intro/logo-intro.mp4" type="video/mp4" />
+        </video>
+      )}
     </motion.div>
   );
 };
