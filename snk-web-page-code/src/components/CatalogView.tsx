@@ -40,67 +40,32 @@ const currencyOptions = ['COP', 'USD', 'EUR', 'MXN'] as const;
 const toggleIn = <T,>(list: T[], value: T) =>
   list.includes(value) ? list.filter(item => item !== value) : [...list, value];
 
-// Botón con menú desplegable; se cierra al hacer clic fuera o con Escape.
-const FilterDropdown: React.FC<{
+// Sección plegable dentro del panel de filtros.
+const FilterSection: React.FC<{
   id: string;
   label: string;
-  count?: number;
+  summary?: string;
   openId: string | null;
   setOpenId: (id: string | null) => void;
-  align?: 'left' | 'right';
   children: React.ReactNode;
-}> = ({ id, label, count = 0, openId, setOpenId, align = 'left', children }) => {
-  const ref = useRef<HTMLDivElement>(null);
+}> = ({ id, label, summary, openId, setOpenId, children }) => {
   const isOpen = openId === id;
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) setOpenId(null);
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpenId(null);
-    };
-    document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [isOpen, setOpenId]);
-
   return (
-    <div ref={ref} className="relative">
+    <div className="border-b border-white/5 last:border-b-0">
       <button
         id={`catalog-filter-${id}`}
         type="button"
         aria-expanded={isOpen}
-        aria-haspopup="true"
         onClick={() => setOpenId(isOpen ? null : id)}
-        className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.18em] transition-all ${
-          isOpen || count > 0
-            ? 'border-white/40 bg-white/10 text-white'
-            : 'border-white/10 bg-white/[0.03] text-white/70 hover:border-white/30 hover:text-white'
-        }`}
+        className="flex w-full items-center justify-between gap-3 px-3 py-3.5 text-left"
       >
-        <span>{label}</span>
-        {count > 0 && (
-          <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[9px] text-black">
-            {count}
-          </span>
-        )}
-        <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-white">{label}</span>
+        <span className="flex min-w-0 items-center gap-2 text-[11px] text-neutral-500">
+          {summary && <span className="truncate">{summary}</span>}
+          <ChevronDown className={`h-4 w-4 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        </span>
       </button>
-
-      {isOpen && (
-        <div
-          className={`fixed inset-x-4 z-30 mt-2 rounded-2xl border border-white/10 bg-neutral-950/95 p-4 shadow-2xl shadow-black backdrop-blur-md sm:absolute sm:inset-x-auto sm:top-full sm:w-[300px] ${
-            align === 'right' ? 'sm:right-0' : 'sm:left-0'
-          }`}
-        >
-          {children}
-        </div>
-      )}
+      {isOpen && <div className="px-1.5 pb-3">{children}</div>}
     </div>
   );
 };
@@ -140,7 +105,26 @@ export const CatalogView: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<CollectionTag[]>([]);
   const [minRating, setMinRating] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('default');
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [openSection, setOpenSection] = useState<string | null>('sort');
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filtersRef = useRef<HTMLDivElement>(null);
+
+  // El panel de filtros se cierra al tocar fuera o con Escape.
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (filtersRef.current && !filtersRef.current.contains(event.target as Node)) setFiltersOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setFiltersOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [filtersOpen]);
 
   // Al llegar desde un tarjetón (Recomendaciones, marcas…) se aplican sus filtros.
   const incomingFilters = activeView.type === 'catalog' ? activeView.filters : undefined;
@@ -274,14 +258,55 @@ export const CatalogView: React.FC = () => {
           />
         </div>
 
-        {/* Barra de filtros desplegables */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="mr-1 hidden items-center gap-2 sm:flex">
-            <SlidersHorizontal className="h-4 w-4 text-white/60" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/60">Filtrar</span>
+        {/* Resultados a la izquierda y botón de filtros en la esquina derecha */}
+        <div ref={filtersRef} className="relative flex items-center justify-between gap-3">
+          <span className="text-[11px] uppercase tracking-[0.2em] text-neutral-500">
+            {processedProducts.length} {processedProducts.length === 1 ? 'resultado' : 'resultados'}
           </span>
 
-          <FilterDropdown id="brand" label="Marca" count={selectedBrandIds.length} openId={openDropdown} setOpenId={setOpenDropdown}>
+          <button
+            id="catalog-filters-btn"
+            type="button"
+            aria-expanded={filtersOpen}
+            onClick={() => setFiltersOpen(open => !open)}
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
+              filtersOpen || activeChips.length > 0
+                ? 'border-white/40 bg-white/10 text-white'
+                : 'border-white/15 bg-white/[0.03] text-white/80 hover:border-white/35 hover:text-white'
+            }`}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            <span>Filtros</span>
+            {activeChips.length > 0 && (
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[9px] text-black">
+                {activeChips.length}
+              </span>
+            )}
+            <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${filtersOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {filtersOpen && (
+            <div
+              id="catalog-filters-panel"
+              className="search-panel absolute right-0 top-full z-30 mt-3 max-h-[70vh] w-[min(92vw,380px)] overflow-y-auto rounded-2xl border border-neutral-800 shadow-2xl shadow-black"
+            >
+              <div className="px-1.5 pt-1">
+              <FilterSection id="sort" label="Ordenar" summary={SORT_OPTIONS.find(option => option.id === sortBy)!.label} openId={openSection} setOpenId={setOpenSection}>
+              <div className="space-y-1">
+                {SORT_OPTIONS.map(option => (
+                  <OptionRow
+                    key={option.id}
+                    selected={sortBy === option.id}
+                    onClick={() => {
+                      setSortBy(option.id);
+                    }}
+                  >
+                    {option.label}
+                  </OptionRow>
+                ))}
+              </div>
+              </FilterSection>
+              <FilterSection id="brand" label="Marca" summary={selectedBrandIds.length ? `${selectedBrandIds.length} seleccionadas` : 'Todas'} openId={openSection} setOpenId={setOpenSection}>
             <div className="space-y-1">
               {brands.map(b => (
                 <OptionRow
@@ -301,9 +326,8 @@ export const CatalogView: React.FC = () => {
                 </OptionRow>
               ))}
             </div>
-          </FilterDropdown>
-
-          <FilterDropdown id="size" label="Talla US" count={selectedSizes.length} openId={openDropdown} setOpenId={setOpenDropdown}>
+              </FilterSection>
+              <FilterSection id="size" label="Talla US" summary={selectedSizes.length ? selectedSizes.join(', ') : 'Todas'} openId={openSection} setOpenId={setOpenSection}>
             <div className="grid grid-cols-4 gap-1.5">
               {sizeOptions.map(size => (
                 <button
@@ -321,9 +345,8 @@ export const CatalogView: React.FC = () => {
                 </button>
               ))}
             </div>
-          </FilterDropdown>
-
-          <FilterDropdown id="price" label="Precio" count={selectedPrices.length} openId={openDropdown} setOpenId={setOpenDropdown}>
+              </FilterSection>
+              <FilterSection id="price" label="Precio" summary={selectedPrices.length ? `${selectedPrices.length} rangos` : 'Todos'} openId={openSection} setOpenId={setOpenSection}>
             <div className="space-y-1">
               {PRICE_RANGES.map(range => (
                 <OptionRow
@@ -335,9 +358,8 @@ export const CatalogView: React.FC = () => {
                 </OptionRow>
               ))}
             </div>
-          </FilterDropdown>
-
-          <FilterDropdown id="collection" label="Colección" count={selectedTags.length} openId={openDropdown} setOpenId={setOpenDropdown}>
+              </FilterSection>
+              <FilterSection id="collection" label="Colección" summary={selectedTags.length ? `${selectedTags.length} activas` : 'Todas'} openId={openSection} setOpenId={setOpenSection}>
             <div className="space-y-1">
               {COLLECTION_OPTIONS.map(option => (
                 <OptionRow
@@ -349,9 +371,8 @@ export const CatalogView: React.FC = () => {
                 </OptionRow>
               ))}
             </div>
-          </FilterDropdown>
-
-          <FilterDropdown id="rating" label="Calificación" count={minRating !== null ? 1 : 0} openId={openDropdown} setOpenId={setOpenDropdown}>
+              </FilterSection>
+              <FilterSection id="rating" label="Calificación" summary={minRating !== null ? `${minRating}+` : 'Todas'} openId={openSection} setOpenId={setOpenSection}>
             <div className="space-y-1">
               {RATING_OPTIONS.map(value => (
                 <OptionRow
@@ -364,10 +385,8 @@ export const CatalogView: React.FC = () => {
                 </OptionRow>
               ))}
             </div>
-          </FilterDropdown>
-
-          <div className="ml-auto flex flex-wrap items-center gap-2">
-            <FilterDropdown id="currency" label={currency} openId={openDropdown} setOpenId={setOpenDropdown} align="right">
+              </FilterSection>
+              <FilterSection id="currency" label="Moneda" summary={currency} openId={openSection} setOpenId={setOpenSection}>
               <div className="space-y-1">
                 {currencyOptions.map(code => (
                   <OptionRow
@@ -375,45 +394,37 @@ export const CatalogView: React.FC = () => {
                     selected={currency === code}
                     onClick={() => {
                       setCurrency(code);
-                      setOpenDropdown(null);
                     }}
                   >
                     {code}
                   </OptionRow>
                 ))}
               </div>
-            </FilterDropdown>
-
-            <FilterDropdown
-              id="sort"
-              label={`Ordenar: ${SORT_OPTIONS.find(option => option.id === sortBy)!.label}`}
-              openId={openDropdown}
-              setOpenId={setOpenDropdown}
-              align="right"
-            >
-              <div className="space-y-1">
-                {SORT_OPTIONS.map(option => (
-                  <OptionRow
-                    key={option.id}
-                    selected={sortBy === option.id}
-                    onClick={() => {
-                      setSortBy(option.id);
-                      setOpenDropdown(null);
-                    }}
-                  >
-                    {option.label}
-                  </OptionRow>
-                ))}
+              </FilterSection>
               </div>
-            </FilterDropdown>
-          </div>
+
+              <div className="sticky bottom-0 flex items-center gap-2 border-t border-white/10 bg-[rgba(8,8,9,0.98)] p-3">
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="flex-1 rounded-full border border-white/15 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-white/80 transition-colors hover:border-white/40 hover:text-white"
+                >
+                  Limpiar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFiltersOpen(false)}
+                  className="flex-1 rounded-full bg-white px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-colors hover:bg-neutral-200"
+                >
+                  Ver {processedProducts.length}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Filtros activos + conteo */}
-        <div className="mt-4 flex min-h-8 flex-wrap items-center gap-2">
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-500">
-            {processedProducts.length} {processedProducts.length === 1 ? 'resultado' : 'resultados'}
-          </span>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           {activeChips.map(chip => (
             <button
               key={chip.key}
