@@ -16,6 +16,7 @@ import { SplashIntro } from './components/SplashIntro';
 import { RecommendationsView } from './components/RecommendationsView';
 import { BrandMarquee } from './components/BrandMarquee';
 import { BrandLogo } from './components/BrandLogo';
+import { FooterSignature } from './components/FooterSignature';
 import {
   ShieldCheck,
   Truck,
@@ -384,24 +385,6 @@ const PaymentResultView: React.FC = () => {
   );
 };
 
-// Estrella de 5 puntas con lados curvos, centrada en (0,0) y simétrica respecto al eje vertical.
-const STAR_PATH = (() => {
-  const outer = 30;
-  const inner = 9.5;
-  const point = (radius: number, angle: number) =>
-    [radius * Math.sin(angle), -radius * Math.cos(angle)].map(n => n.toFixed(2)).join(' ');
-  let d = '';
-  for (let k = 0; k < 5; k += 1) {
-    const tip = (k * 2 * Math.PI) / 5;
-    const valley = tip + Math.PI / 5;
-    const nextTip = tip + (2 * Math.PI) / 5;
-    d += `${k === 0 ? 'M' : 'L'} ${point(outer, tip)} `;
-    d += `Q ${point(inner * 1.25, (tip + valley) / 2)} ${point(inner, valley)} `;
-    d += `Q ${point(inner * 1.25, (valley + nextTip) / 2)} ${point(outer, nextTip)} `;
-  }
-  return `${d}Z`;
-})();
-
 const footerLinks: { label: string; view: ViewState }[] = [
   { label: 'Inicio', view: { type: 'home' } },
   { label: 'Catálogo', view: { type: 'catalog' } },
@@ -630,26 +613,7 @@ function MainLayout() {
           </div>
 
           {/* Firma de la marca en letra gótica, roja y a lo ancho */}
-          <svg
-            className="footer-signature mt-16 block w-full select-none"
-            viewBox="0 0 1000 250"
-            role="img"
-            aria-label="Sneakers World. Cinco estrellas"
-          >
-            <text
-              x="500"
-              y="128"
-              textAnchor="middle"
-              textLength="980"
-              lengthAdjust="spacingAndGlyphs"
-            >
-              Sneakers World.
-            </text>
-            {/* 5 estrellas simétricas, centradas y más angostas que el texto (efecto embudo) */}
-            {[-2, -1, 0, 1, 2].map(i => (
-              <path key={i} d={STAR_PATH} transform={`translate(${500 + i * 70} 200)`} />
-            ))}
-          </svg>
+          <FooterSignature />
 
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-neutral-900 pt-8 text-xs text-neutral-600 sm:flex-row">
             <p>© {new Date().getFullYear()} Sneakers Collection. Todos los derechos reservados.</p>

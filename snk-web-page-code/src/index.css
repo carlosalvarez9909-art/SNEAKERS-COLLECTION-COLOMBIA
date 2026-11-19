@@ -1,13 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
-/* Cloister Black (Dieter Steffmann). Si el archivo no está en /public/fonts se usa UnifrakturMaguntia. */
-@font-face {
-  font-family: "Cloister Black";
-  src: url("/fonts/CloisterBlack.ttf") format("truetype");
-  font-display: swap;
-}
-
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   /* Todo el sitio usa la tipografía de los banners (Inter); sin letra monoespaciada */
@@ -564,17 +557,13 @@ select {
 }
 
 /* ============ Footer ============ */
-.footer-signature {
-  height: auto;
-  overflow: visible;
-}
-
-.footer-signature path {
-  fill: #d10a1f;
-}
-
-.footer-signature text {
-  font-family: "Cloister Black", "UnifrakturMaguntia", serif;
-  font-size: 140px;
-  fill: #d10a1f;
+.footer-signature-text {
+  font-family: "UnifrakturMaguntia", "Cloister Black", serif;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0;
+  color: #d10a1f;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
 }
