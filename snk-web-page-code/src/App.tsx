@@ -15,6 +15,7 @@ import { StarfieldBackground } from './components/StarfieldBackground';
 import { SplashIntro } from './components/SplashIntro';
 import { RecommendationsView } from './components/RecommendationsView';
 import { BrandMarquee } from './components/BrandMarquee';
+import { BrandLogo } from './components/BrandLogo';
 import {
   ShieldCheck,
   Truck,
@@ -74,20 +75,26 @@ const BrandView: React.FC<{ brandId: string }> = ({ brandId }) => {
     >
       {/* Brand Hero Banner */}
       <div className="relative h-[45vh] w-full overflow-hidden flex items-center justify-center">
-        <div className="absolute inset-0 z-0">
-          <img
-            src={brand.heroImage}
-            alt={brand.name}
-            className="h-full w-full object-cover opacity-35"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-transparent" />
-        </div>
+        {brand.heroImage && (
+          <div className="absolute inset-0 z-0">
+            <img
+              src={brand.heroImage}
+              alt={brand.name}
+              className="h-full w-full object-cover opacity-35"
+              referrerPolicy="no-referrer"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-transparent" />
+          </div>
+        )}
 
         <div className="relative z-10 mx-auto max-w-5xl px-4 text-center space-y-3">
           <span className="rounded-full bg-white px-3.5 py-1 text-[10px] font-mono font-extrabold text-neutral-950 tracking-widest uppercase">
             CASA DE DISEÑO ORIGINAL
           </span>
+
+          <div className="flex justify-center py-2">
+            <BrandLogo brand={brand} className="h-20 w-auto max-w-[260px] sm:h-24" fallbackClassName="hidden" />
+          </div>
 
           <h2 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-[-0.06em] text-white">
             {brand.name}

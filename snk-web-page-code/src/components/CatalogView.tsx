@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { BrandLogo } from './BrandLogo';
 import { ProductCard } from './ProductCard';
 import { SlidersHorizontal, Sliders, X, Check, Star, Trash2, ChevronDown } from 'lucide-react';
 import { finalPriceOf, salesScore } from '../lib/productMetrics';
@@ -295,7 +296,12 @@ export const CatalogView: React.FC = () => {
                   selected={selectedBrandIds.includes(b.id)}
                   onClick={() => setSelectedBrandIds(prev => toggleIn(prev, b.id))}
                 >
-                  {b.name}
+                  <span className="flex items-center gap-2.5">
+                    <span className="flex h-5 w-10 items-center justify-center">
+                      <BrandLogo brand={b} className="h-5 w-auto max-w-[40px]" fallbackClassName="hidden" />
+                    </span>
+                    {b.name}
+                  </span>
                   <span className="font-mono text-[9px] text-neutral-600">
                     {products.filter(p => p.brandId === b.id).length}
                   </span>

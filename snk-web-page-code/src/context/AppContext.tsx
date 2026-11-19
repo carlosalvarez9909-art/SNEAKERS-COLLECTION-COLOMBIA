@@ -312,13 +312,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Admin Actions
+  // Garantiza que la marca exista en Supabase antes de guardar un producto de esa marca.
+  const ensureBrandSaved = async (brandId: string) => {
+    const brand = brands.find(b => b.id === brandId);
+    if (brand) await upsertBrand(brand);
+  };
+
   const addProduct = async (product: Product) => {
+    await ensureBrandSaved(product.brandId);
     await upsertProduct(product);
     const updated = [product, ...products];
     setProducts(updated);
   };
 
   const updateProduct = async (updatedProd: Product) => {
+    await ensureBrandSaved(updatedProd.brandId);
     await upsertProduct(updatedProd);
     const updated = products.map(p => p.id === updatedProd.id ? updatedProd : p);
     setProducts(updated);

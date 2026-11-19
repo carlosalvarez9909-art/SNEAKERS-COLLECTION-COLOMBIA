@@ -185,6 +185,14 @@ const fromReviewRow = (row: ReviewRow): Review => ({
   createdAt: row.created_at
 });
 
+// Las marcas de la tienda (con su logo) se muestran aunque todavía no estén en Supabase.
+// Las que sí están en la base de datos mandan; solo se agregan las que falten.
+const mergeWithKnownBrands = (databaseBrands: Brand[]): Brand[] => {
+  const known = new Set(databaseBrands.map(brand => brand.id));
+  const missing = INITIAL_BRANDS.filter(brand => !known.has(brand.id));
+  return [...databaseBrands, ...missing].sort((a, b) => a.name.localeCompare(b.name, 'es'));
+};
+
 export async function fetchCatalog() {
   if (!supabase) {
     return {
@@ -210,7 +218,7 @@ export async function fetchCatalog() {
 
   return {
     products: (productsResult.data as ProductRow[]).map(fromProductRow),
-    brands: (brandsResult.data as BrandRow[]).map(fromBrandRow),
+    brands: mergeWithKnownBrands((brandsResult.data as BrandRow[]).map(fromBrandRow)),
     banners: (bannersResult.data as BannerRow[]).map(fromBannerRow),
     coupons: (couponsResult.data as CouponRow[]).map(fromCouponRow),
     reviews: (reviewsResult.data as ReviewRow[]).map(fromReviewRow)

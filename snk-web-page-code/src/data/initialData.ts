@@ -5,7 +5,7 @@ export const INITIAL_BRANDS: Brand[] = [
     id: 'jordan',
     name: 'Jordan',
     slug: 'jordan',
-    logo: 'Jumpman',
+    logo: '/brands/jordan.png',
     story: 'Creada para Michael Jordan en 1984, la marca de la corona y el Jumpman revolucionó las canchas de baloncesto y definió el streetwear contemporáneo.',
     heroImage: 'https://images.unsplash.com/photo-1597045566677-8cf032ed6634?auto=format&fit=crop&q=80&w=1200'
   },
@@ -13,7 +13,7 @@ export const INITIAL_BRANDS: Brand[] = [
     id: 'nike',
     name: 'Nike',
     slug: 'nike',
-    logo: 'Swoosh',
+    logo: '/brands/nike.png',
     story: 'Inspiración e innovación para cada atleta del mundo. Just Do It. Pioneros en el diseño de calzado de rendimiento e íconos de la cultura urbana.',
     heroImage: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=1200'
   },
@@ -21,7 +21,7 @@ export const INITIAL_BRANDS: Brand[] = [
     id: 'adidas',
     name: 'Adidas',
     slug: 'adidas',
-    logo: 'Three Stripes',
+    logo: '/brands/adidas.png',
     story: 'Fundada en Alemania por Adi Dassler, Adidas representa la unión impecable entre la innovación deportiva y el estilo clásico de la herencia Originals.',
     heroImage: 'https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&q=80&w=1200'
   },
@@ -29,9 +29,65 @@ export const INITIAL_BRANDS: Brand[] = [
     id: 'newbalance',
     name: 'New Balance',
     slug: 'new-balance',
-    logo: 'NB',
+    logo: '/brands/newbalance.png',
     story: 'Con un enfoque inigualable en el confort, la calidad de los materiales y la artesanía impecable, New Balance une el dad shoe clásico con el estilo moderno.',
     heroImage: 'https://images.unsplash.com/photo-1551201602-3f9456f07bc8?auto=format&fit=crop&q=80&w=1200'
+  },
+  {
+    id: 'puma',
+    name: 'Puma',
+    slug: 'puma',
+    logo: '/brands/puma.png',
+    story: 'Nacida en Herzogenaurach, Alemania, en 1948, Puma une la velocidad del deporte con la actitud de la calle en siluetas que cruzan del estadio al streetwear.',
+    heroImage: ''
+  },
+  {
+    id: 'lacoste',
+    name: 'Lacoste',
+    slug: 'lacoste',
+    logo: '/brands/lacoste.png',
+    story: 'Fundada en 1933 por el tenista René Lacoste, la marca del cocodrilo lleva la elegancia francesa del tenis a zapatillas limpias y atemporales.',
+    heroImage: ''
+  },
+  {
+    id: 'louisvuitton',
+    name: 'Louis Vuitton',
+    slug: 'louis-vuitton',
+    logo: '/brands/louisvuitton.png',
+    story: 'Maison francesa fundada en 1854, referente del lujo. Sus sneakers combinan artesanía de alta gama con el lenguaje de la cultura urbana.',
+    heroImage: ''
+  },
+  {
+    id: 'tommyhilfiger',
+    name: 'Tommy Hilfiger',
+    slug: 'tommy-hilfiger',
+    logo: '/brands/tommyhilfiger.png',
+    story: 'Desde 1985, Tommy Hilfiger reinterpreta el estilo clásico americano con un toque preppy, cómodo y versátil para el día a día.',
+    heroImage: ''
+  },
+  {
+    id: 'armaniexchange',
+    name: 'Armani Exchange',
+    slug: 'armani-exchange',
+    logo: '/brands/armaniexchange.png',
+    story: 'La línea urbana de Giorgio Armani: diseño italiano minimalista con espíritu metropolitano, pensado para moverse por la ciudad con estilo.',
+    heroImage: ''
+  },
+  {
+    id: 'skechers',
+    name: 'Skechers',
+    slug: 'skechers',
+    logo: '/brands/skechers.png',
+    story: 'Nacida en California en 1992, Skechers es sinónimo de comodidad: amortiguación, ligereza y diseños para caminar todo el día.',
+    heroImage: ''
+  },
+  {
+    id: 'lecoqsportif',
+    name: 'Le Coq Sportif',
+    slug: 'le-coq-sportif',
+    logo: '/brands/lecoqsportif.png',
+    story: 'Marca francesa con herencia deportiva desde 1882. El gallo representa un estilo retro y sofisticado que vuelve una y otra vez a las calles.',
+    heroImage: ''
   }
 ];
 
