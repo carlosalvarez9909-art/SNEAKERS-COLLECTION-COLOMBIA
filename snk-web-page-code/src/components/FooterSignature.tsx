@@ -25,7 +25,7 @@ const FILL = 0.96; // porción del ancho disponible que ocupa la frase
  * "Sneakers World." en letra gótica roja, ajustada al ancho de la pantalla sin
  * estirar las letras, con 5 estrellas centradas debajo (efecto embudo).
  */
-export const FooterSignature: React.FC = () => {
+export const FooterSignature: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLSpanElement>(null);
   const [fontSize, setFontSize] = useState<number | null>(null);
@@ -50,6 +50,25 @@ export const FooterSignature: React.FC = () => {
   }, []);
 
   const starSize = fontSize ? Math.max(14, Math.round(fontSize * 0.26)) : 28;
+
+  // Versión pequeña (menú de la lupa): tamaño fijo, alineada a la izquierda,
+  // con las estrellas centradas bajo el texto.
+  if (compact) {
+    return (
+      <div className="inline-flex select-none flex-col items-center" role="img" aria-label="Sneakers World. Cinco estrellas">
+        <span aria-hidden="true" className="footer-signature-text whitespace-nowrap" style={{ fontSize: 30 }}>
+          Sneakers World.
+        </span>
+        <span className="mt-1 flex items-center justify-center gap-1.5" aria-hidden="true">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <svg key={i} viewBox="-31 -31 62 62" width={10} height={10}>
+              <path d={STAR_PATH} fill="#d10a1f" />
+            </svg>
+          ))}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className="footer-signature relative mt-16 w-full select-none overflow-hidden py-2" role="img" aria-label="Sneakers World. Cinco estrellas">

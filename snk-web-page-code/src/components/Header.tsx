@@ -4,6 +4,7 @@ import { Search, Heart, ShoppingBag, Settings, Sparkles, Home, LayoutGrid, Info 
 import type { ViewState } from '../types';
 import { OriginalLogo } from './OriginalLogo';
 import { BrandLogo } from './BrandLogo';
+import { FooterSignature } from './FooterSignature';
 
 interface HeaderProps {
   onOpenCart: () => void;
@@ -156,7 +157,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart }) => {
             {showSearchDrop && (
               <div
                 id="search-nav-dropdown"
-                className="fixed inset-x-3 top-[84px] z-50 max-h-[calc(100vh-100px)] overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-950/95 p-4 shadow-2xl shadow-black/80 backdrop-blur-md sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-3 sm:w-[380px]"
+                className="search-panel fixed inset-x-3 top-[84px] z-50 max-h-[calc(100dvh-100px)] overflow-y-auto rounded-2xl border border-neutral-800 p-4 shadow-2xl shadow-black/80 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-3 sm:w-[380px]"
               >
                 <form onSubmit={handleSearchSubmit}>
                   <div className="relative">
@@ -169,7 +170,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart }) => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Escape') setShowSearchDrop(false); }}
-                      className="w-full rounded-full border border-neutral-800 bg-neutral-900 py-2.5 pl-10 pr-4 text-sm text-white placeholder-neutral-500 outline-none transition-all focus:border-white/30 focus:ring-1 focus:ring-white/10"
+                      className="w-full rounded-full border border-neutral-800 bg-neutral-900 py-2.5 pl-10 pr-4 text-base text-white sm:text-sm placeholder-neutral-500 outline-none transition-all focus:border-white/30 focus:ring-1 focus:ring-white/10"
                     />
                   </div>
                 </form>
@@ -265,6 +266,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart }) => {
                     </div>
                   </div>
                 )}
+
+                <div className="mt-4 border-t border-neutral-900 pt-4">
+                  <FooterSignature compact />
+                </div>
               </div>
             )}
           </div>

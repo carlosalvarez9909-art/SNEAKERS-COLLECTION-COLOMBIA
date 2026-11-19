@@ -588,26 +588,23 @@ function MainLayout() {
               </h4>
 
               <ul className="mt-5 space-y-4 text-sm">
-                <li className="flex items-start justify-center gap-2.5 md:justify-start">
-                  <Truck className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
-                  <span>Envíos a todo Colombia con transportadoras aseguradas.</span>
+                <li>
+                  <Truck className="mr-2 inline h-4 w-4 align-[-3px] text-neutral-500" />
+                  Envíos a todo Colombia con transportadoras aseguradas.
                 </li>
 
-                <li className="flex items-start justify-center gap-2.5 md:justify-start">
-                  <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
-                  <span>
-                    WhatsApp:{' '}
-                    <a
-                      href="https://wa.me/573208646516"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-semibold text-white hover:underline"
-                    >
-                      +57 320 864 6516
-                    </a>
-                  </span>
+                <li>
+                  <MessageCircle className="mr-2 inline h-4 w-4 align-[-3px] text-neutral-500" />
+                  WhatsApp:{' '}
+                  <a
+                    href="https://wa.me/573208646516"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-white hover:underline"
+                  >
+                    +57 320 864 6516
+                  </a>
                 </li>
-
               </ul>
             </div>
           </div>
