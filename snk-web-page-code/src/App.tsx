@@ -25,7 +25,6 @@ import {
   ArrowRight,
   CornerDownRight,
   MessageCircle,
-  AtSign,
   Store
 } from 'lucide-react';
 import type { ViewState } from './types';
@@ -385,10 +384,23 @@ const PaymentResultView: React.FC = () => {
   );
 };
 
-const socialLinks = [
-  { label: 'Instagram', href: 'https://www.instagram.com/sneakerscollectionsc/', icon: AtSign },
-  { label: 'Facebook Marketplace', href: 'https://www.facebook.com/marketplace/profile/61592753193624/', icon: Store }
-];
+// Estrella de 5 puntas con lados curvos, centrada en (0,0) y simétrica respecto al eje vertical.
+const STAR_PATH = (() => {
+  const outer = 30;
+  const inner = 9.5;
+  const point = (radius: number, angle: number) =>
+    [radius * Math.sin(angle), -radius * Math.cos(angle)].map(n => n.toFixed(2)).join(' ');
+  let d = '';
+  for (let k = 0; k < 5; k += 1) {
+    const tip = (k * 2 * Math.PI) / 5;
+    const valley = tip + Math.PI / 5;
+    const nextTip = tip + (2 * Math.PI) / 5;
+    d += `${k === 0 ? 'M' : 'L'} ${point(outer, tip)} `;
+    d += `Q ${point(inner * 1.25, (tip + valley) / 2)} ${point(inner, valley)} `;
+    d += `Q ${point(inner * 1.25, (valley + nextTip) / 2)} ${point(outer, nextTip)} `;
+  }
+  return `${d}Z`;
+})();
 
 const footerLinks: { label: string; view: ViewState }[] = [
   { label: 'Inicio', view: { type: 'home' } },
@@ -528,12 +540,14 @@ function MainLayout() {
 
             {/* Marca: logo, descripción y redes */}
             <div className="flex flex-col items-center text-center md:col-span-5 md:items-start md:text-left">
-              <img
-                src="/intro/logo-footer.jpg"
-                alt="Sneakers Collection"
-                className="footer-logo h-36 w-auto cursor-pointer"
+              <button
+                type="button"
                 onClick={() => navigateTo({ type: 'home' })}
-              />
+                aria-label="Ir al inicio"
+                className="transition-transform duration-200 hover:scale-105"
+              >
+                <OriginalLogo size="md" showTagline={false} className="footer-logo" />
+              </button>
 
               <p className="mt-6 max-w-sm text-sm leading-relaxed text-neutral-400">
                 Tienda colombiana de sneakers de alta calidad. Seleccionamos cada par de Jordan,
@@ -543,18 +557,24 @@ function MainLayout() {
               </p>
 
               <div className="mt-6 flex flex-wrap justify-center gap-3 md:justify-start">
-                {socialLinks.map(({ label, href, icon: Icon }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-white/80 transition-colors hover:border-white/40 hover:text-white"
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{label}</span>
-                  </a>
-                ))}
+                <a
+                  href="https://www.instagram.com/sneakerscollectionsc/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-white/80 transition-colors hover:border-white/40 hover:text-white"
+                >
+                  <img src="/social/instagram.png" alt="" className="h-4 w-4" />
+                  <span>Instagram</span>
+                </a>
+                <a
+                  href="https://www.facebook.com/marketplace/profile/61592753193624/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-white/80 transition-colors hover:border-white/40 hover:text-white"
+                >
+                  <Store className="h-4 w-4 text-[#4da3ff]" />
+                  <span>Facebook Marketplace</span>
+                </a>
               </div>
             </div>
 
@@ -605,17 +625,6 @@ function MainLayout() {
                   </span>
                 </li>
 
-                <li className="flex items-start justify-center gap-2.5 md:justify-start">
-                  <AtSign className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
-                  <a
-                    href="https://www.instagram.com/sneakerscollectionsc/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-white hover:underline"
-                  >
-                    @sneakerscollectionsc
-                  </a>
-                </li>
               </ul>
             </div>
           </div>
@@ -623,9 +632,9 @@ function MainLayout() {
           {/* Firma de la marca en letra gótica, roja y a lo ancho */}
           <svg
             className="footer-signature mt-16 block w-full select-none"
-            viewBox="0 0 1000 170"
+            viewBox="0 0 1000 250"
             role="img"
-            aria-label="Sneakers World."
+            aria-label="Sneakers World. Cinco estrellas"
           >
             <text
               x="500"
@@ -636,6 +645,10 @@ function MainLayout() {
             >
               Sneakers World.
             </text>
+            {/* 5 estrellas simétricas, centradas y más angostas que el texto (efecto embudo) */}
+            {[-2, -1, 0, 1, 2].map(i => (
+              <path key={i} d={STAR_PATH} transform={`translate(${500 + i * 70} 200)`} />
+            ))}
           </svg>
 
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-neutral-900 pt-8 text-xs text-neutral-600 sm:flex-row">

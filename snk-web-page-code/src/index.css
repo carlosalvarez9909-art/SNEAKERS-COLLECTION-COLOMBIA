@@ -564,14 +564,13 @@ select {
 }
 
 /* ============ Footer ============ */
-.footer-logo {
-  /* El fondo negro de la imagen se funde con el fondo espacial */
-  mix-blend-mode: screen;
-}
-
 .footer-signature {
   height: auto;
   overflow: visible;
+}
+
+.footer-signature path {
+  fill: #d10a1f;
 }
 
 .footer-signature text {
