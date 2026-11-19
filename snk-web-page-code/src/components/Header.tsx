@@ -4,7 +4,6 @@ import { Search, Heart, ShoppingBag, Settings, Sparkles, Home, LayoutGrid, Info 
 import type { ViewState } from '../types';
 import { OriginalLogo } from './OriginalLogo';
 import { BrandLogo } from './BrandLogo';
-import { FooterSignature } from './FooterSignature';
 
 interface HeaderProps {
   onOpenCart: () => void;
@@ -267,8 +266,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart }) => {
                   </div>
                 )}
 
-                <div className="mt-4 border-t border-neutral-900 pt-4">
-                  <FooterSignature compact />
+                <div className="mt-4 flex justify-center border-t border-neutral-900 pt-5 pb-1">
+                  <img
+                    src="/sneakers-world.png"
+                    alt="Top Quality Shoes · Sneakers World®"
+                    className="h-auto w-[78%] max-w-[280px] select-none"
+                    draggable={false}
+                  />
                 </div>
               </div>
             )}
