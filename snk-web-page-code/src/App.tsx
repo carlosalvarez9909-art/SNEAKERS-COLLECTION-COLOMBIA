@@ -16,7 +16,6 @@ import { SplashIntro } from './components/SplashIntro';
 import { RecommendationsView } from './components/RecommendationsView';
 import { BrandMarquee } from './components/BrandMarquee';
 import { BrandLogo } from './components/BrandLogo';
-import { FooterSignature } from './components/FooterSignature';
 import {
   ShieldCheck,
   Truck,
@@ -609,8 +608,15 @@ function MainLayout() {
             </div>
           </div>
 
-          {/* Firma de la marca en letra gótica, roja y a lo ancho */}
-          <FooterSignature />
+          {/* Logotipo de la marca: Top Quality Shoes · Sneakers World® · 5 estrellas */}
+          <div className="mt-16 flex justify-center">
+            <img
+              src="/sneakers-world.png"
+              alt="Top Quality Shoes · Sneakers World®"
+              className="h-auto w-[92%] max-w-[880px] select-none"
+              draggable={false}
+            />
+          </div>
 
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-neutral-900 pt-8 text-xs text-neutral-600 sm:flex-row">
             <p>© {new Date().getFullYear()} Sneakers Collection. Todos los derechos reservados.</p>

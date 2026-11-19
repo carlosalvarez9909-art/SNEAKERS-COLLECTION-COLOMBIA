@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -572,16 +572,6 @@ select {
 }
 
 /* ============ Footer ============ */
-.footer-signature-text {
-  font-family: "UnifrakturMaguntia", "Cloister Black", serif;
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: 0;
-  color: #d10a1f;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: geometricPrecision;
-}
 
 /* Panel de la lupa: fondo sólido (no depende de color-mix, que falla en iPhone viejos) */
 .search-panel {
