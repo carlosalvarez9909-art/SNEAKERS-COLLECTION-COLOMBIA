@@ -42,7 +42,7 @@ export const LatestDrops: React.FC = () => {
           <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-red-500">
             Recién llegados
           </p>
-          <h2 className="mt-3 text-4xl font-black uppercase italic tracking-[-0.04em] text-white sm:text-5xl">
+          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
             Últimos lanzamientos
           </h2>
         </div>

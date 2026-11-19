@@ -129,9 +129,6 @@ export const CatalogView: React.FC = () => {
     activeView,
     searchQuery,
     setSearchQuery,
-    compareProductIds,
-    toggleCompare,
-    clearCompare,
     formatPrice,
     currency,
     setCurrency
@@ -144,7 +141,6 @@ export const CatalogView: React.FC = () => {
   const [minRating, setMinRating] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [showCompareModal, setShowCompareModal] = useState(false);
 
   // Al llegar desde un tarjetón (Recomendaciones, marcas…) se aplican sus filtros.
   const incomingFilters = activeView.type === 'catalog' ? activeView.filters : undefined;
@@ -218,9 +214,6 @@ export const CatalogView: React.FC = () => {
     return result;
   }, [products, searchQuery, selectedBrandIds, selectedSizes, selectedPrices, selectedTags, minRating, sortBy]);
 
-  const comparedProducts = useMemo(() => {
-    return products.filter(p => compareProductIds.includes(p.id));
-  }, [products, compareProductIds]);
 
   const priceLabel = (range: typeof PRICE_RANGES[number]) =>
     range.max === Infinity
@@ -263,7 +256,7 @@ export const CatalogView: React.FC = () => {
         {/* Page Header */}
         <div className="mb-6 flex flex-col gap-4 border-b border-white/10 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="font-sans text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">
+            <h2 className="font-sans text-2xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-3xl">
               Catálogo de Sneakers
             </h2>
             <p className="text-[10px] font-mono tracking-wider text-neutral-500 uppercase mt-1">
@@ -471,154 +464,6 @@ export const CatalogView: React.FC = () => {
         </main>
 
       </div>
-
-      {/* FLOATING COMPARISON FOOTER PANEL */}
-      {compareProductIds.length > 0 && (
-        <div id="compare-tray" className="fixed bottom-0 left-0 w-full bg-neutral-950/95 border-t border-neutral-900 py-3.5 px-4 backdrop-blur-md shadow-2xl z-40">
-          <div className="mx-auto max-w-7xl flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <span className="rounded bg-amber-500 px-2 py-0.5 text-[9px] font-bold text-neutral-950 font-mono">
-                {compareProductIds.length} SNEAKERS
-              </span>
-              <p className="text-xs text-neutral-300 font-sans hidden sm:block">
-                Has seleccionado modelos para comparar especificaciones técnicas de primera línea.
-              </p>
-            </div>
-            
-            <div className="flex space-x-3">
-              <button
-                id="compare-open-modal-btn"
-                onClick={() => setShowCompareModal(true)}
-                className="rounded-full bg-white text-neutral-950 font-bold text-[10px] tracking-wider uppercase px-5 py-2 hover:bg-neutral-200 transition-colors"
-              >
-                COMPARAR AHORA
-              </button>
-              <button
-                id="compare-clear-all-btn"
-                onClick={clearCompare}
-                className="rounded-full border border-neutral-800 bg-neutral-900 text-neutral-400 font-bold text-[10px] tracking-wider uppercase px-4 py-2 hover:text-white"
-              >
-                Vaciar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* DETAILED SNEAKERS COMPARATIVE MODAL */}
-      {showCompareModal && (
-        <div id="compare-modal-backdrop" className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md">
-          <div id="compare-modal" className="relative w-full max-w-5xl rounded-2xl border border-neutral-800 bg-neutral-950 p-6 shadow-2xl shadow-black max-h-[90vh] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-            
-            {/* Close */}
-            <button
-              id="compare-modal-close"
-              onClick={() => setShowCompareModal(false)}
-              className="absolute right-4 top-4 rounded-lg bg-neutral-900 p-2 text-neutral-400 hover:text-white transition-colors"
-            >
-              <X className="h-4.5 w-4.5" />
-            </button>
-
-            <h3 className="font-sans text-lg font-black uppercase tracking-tight text-white mb-6">
-              Comparativa Técnica Curada
-            </h3>
-
-            {/* Grid table */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 divide-y md:divide-y-0 md:divide-x divide-neutral-900">
-              
-              {/* Row Header Labels */}
-              <div className="hidden md:flex flex-col space-y-12 pr-4 text-xs font-mono text-neutral-500 uppercase self-end pb-8">
-                <div>Calzado</div>
-                <div>Precio Final</div>
-                <div>Valoración</div>
-                <div>Edición</div>
-                <div>Tecnología</div>
-                <div>Materiales</div>
-              </div>
-
-              {/* Items details */}
-              {comparedProducts.map(p => {
-                const finalP = p.basePrice * (1 - p.discount / 100);
-                return (
-                  <div id={`compare-modal-col-${p.id}`} key={p.id} className="pt-4 md:pt-0 md:px-4 space-y-4 text-center">
-                    
-                    {/* Header Image & Name */}
-                    <div className="flex flex-col items-center">
-                      <img 
-                        src={p.images[0]} 
-                        alt="" 
-                        className="h-24 w-24 object-contain mb-2" 
-                        referrerPolicy="no-referrer"
-                      />
-                      <h4 className="text-xs font-extrabold text-white uppercase line-clamp-1">{p.name}</h4>
-                      <button
-                        id={`compare-modal-remove-${p.id}`}
-                        onClick={() => toggleCompare(p.id)}
-                        className="mt-1 flex items-center space-x-1 text-[9px] font-mono text-red-500 hover:underline"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                        <span>Quitar</span>
-                      </button>
-                    </div>
-
-                    {/* Price */}
-                    <div className="py-2 border-y border-neutral-900">
-                      <div className="md:hidden text-[10px] font-sans text-neutral-500 uppercase">Precio</div>
-                      <span className="text-xs font-sans font-bold text-white">{formatPrice(finalP)}</span>
-                      {p.discount > 0 && <p className="text-[9px] font-sans text-neutral-500 line-through">{formatPrice(p.basePrice)}</p>}
-                    </div>
-
-                    {/* Rating */}
-                    <div className="py-2 border-y border-neutral-900 flex flex-col items-center">
-                      <div className="md:hidden text-[10px] font-mono text-neutral-500 uppercase mb-1">Valoración</div>
-                      <div className="flex items-center justify-center space-x-1">
-                        <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
-                        <span className="text-xs font-mono font-bold text-white">{p.rating}</span>
-                      </div>
-                    </div>
-
-                    {/* Edition */}
-                    <div className="py-2 border-y border-neutral-900">
-                      <div className="md:hidden text-[10px] font-mono text-neutral-500 uppercase">Edición</div>
-                      <span className={`rounded-full px-2 py-0.5 text-[9px] font-mono uppercase ${p.isLimited ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'bg-neutral-900 text-neutral-400'}`}>
-                        {p.isLimited ? 'Limitada' : 'Estándar'}
-                      </span>
-                    </div>
-
-                    {/* Technologies */}
-                    <div className="py-2 border-y border-neutral-900">
-                      <div className="md:hidden text-[10px] font-mono text-neutral-500 uppercase mb-1.5">Tecnología</div>
-                      <div className="flex flex-wrap justify-center gap-1.5">
-                        {p.technologies.slice(0, 2).map((tech, i) => (
-                          <span key={i} className="rounded bg-neutral-900 px-1.5 py-0.5 text-[8px] font-mono text-neutral-400">
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Materials */}
-                    <div className="py-2 border-y border-neutral-900">
-                      <div className="md:hidden text-[10px] font-mono text-neutral-500 uppercase mb-1">Materiales</div>
-                      <p className="text-[10px] text-neutral-400 line-clamp-2">{p.materials.join(', ')}</p>
-                    </div>
-
-                  </div>
-                );
-              })}
-
-              {/* Pad with empty slot if less than 3 */}
-              {comparedProducts.length < 3 && Array.from({ length: 3 - comparedProducts.length }).map((_, idx) => (
-                <div key={idx} className="hidden md:flex flex-col items-center justify-center border border-dashed border-neutral-900 rounded-xl p-6 h-56 text-neutral-600 font-mono text-[10px] uppercase">
-                  Casilla Vacía
-                </div>
-              ))}
-
-            </div>
-
-          </div>
-        </div>
-      )}
 
     </div>
   );

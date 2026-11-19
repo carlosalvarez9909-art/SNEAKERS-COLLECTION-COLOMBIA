@@ -72,7 +72,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         {/* Drawer Header */}
         <div className="flex items-center justify-between border-b border-neutral-900 pb-4">
           <div className="flex items-center space-x-2.5">
-            <h3 className="font-sans text-lg font-black uppercase tracking-tight text-white">Tu Carrito</h3>
+            <h3 className="font-sans text-lg font-black uppercase tracking-[-0.06em] luxury-title">Tu Carrito</h3>
             <span className="rounded bg-amber-500 px-2 py-0.5 text-[9px] font-bold text-neutral-950 font-mono">
               {cart.reduce((sum, item) => sum + item.quantity, 0)} ITEMS
             </span>

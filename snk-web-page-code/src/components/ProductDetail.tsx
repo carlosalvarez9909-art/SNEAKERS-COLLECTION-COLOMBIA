@@ -17,8 +17,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
     addToCart, 
     toggleFavorite, 
     isFavorite, 
-    toggleCompare, 
-    compareProductIds, 
     formatPrice, 
     navigateTo,
     addReview,
@@ -63,7 +61,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
   const productReviews = reviews.filter(r => r.productId === product.id);
   const finalPrice = product.basePrice * (1 - product.discount / 100);
   const isFav = isFavorite(product.id);
-  const isCompared = compareProductIds.includes(product.id);
 
   // Handle manual 360-degree spin button
   const handleSpin360 = () => {
@@ -345,15 +342,8 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                 <span>CONSULTAR POR WHATSAPP</span>
               </button>
 
-              {/* Compare and share toggles */}
-              <div className="flex items-center justify-between border-t border-neutral-950 pt-4 text-xs font-mono text-neutral-400">
-                <button
-                  id="detail-compare-toggle"
-                  onClick={() => toggleCompare(product.id)}
-                  className="hover:text-white transition-colors uppercase font-bold flex items-center space-x-1.5"
-                >
-                  <span>{isCompared ? '✓ QUITAR DE COMPARACIÓN' : '+ AGREGAR A COMPARAR'}</span>
-                </button>
+              {/* Compartir */}
+              <div className="flex items-center justify-end border-t border-neutral-950 pt-4 text-xs font-mono text-neutral-400">
                 <button
                   id="detail-share-copy"
                   onClick={() => {

@@ -20,14 +20,14 @@ type Collection = {
   pick: (products: Product[]) => Product[];
 };
 
-// Los colores salen de la paleta RGB de la marca (index.css: --gold-1, --gold-2, --red-1, --red-2).
+// Paleta monocromática: blanco sobre el fondo espacial.
 const COLLECTIONS: Collection[] = [
   {
     id: 'best-sellers',
     title: 'Más vendidos',
     kicker: 'Top ventas',
     description: 'Los pares que nunca se quedan en la bóveda.',
-    accent: '#ff2d55',
+    accent: '#ffffff',
     icon: Flame,
     filters: { isBestSeller: true },
     pick: products =>
@@ -38,7 +38,7 @@ const COLLECTIONS: Collection[] = [
     title: 'Ediciones limitadas',
     kicker: 'Exclusivo',
     description: 'Piezas de tiraje corto para coleccionistas.',
-    accent: '#8b5cf6',
+    accent: '#ffffff',
     icon: Crown,
     filters: { isLimited: true },
     pick: products => products.filter(p => p.isLimited)
@@ -48,7 +48,7 @@ const COLLECTIONS: Collection[] = [
     title: 'Tendencia',
     kicker: 'Lo más buscado',
     description: 'Lo que se está moviendo en la calle ahora.',
-    accent: '#00e5ff',
+    accent: '#ffffff',
     icon: TrendingUp,
     filters: { isTrending: true },
     pick: products => products.filter(p => p.isTrending)
@@ -58,7 +58,7 @@ const COLLECTIONS: Collection[] = [
     title: 'Ofertas',
     kicker: 'Descuentos activos',
     description: 'Referencias premium con precio especial.',
-    accent: '#ffbf00',
+    accent: '#ffffff',
     icon: BadgePercent,
     filters: { onSale: true },
     pick: products => products.filter(p => p.discount > 0).sort((a, b) => b.discount - a.discount)
@@ -125,7 +125,7 @@ const CollectionCard: React.FC<{
         </span>
 
         <h3
-          className={`mt-4 font-sans font-black uppercase leading-[0.9] tracking-[-0.06em] text-white ${
+          className={`mt-4 font-sans font-black uppercase leading-[0.9] tracking-[-0.06em] luxury-title ${
             large ? 'text-4xl sm:text-5xl' : 'text-3xl'
           }`}
         >
@@ -160,10 +160,9 @@ const TopRankings: React.FC = () => {
     <section className="mt-28">
       <div className="text-center">
         <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-neutral-500">Rankings</p>
-        <h2 className="mt-3 font-sans text-3xl font-black uppercase tracking-[-0.06em] text-white sm:text-5xl">
+        <h2 className="mt-3 font-sans text-3xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
           Top 5
         </h2>
-        <div className="title-rgb-bar mx-auto mt-3" />
       </div>
 
       <div className="mt-10 flex flex-wrap justify-center gap-2" role="tablist">
@@ -267,10 +266,9 @@ export const RecommendationsView: React.FC = () => {
           <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-neutral-500">
             Curaduría Sneakers Collection
           </p>
-          <h1 className="mt-3 font-sans text-3xl font-black uppercase tracking-[-0.06em] text-white sm:text-5xl">
+          <h1 className="mt-3 font-sans text-3xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
             Recomendaciones
           </h1>
-          <div className="title-rgb-bar mx-auto mt-3" />
           <p className="mx-auto mt-4 max-w-xl text-xs leading-relaxed text-neutral-400 sm:text-sm">
             Explora por colección o descubre los rankings de la casa.
           </p>

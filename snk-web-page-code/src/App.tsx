@@ -34,10 +34,9 @@ const SectionTitle: React.FC<{
   align?: 'left' | 'center';
 }> = ({ title, subtitle, align = 'left' }) => (
   <div className={align === 'center' ? 'text-center' : 'text-left'}>
-    <h2 className="font-sans text-2xl font-black uppercase tracking-[-0.06em] text-white sm:text-4xl">
+    <h2 className="font-sans text-2xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-4xl">
       {title}
     </h2>
-    <div className={`title-rgb-bar mt-3 ${align === 'center' ? 'mx-auto' : ''}`} />
     {subtitle && (
       <p className="mt-3 max-w-2xl text-xs leading-relaxed text-neutral-400 sm:text-sm mx-0 data-[center=true]:mx-auto" data-center={align === 'center'}>
         {subtitle}
@@ -96,11 +95,10 @@ const BrandView: React.FC<{ brandId: string }> = ({ brandId }) => {
             <BrandLogo brand={brand} className="h-20 w-auto max-w-[260px] sm:h-24" fallbackClassName="hidden" />
           </div>
 
-          <h2 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-[-0.06em] text-white">
+          <h2 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-[-0.06em] luxury-title">
             {brand.name}
           </h2>
 
-          <div className="title-rgb-bar mx-auto" />
 
           <p className="max-w-2xl mx-auto text-xs sm:text-sm text-neutral-300 font-sans leading-relaxed">
             {brand.story}
@@ -264,10 +262,9 @@ const AboutView: React.FC = () => {
               transition={{ duration: 0.9, ease: 'easeOut' }}
               className="flex flex-col items-center"
             >
-              <h2 className="font-sans text-3xl font-black uppercase tracking-[-0.06em] text-white sm:text-5xl">
+              <h2 className="font-sans text-3xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
                 {block.title}
               </h2>
-              <div className="title-rgb-bar mt-4" />
               <p className="mt-5 max-w-md text-sm leading-7 text-neutral-400 sm:text-base">
                 {block.text}
               </p>
@@ -298,7 +295,7 @@ const AboutView: React.FC = () => {
                 <p className="font-mono text-[11px] tracking-[0.3em] text-neutral-500">
                   PASO {index + 1}
                 </p>
-                <h3 className="mt-2 font-sans text-xl font-black uppercase tracking-[-0.04em] text-white sm:text-2xl">
+                <h3 className="mt-2 font-sans text-xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-2xl">
                   {step.title}
                 </h3>
                 <p className="mx-auto mt-2 max-w-sm text-sm text-neutral-400">

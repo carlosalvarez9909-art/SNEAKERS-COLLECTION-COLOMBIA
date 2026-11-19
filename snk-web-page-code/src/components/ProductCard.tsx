@@ -15,14 +15,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
     navigateTo,
     toggleFavorite,
     isFavorite,
-    toggleCompare,
-    compareProductIds,
     formatPrice
   } = useApp();
 
   const cardRef = useRef<HTMLDivElement>(null);
   const isFav = isFavorite(product.id);
-  const isCompared = compareProductIds.includes(product.id);
   const finalPrice = product.basePrice * (1 - product.discount / 100);
   const glowColor = product.colors?.[0]?.hex || '#ffffff';
 
@@ -175,22 +172,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
                 </span>
               )}
             </div>
-
-            <button
-              id={`product-card-compare-${product.id}`}
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                toggleCompare(product.id);
-              }}
-              className={`rounded-full border px-2.5 py-1 text-[8px] font-mono uppercase tracking-[0.16em] transition-all ${
-                isCompared
-                  ? 'border-white bg-white font-bold text-black'
-                  : 'border-white/15 bg-black/25 text-white/70 hover:border-white/30 hover:text-white'
-              }`}
-            >
-              {isCompared ? 'Agregado' : 'Comparar'}
-            </button>
           </div>
         </div>
       </div>

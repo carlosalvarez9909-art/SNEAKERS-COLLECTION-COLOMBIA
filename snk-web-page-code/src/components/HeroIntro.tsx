@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export const HeroIntro: React.FC = () => {
@@ -75,16 +75,6 @@ export const HeroIntro: React.FC = () => {
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className="max-w-xl text-left"
           >
-            <motion.div 
-              initial={{ y: 18, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.15 }}
-              className="mb-4 inline-flex items-center space-x-2 rounded-full border border-white/10 bg-black/30 px-3 py-1 text-[10px] font-mono tracking-[0.22em] text-white/80 backdrop-blur-sm"
-            >
-              <Sparkles className="h-3 w-3 text-white/80" />
-              <span className="uppercase font-bold">{currentBanner.tag}</span>
-            </motion.div>
-
             <motion.h2
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}

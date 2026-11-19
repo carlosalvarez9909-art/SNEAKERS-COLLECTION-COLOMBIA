@@ -155,7 +155,7 @@ export const CheckoutView: React.FC = () => {
         
         {/* Banner header */}
         <div className="mb-10 border-b border-neutral-900 pb-6">
-          <h2 className="font-sans text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">
+          <h2 className="font-sans text-2xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-3xl">
             {isCompleted ? '¡Pedido Confirmado!' : 'Checkout Seguro'}
           </h2>
           <p className="text-[10px] font-mono tracking-wider text-neutral-500 uppercase mt-1">

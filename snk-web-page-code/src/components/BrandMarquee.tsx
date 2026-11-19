@@ -49,7 +49,7 @@ export const BrandMarquee: React.FC<{ title?: string }> = ({ title = 'Nuestras m
               onClick={() => navigateTo({ type: 'brand', brandId: brand.id })}
               tabIndex={index < base.length ? 0 : -1}
               aria-hidden={index >= base.length}
-              className="group flex w-[220px] shrink-0 flex-col items-center rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-6 backdrop-blur-[2px] transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/[0.06]"
+              className="group flex w-[220px] shrink-0 flex-col items-center bg-transparent px-6 py-6 transition-transform duration-300 hover:-translate-y-1"
             >
               <span className="flex h-[72px] items-center justify-center">
                 <BrandLogo

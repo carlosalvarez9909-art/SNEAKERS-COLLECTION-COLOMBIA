@@ -34,7 +34,6 @@ export interface AppContextType {
   currency: CurrencyCode;
   currencyConfig: CurrencyConfig;
   activeView: ViewState;
-  compareProductIds: string[];
   searchQuery: string;
   activeCoupon: Coupon | null;
   
@@ -52,9 +51,6 @@ export interface AppContextType {
   toggleFavorite: (productId: string) => void;
   isFavorite: (productId: string) => boolean;
   
-  // Comparison actions
-  toggleCompare: (productId: string) => void;
-  clearCompare: () => void;
   
   // Currency actions
   setCurrency: (code: CurrencyCode) => void;
@@ -107,7 +103,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [favorites, setFavorites] = useState<string[]>([]);
   const [currency, setCurrencyState] = useState<CurrencyCode>('COP');
   const [activeView, setActiveView] = useState<ViewState>({ type: 'home' });
-  const [compareProductIds, setCompareProductIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
 
@@ -214,21 +209,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const isFavorite = (productId: string) => favorites.includes(productId);
 
-  // Comparison Management
-  const toggleCompare = (productId: string) => {
-    if (compareProductIds.includes(productId)) {
-      setCompareProductIds(compareProductIds.filter(id => id !== productId));
-    } else {
-      if (compareProductIds.length >= 3) {
-        // limit reached, replace the first one
-        setCompareProductIds([...compareProductIds.slice(1), productId]);
-      } else {
-        setCompareProductIds([...compareProductIds, productId]);
-      }
-    }
-  };
-
-  const clearCompare = () => setCompareProductIds([]);
 
   // Currency Converter
   const setCurrency = (code: CurrencyCode) => {
@@ -455,7 +435,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       currency,
       currencyConfig: CURRENCY_MAP[currency],
       activeView,
-      compareProductIds,
       searchQuery,
       activeCoupon,
       
@@ -470,8 +449,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       toggleFavorite,
       isFavorite,
       
-      toggleCompare,
-      clearCompare,
       
       setCurrency,
       formatPrice,
