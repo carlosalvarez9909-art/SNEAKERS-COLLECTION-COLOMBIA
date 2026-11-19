@@ -49,12 +49,13 @@ export const BrandMarquee: React.FC<{ title?: string }> = ({ title = 'Nuestras m
               onClick={() => navigateTo({ type: 'brand', brandId: brand.id })}
               tabIndex={index < base.length ? 0 : -1}
               aria-hidden={index >= base.length}
-              className="group flex w-[220px] shrink-0 flex-col items-center rounded-2xl border border-white/10 bg-white/[0.03] px-10 py-6 backdrop-blur-[2px] transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/[0.06]"
+              className="group flex w-[220px] shrink-0 flex-col items-center rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-6 backdrop-blur-[2px] transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/[0.06]"
             >
-              <span className="flex h-14 items-center justify-center sm:h-16">
+              <span className="flex h-[72px] items-center justify-center">
                 <BrandLogo
                   brand={brand}
-                  className="brand-logo-img h-12 w-auto max-w-[160px] sm:h-14"
+                  fit={{ area: 5600, maxWidth: 170, maxHeight: 70 }}
+                  className="brand-logo-img h-12 w-auto max-w-[170px]"
                   fallbackClassName="brand-wordmark font-sans text-3xl font-black uppercase tracking-[-0.06em] text-transparent transition-colors duration-300 group-hover:text-white sm:text-4xl"
                 />
               </span>

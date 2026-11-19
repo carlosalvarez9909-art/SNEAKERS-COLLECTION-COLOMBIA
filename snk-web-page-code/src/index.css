@@ -636,7 +636,7 @@ select {
 
 /* Logos de marca (siluetas blancas transparentes); brillan al pasar el mouse */
 .brand-logo-img {
-  opacity: 0.75;
+  opacity: 0.9;
   transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
 }
 

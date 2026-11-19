@@ -256,7 +256,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart }) => {
                         >
                           <BrandLogo
                             brand={b}
-                            className="brand-logo-img h-8 w-auto max-w-[84px]"
+                            fit={{ area: 1500, maxWidth: 88, maxHeight: 38 }}
+                            className="brand-logo-img h-8 w-auto max-w-[88px]"
                             fallbackClassName="text-[10px] font-bold uppercase text-neutral-300"
                           />
                         </button>
