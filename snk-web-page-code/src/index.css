@@ -691,3 +691,95 @@ select {
 @media (prefers-reduced-motion: reduce) {
   .float-y { animation: none; }
 }
+
+/* Carruseles deslizables sin barra visible */
+.no-scrollbar {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Sellos de confianza del producto: anillo rojo que gira y brilla */
+.trust-badge {
+  --ring-speed: 6s;
+}
+.trust-ring {
+  position: relative;
+  display: flex;
+  height: 4rem;
+  width: 4rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+}
+.trust-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--angle, 0deg), transparent 0deg, #d10a1f 90deg, rgba(255, 255, 255, 0.9) 120deg, transparent 200deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: trust-spin var(--ring-speed) linear infinite;
+}
+.trust-ring::after {
+  content: '';
+  position: absolute;
+  inset: 10%;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(209, 10, 31, 0.28), transparent 70%);
+  animation: trust-pulse 2.6s ease-in-out infinite;
+}
+.trust-badge:nth-child(2) .trust-ring::after { animation-delay: 0.4s; }
+.trust-badge:nth-child(3) .trust-ring::after { animation-delay: 0.8s; }
+.trust-ring svg {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  filter: drop-shadow(0 0 8px rgba(209, 10, 31, 0.8));
+  transition: transform 0.4s ease, color 0.3s ease;
+}
+.trust-badge:hover .trust-ring svg {
+  color: #e0102a;
+  transform: scale(1.15) rotate(-6deg);
+}
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes trust-spin {
+  to { --angle: 360deg; }
+}
+@keyframes trust-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+/* Barra de progreso de lectura en el inicio */
+.scroll-progress {
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, #8a0614, #e0102a, #ffffff);
+  box-shadow: 0 0 12px rgba(224, 16, 42, 0.8);
+}
+
+/* Aviso suave cuando falta elegir talla */
+@keyframes nudge {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.nudge {
+  animation: nudge 0.45s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trust-ring::before,
+  .trust-ring::after {
+    animation: none;
+  }
+}

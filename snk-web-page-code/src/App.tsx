@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import { LogoRow, PAYMENT_LOGOS, CARRIER_LOGOS } from './components/TrustLogos';
 import type { ViewState } from './types';
-import { motion, AnimatePresence, useInView } from 'motion/react';
+import { motion, AnimatePresence, useInView, useScroll, useSpring } from 'motion/react';
 
 // Mismo formato de título para todas las secciones del sitio.
 const SectionTitle: React.FC<{
@@ -587,6 +587,13 @@ const footerLinks: { label: string; view: ViewState }[] = [
   { label: 'Tus favoritos', view: { type: 'favorites' } }
 ];
 
+// Línea roja arriba que avanza mientras el cliente baja por el inicio.
+const HomeScrollProgress: React.FC = () => {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.3 });
+  return <motion.div style={{ scaleX }} className="scroll-progress fixed inset-x-0 top-0 z-[60] h-[3px]" />;
+};
+
 // Inner App Layout that can safely consume useApp context
 function MainLayout() {
   const { activeView, navigateTo, products } = useApp();
@@ -603,6 +610,7 @@ function MainLayout() {
       case 'home':
         return (
           <div id="home-view" className="space-y-4">
+            <HomeScrollProgress />
 
             {/* Cinematic Carousel Portada */}
             <HeroIntro />
@@ -611,15 +619,17 @@ function MainLayout() {
             <LatestDrops />
 
             {/* Tendencias del momento slider */}
-            <TrendingCarousel />
+            <motion.div {...reveal}>
+              <TrendingCarousel />
+            </motion.div>
 
             <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-              <div className="mb-8">
+              <motion.div {...reveal} className="mb-8">
                 <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-red-500">Exclusivo</p>
                 <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
                   La casa de los sneakers
                 </h2>
-              </div>
+              </motion.div>
 
               <div
                 id="home-new-arrivals-grid"
@@ -634,7 +644,7 @@ function MainLayout() {
                 <button
                   id="home-view-all-catalog-btn"
                   onClick={() => navigateTo({ type: 'catalog' })}
-                  className="group inline-flex items-center space-x-2 rounded-full border border-white/10 bg-white/5 px-7 py-3.5 text-xs font-bold uppercase tracking-[0.22em] text-white/80 transition-colors hover:border-white/20 hover:text-white"
+                  className="red-glow-hover group inline-flex items-center space-x-2 rounded-full border border-white/10 bg-white/5 px-7 py-3.5 text-xs font-bold uppercase tracking-[0.22em] text-white/80 transition-all hover:text-white active:scale-95"
                 >
                   <span>VER CATÁLOGO COMPLETO</span>
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -643,7 +653,9 @@ function MainLayout() {
             </section>
 
             {/* Carrusel de marcas, al final del inicio */}
-            <BrandMarquee />
+            <motion.div {...reveal}>
+              <BrandMarquee />
+            </motion.div>
           </div>
         );
 
