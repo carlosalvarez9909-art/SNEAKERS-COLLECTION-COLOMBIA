@@ -372,3 +372,36 @@ export async function markOrderPaid(id: string) {
   const { error } = await supabase.from('orders').update({ status: 'paid' }).eq('id', id);
   if (error) throw error;
 }
+
+export type RegisteredCustomer = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  city: string | null;
+  createdAt: string;
+};
+
+export async function fetchCustomers(): Promise<RegisteredCustomer[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('customers')
+    .select('id, name, email, phone, city, created_at')
+    .order('created_at', { ascending: false })
+    .limit(1000);
+  if (error) throw error;
+  return (data ?? []).map((row: Record<string, any>) => ({
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    city: row.city,
+    createdAt: new Date(row.created_at).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' })
+  }));
+}
+
+export async function deleteCustomer(id: string) {
+  if (!supabase) return;
+  const { error } = await supabase.from('customers').delete().eq('id', id);
+  if (error) throw error;
+}

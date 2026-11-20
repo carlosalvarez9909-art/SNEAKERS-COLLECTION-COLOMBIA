@@ -239,3 +239,20 @@ create policy "Admins can update orders"
   on public.orders for update to authenticated
   using (public.is_admin()) with check (public.is_admin());
 grant select, update on public.orders to authenticated;
+
+-- Clientes registrados en el club (promos y descuentos). Solo el servidor inserta; el admin lee y borra.
+create table if not exists public.customers (
+  id uuid primary key default gen_random_uuid(),
+  name text not null check (char_length(name) between 2 and 80),
+  email text not null unique check (email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
+  phone text not null check (char_length(phone) between 7 and 20),
+  city text,
+  accepts_marketing boolean not null default true,
+  created_at timestamptz not null default now()
+);
+alter table public.customers enable row level security;
+create policy "admin lee clientes" on public.customers for select to authenticated using (public.is_admin());
+create policy "admin borra clientes" on public.customers for delete to authenticated using (public.is_admin());
+revoke all on public.customers from anon;
+grant select, delete on public.customers to authenticated;
+create index if not exists customers_created_at_idx on public.customers (created_at desc);

@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Product, Brand, Coupon, HeroBanner } from '../types';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import { fetchAdminOrders, updateOrderFulfillment, markOrderPaid, type AdminOrder } from '../lib/catalog';
+import { fetchAdminOrders, updateOrderFulfillment, markOrderPaid, fetchCustomers, deleteCustomer, type AdminOrder, type RegisteredCustomer } from '../lib/catalog';
+import { CustomerSignup } from './CustomerSignup';
 import { 
   Settings, Database, Plus, Trash2, Edit3, Save, CheckCircle, 
   X, ShoppingBag, Tag, Sparkles, RefreshCw, AlertCircle, 
-  UserRound, HelpCircle, MessageCircle, LogOut, ShieldCheck 
+  UserRound, MessageCircle, LogOut, ShieldCheck, Download 
 } from 'lucide-react';
 
 export const AdminPanel: React.FC = () => {
@@ -39,7 +40,7 @@ export const AdminPanel: React.FC = () => {
   const [isUploadingImages, setIsUploadingImages] = useState(false);
 
   // Active Admin Sub-tab state
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'coupons' | 'banners'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'customers' | 'coupons' | 'banners'>('products');
 
   // Form states - Products
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -174,6 +175,49 @@ export const AdminPanel: React.FC = () => {
     // Al entrar se cargan los pedidos (para el contador) y se refrescan al abrir la pestaña.
     if (isAuthenticated) void loadOrders();
   }, [isAuthenticated, activeTab === 'orders']);
+
+  // Clientes registrados en el club (tabla customers).
+  const [customers, setCustomers] = useState<RegisteredCustomer[]>([]);
+  const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
+  const loadCustomers = async () => {
+    if (!isSupabaseConfigured) return;
+    setIsLoadingCustomers(true);
+    try {
+      setCustomers(await fetchCustomers());
+    } catch (error) {
+      setAdminMessage(error instanceof Error ? error.message : 'No se pudieron cargar los clientes.');
+    } finally {
+      setIsLoadingCustomers(false);
+    }
+  };
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'customers') void loadCustomers();
+  }, [isAuthenticated, activeTab]);
+
+  const removeCustomer = async (customer: RegisteredCustomer) => {
+    if (!window.confirm(`¿Borrar a ${customer.name} de los clientes registrados?`)) return;
+    try {
+      await deleteCustomer(customer.id);
+      setCustomers(prev => prev.filter(c => c.id !== customer.id));
+    } catch (error) {
+      setAdminMessage(error instanceof Error ? error.message : 'No se pudo borrar el cliente.');
+    }
+  };
+
+  const exportCustomers = () => {
+    const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
+    const rows = [
+      ['Nombre', 'Correo', 'Teléfono', 'Ciudad', 'Fecha de registro'],
+      ...customers.map(c => [c.name, c.email, c.phone, c.city ?? '', c.createdAt])
+    ];
+    const csv = '\ufeff' + rows.map(row => row.map(escape).join(',')).join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'clientes-sneakers-collection.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   const changeFulfillment = async (order: AdminOrder, fulfillment: AdminOrder['fulfillment']) => {
     try {
@@ -488,56 +532,7 @@ export const AdminPanel: React.FC = () => {
       <div className="bg-transparent text-white min-h-screen">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-3xl border border-neutral-900 bg-neutral-950 p-8">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
-                  <Settings className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-neutral-500">Ajustes</p>
-                  <h2 className="font-sans text-2xl font-black uppercase text-white">Mi cuenta</h2>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="rounded-2xl border border-neutral-900 bg-neutral-900/30 p-5">
-                  <div className="mb-3 flex items-center gap-2 text-amber-500">
-                    <UserRound className="h-4 w-4" />
-                    <span className="text-[11px] font-mono uppercase tracking-[0.2em]">Perfil</span>
-                  </div>
-                  <p className="text-sm text-neutral-300">Nombre: Carlos Alberto</p>
-                  <p className="text-sm text-neutral-300">Correo: carlos@sneakerscollection.com</p>
-                  <p className="text-sm text-neutral-300">Ciudad: Bogotá, Colombia</p>
-                </div>
-
-                <div className="rounded-2xl border border-neutral-900 bg-neutral-900/30 p-5">
-                  <div className="mb-3 flex items-center gap-2 text-amber-500">
-                    <HelpCircle className="h-4 w-4" />
-                    <span className="text-[11px] font-mono uppercase tracking-[0.2em]">Preguntas frecuentes</span>
-                  </div>
-                  <div className="space-y-2 text-sm text-neutral-300">
-                    <p><span className="font-bold text-white">¿Cuánto tarda el envío?</span> De 2 a 5 días hábiles.</p>
-                    <p><span className="font-bold text-white">¿Son originales?</span> Sí, todos los pares pasan por verificación.</p>
-                    <p><span className="font-bold text-white">¿Puedo pagar por WhatsApp?</span> Sí, con coordinación directa.</p>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-neutral-900 bg-neutral-900/30 p-5">
-                  <div className="mb-3 flex items-center gap-2 text-amber-500">
-                    <MessageCircle className="h-4 w-4" />
-                    <span className="text-[11px] font-mono uppercase tracking-[0.2em]">Contacto</span>
-                  </div>
-                  <a
-                    href="https://wa.me/573000000000"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex rounded-full bg-emerald-500 px-4 py-2 text-xs font-bold uppercase text-white hover:bg-emerald-400"
-                  >
-                    Hablar por WhatsApp
-                  </a>
-                </div>
-              </div>
-            </div>
+            <CustomerSignup />
 
             <div className="rounded-3xl border border-neutral-900 bg-neutral-950 p-8">
               <div className="mb-5 flex items-center gap-2 text-amber-500">
@@ -643,6 +638,13 @@ export const AdminPanel: React.FC = () => {
                   {dbOrders.filter(o => o.fulfillment === 'por_despachar' && o.paymentStatus !== 'failed').length}
                 </span>
               )}
+            </button>
+            <button
+              id="admin-tab-customers"
+              onClick={() => { setActiveTab('customers'); }}
+              className={`rounded-lg px-4 py-2 text-xs font-mono tracking-wider uppercase transition-colors ${activeTab === 'customers' ? 'bg-amber-500 text-neutral-950 font-bold' : 'bg-neutral-900 text-neutral-400 hover:text-white'}`}
+            >
+              Clientes
             </button>
             <button
               id="admin-tab-coupons"
@@ -1142,6 +1144,76 @@ export const AdminPanel: React.FC = () => {
                 <h3 className="mt-4 text-sm font-bold text-white uppercase">Sin órdenes registradas</h3>
                 <p className="mt-1 text-xs text-neutral-500">Las compras generadas aparecerán registradas aquí.</p>
               </div>
+            )}
+          </div>
+        )}
+
+        {/* CLIENTES REGISTRADOS */}
+        {activeTab === 'customers' && (
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h3 className="font-sans text-md font-bold text-white uppercase">Clientes registrados ({customers.length})</h3>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={exportCustomers}
+                  disabled={customers.length === 0}
+                  className="flex items-center gap-1.5 rounded-full border border-neutral-800 px-4 py-2 text-[10px] font-bold uppercase text-neutral-300 hover:text-white disabled:opacity-40"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Exportar CSV
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void loadCustomers()}
+                  className="flex items-center gap-1.5 rounded-full border border-neutral-800 px-4 py-2 text-[10px] font-bold uppercase text-neutral-300 hover:text-white"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${isLoadingCustomers ? 'animate-spin' : ''}`} />
+                  Actualizar
+                </button>
+              </div>
+            </div>
+
+            {customers.length > 0 ? (
+              <div className="space-y-3">
+                {customers.map(customer => (
+                  <div key={customer.id} className="flex flex-col gap-3 rounded-2xl border border-neutral-900 bg-neutral-950 p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-2 font-bold text-white">
+                        <UserRound className="h-4 w-4 shrink-0 text-neutral-500" />
+                        <span className="truncate">{customer.name}</span>
+                      </p>
+                      <p className="mt-1 truncate text-sm text-neutral-400">{customer.email}</p>
+                      <p className="text-xs text-neutral-500">
+                        {customer.phone}{customer.city ? ` · ${customer.city}` : ''} · {customer.createdAt}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 gap-2">
+                      <a
+                        href={`https://wa.me/${customer.phone.replace(/\D/g, '').replace(/^(?!57)(3\d{9})$/, '57$1')}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-2 text-[10px] font-bold uppercase text-white hover:bg-emerald-500"
+                      >
+                        <MessageCircle className="h-3.5 w-3.5" />
+                        WhatsApp
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => void removeCustomer(customer)}
+                        title="Borrar cliente"
+                        className="rounded-full border border-neutral-800 p-2 text-neutral-400 hover:border-red-800 hover:text-red-400"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="rounded-2xl border border-neutral-900 bg-neutral-950 p-8 text-center text-sm text-neutral-500">
+                {isLoadingCustomers ? 'Cargando clientes…' : 'Todavía no hay clientes registrados.'}
+              </p>
             )}
           </div>
         )}
