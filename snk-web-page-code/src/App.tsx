@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
 import { HeroIntro } from './components/HeroIntro';
@@ -32,7 +32,7 @@ import {
 } from 'lucide-react';
 import { LogoRow, PAYMENT_LOGOS, CARRIER_LOGOS } from './components/TrustLogos';
 import type { ViewState } from './types';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useInView } from 'motion/react';
 
 // Mismo formato de título para todas las secciones del sitio.
 const SectionTitle: React.FC<{
@@ -202,25 +202,48 @@ const FavoritesView: React.FC = () => {
 
 const storyBlocks = [
   {
-    title: 'Ganadores',
-    text: 'Para quienes se mueven con propósito y no esperan permiso para llegar primero.'
+    title: 'Hecho en la calle',
+    text: 'Nacimos en Cali, entre parches y esquinas. Aquí cada par se gana en la calle, no en la vitrina.'
   },
   {
-    title: 'Soñadores',
-    text: 'Para quienes ven en cada par una historia y se atreven a imaginar más grande.'
+    title: 'Rotación pesada',
+    text: 'Pares para usar, gastar y lucir. Lo que llega se mueve, y lo que se mueve se vuelve leyenda.'
   },
   {
-    title: 'Lujo underground',
-    text: 'Para quienes entienden que el verdadero lujo está en lo que no todos conocen.'
+    title: 'Corona en los pies',
+    text: 'La corona no se hereda: se pisa. Para los que caminan como dueños del barrio.'
   }
 ];
 
 const aboutStats = [
-  { value: '2', label: 'años vendiendo' },
-  { value: '+40', label: 'proveedores aliados' },
-  { value: '+500', label: 'pares entregados' },
-  { value: '+20', label: 'ciudades con envíos' }
+  { value: 2, label: 'años vendiendo' },
+  { value: 40, label: 'proveedores aliados' },
+  { value: 500, label: 'pares entregados' },
+  { value: 20, label: 'ciudades con envíos' }
 ];
+
+// Número que sube desde 0 cuando entra en pantalla.
+const CountUp: React.FC<{ to: number; prefix?: string; duration?: number }> = ({ to, prefix = '', duration = 1.8 }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.6 });
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    let frame = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const progress = Math.min((now - start) / (duration * 1000), 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(to * eased));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [inView, to, duration]);
+
+  return <span ref={ref}>{prefix}{value}</span>;
+};
 
 const salesModels = [
   {
@@ -296,7 +319,9 @@ const AboutView: React.FC = () => {
         <motion.section {...reveal} className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 md:grid-cols-4">
           {aboutStats.map(stat => (
             <div key={stat.label} className="bg-[#050506] px-4 py-8 text-center">
-              <p className="luxury-title font-sans text-4xl font-black tracking-[-0.06em] sm:text-5xl">{stat.value}</p>
+              <p className="luxury-title font-sans text-4xl font-black tabular-nums tracking-[-0.06em] sm:text-5xl">
+                <CountUp to={stat.value} prefix="+" />
+              </p>
               <p className="mt-2 text-xs uppercase tracking-[0.2em] text-neutral-400">{stat.label}</p>
             </div>
           ))}
@@ -306,23 +331,6 @@ const AboutView: React.FC = () => {
           4.9 de calificación promedio de nuestros clientes
         </motion.p>
 
-        {/* Historia */}
-        <section className="py-24">
-          <AboutTitle kicker="Nuestra historia" title="De Cali para todo el país" />
-          <motion.div {...reveal} className="mx-auto mt-10 max-w-3xl space-y-5 text-center text-base leading-8 text-neutral-300">
-            <p>
-              Hace dos años empezamos en Cali con una idea sencilla: que conseguir buenos sneakers
-              en Colombia fuera fácil, rápido y confiable. Pedido a pedido fuimos creciendo gracias
-              a clientes que volvían y nos recomendaban.
-            </p>
-            <p>
-              Hoy trabajamos en alianza con más de 40 proveedores de calzado importado, lo que nos
-              permite tener variedad de marcas, modelos y tallas, y despachar a más de 20 ciudades
-              del país.
-            </p>
-          </motion.div>
-        </section>
-
         {/* Modelos de venta */}
         <section className="pb-24">
           <AboutTitle kicker="Cómo vendemos" title="Al detal y al por mayor" />
@@ -331,16 +339,16 @@ const AboutView: React.FC = () => {
               <motion.div
                 key={title}
                 {...reveal}
-                className="flex flex-col items-center rounded-3xl border border-white/10 bg-white/[0.02] px-6 py-10 text-center"
+                className="glow-card group flex flex-col items-center rounded-3xl border border-white/10 bg-white/[0.02] px-6 py-10 text-center"
               >
-                <Icon className="h-8 w-8 text-white/80" />
+                <Icon className="glow-icon h-8 w-8 text-white/80" />
                 <h3 className="luxury-title mt-5 font-sans text-2xl font-black uppercase tracking-[-0.05em]">{title}</h3>
                 <p className="mt-3 max-w-sm text-sm leading-7 text-neutral-400">{text}</p>
                 {action === 'catalog' ? (
                   <button
                     type="button"
                     onClick={() => navigateTo({ type: 'catalog' })}
-                    className="mt-7 rounded-full bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-black transition-colors hover:bg-neutral-200"
+                    className="glow-button mt-7 rounded-full px-6 py-3 text-xs font-bold uppercase tracking-[0.18em]"
                   >
                     {cta}
                   </button>
@@ -349,7 +357,7 @@ const AboutView: React.FC = () => {
                     href={WHOLESALE_URL}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-7 rounded-full border border-white/25 px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition-colors hover:border-white/60"
+                    className="glow-button mt-7 rounded-full px-6 py-3 text-xs font-bold uppercase tracking-[0.18em]"
                   >
                     {cta}
                   </a>
@@ -388,26 +396,26 @@ const AboutView: React.FC = () => {
                 key={title}
                 {...reveal}
                 transition={{ ...reveal.transition, delay: index * 0.1 }}
-                className="rounded-3xl border border-white/10 bg-white/[0.02] p-6 text-center"
+                className="glow-card group rounded-3xl border border-white/10 bg-white/[0.02] p-6 text-center"
               >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-500">Paso {index + 1}</p>
-                <Icon className="mx-auto mt-4 h-7 w-7 text-white/80" />
-                <h3 className="mt-4 font-sans text-lg font-black uppercase tracking-[-0.03em] text-white">{title}</h3>
+                <p className="glow-title font-sans text-3xl font-black text-white/30">{index + 1}</p>
+                <Icon className="glow-icon mx-auto mt-3 h-7 w-7 text-white/80" />
+                <h3 className="glow-title mt-4 font-sans text-lg font-black uppercase tracking-[-0.03em] text-white">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-neutral-400">{text}</p>
               </motion.div>
             ))}
           </div>
           <motion.div {...reveal} className="mt-12 text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-500">Transportadoras</p>
-            <LogoRow items={CARRIER_LOGOS} fit={{ area: 3200, maxWidth: 130, maxHeight: 48 }} className="mt-6 gap-x-12" />
+            <LogoRow items={CARRIER_LOGOS} fit={{ area: 3200, maxWidth: 140, maxHeight: 48 }} className="mt-6 gap-x-12 gap-y-8" />
           </motion.div>
         </section>
 
         {/* Medios de pago */}
         <section className="pb-24">
-          <AboutTitle kicker="Pagos seguros" title="Medios de pago" />
-          <motion.div {...reveal}>
-            <LogoRow items={PAYMENT_LOGOS} fit={{ area: 3200, maxWidth: 140, maxHeight: 52 }} className="mt-12 gap-x-12 gap-y-8" />
+          <motion.div {...reveal} className="text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-500">Medios de pago</p>
+            <LogoRow items={PAYMENT_LOGOS} fit={{ area: 3200, maxWidth: 140, maxHeight: 52 }} className="mt-6 gap-x-12 gap-y-8" />
           </motion.div>
         </section>
 

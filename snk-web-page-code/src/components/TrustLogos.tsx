@@ -10,6 +10,10 @@ export const PAYMENT_LOGOS = [
 ];
 
 export const CARRIER_LOGOS = [
+  { src: '/shipping/servientrega.png', alt: 'Servientrega' },
+  { src: '/shipping/coordinadora.png', alt: 'Coordinadora' },
+  { src: '/shipping/envia.png', alt: 'Envía' },
+  { src: '/shipping/interrapidisimo.png', alt: 'Inter Rapidísimo' },
   { src: '/shipping/dhl.png', alt: 'DHL' },
   { src: '/shipping/fedex.png', alt: 'FedEx' },
   { src: '/shipping/ups.png', alt: 'UPS' }
