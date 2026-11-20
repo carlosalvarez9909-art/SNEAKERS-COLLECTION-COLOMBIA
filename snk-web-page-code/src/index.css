@@ -662,7 +662,14 @@ select {
 
 /* Título blanco con brillo (Catálogo de Sneakers) */
 .white-glow-title {
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35)) drop-shadow(0 0 24px rgba(255, 255, 255, 0.18));
+  /* Letras blancas con resplandor rojo */
+  filter: drop-shadow(0 0 8px rgba(209, 10, 31, 0.85)) drop-shadow(0 0 22px rgba(209, 10, 31, 0.5));
+}
+
+/* Letras rojas con resplandor blanco (Top rankings) */
+.red-white-glow {
+  color: #e0102a;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.7), 0 0 22px rgba(255, 255, 255, 0.35);
 }
 
 /* Flotación suave (Top rankings) */
