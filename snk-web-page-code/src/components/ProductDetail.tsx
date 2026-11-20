@@ -254,7 +254,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                   <button
                     key={idx}
                     onClick={() => goToImage(idx)}
-                    className={`aspect-square w-16 shrink-0 overflow-hidden rounded-xl border p-1.5 transition-all duration-300 sm:w-20 ${activeImgIdx === idx ? 'border-red-600' : 'border-neutral-900 opacity-60 hover:opacity-100'}`}
+                    className={`aspect-square w-16 shrink-0 overflow-hidden rounded-xl border p-1.5 transition-all duration-300 sm:w-20 ${activeImgIdx === idx ? 'border-neutral-900 opacity-100' : 'border-neutral-900 opacity-40 hover:opacity-100'}`}
                   >
                     <img src={img} alt="" className="h-full w-full object-contain" referrerPolicy="no-referrer" />
                   </button>
