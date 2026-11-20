@@ -628,7 +628,8 @@ select {
 /* Cifras estilo casino */
 .slot-number {
   color: #e0102a;
-  text-shadow: 0 0 14px rgba(209, 10, 31, 0.7), 0 0 34px rgba(209, 10, 31, 0.35);
+  /* El brillo va sobre el número completo (no por dígito) para que no se vean cuadros */
+  filter: drop-shadow(0 0 8px rgba(209, 10, 31, 0.75)) drop-shadow(0 0 22px rgba(209, 10, 31, 0.35));
   font-variant-numeric: tabular-nums;
 }
 

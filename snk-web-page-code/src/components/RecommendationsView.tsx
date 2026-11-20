@@ -171,7 +171,7 @@ const ShowcaseHeader: React.FC<{ title: string; wave?: boolean; glow?: boolean; 
   as = 'h2'
 }) => {
   const Tag = as;
-  const titleClass = `${glow ? 'white-glow-title ' : ''}cursor-default font-sans text-4xl font-black uppercase tracking-[-0.06em] sm:text-6xl`;
+  const titleClass = `${glow ? 'white-glow-title ' : ''}cursor-default font-sans text-[2rem] font-black uppercase leading-[1.05] tracking-[-0.05em] sm:text-5xl lg:text-6xl`;
   return (
     <div className="flex flex-col items-center text-center">
       {wave ? (

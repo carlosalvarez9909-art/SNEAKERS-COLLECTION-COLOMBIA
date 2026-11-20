@@ -375,13 +375,13 @@ const AboutView: React.FC = () => {
             </div>
           ))}
         </motion.section>
-        <motion.p {...reveal} className="mt-5 flex items-center justify-center gap-2 text-sm text-neutral-400">
-          <span className="flex gap-0.5 text-[#d10a1f]">{'★★★★★'}</span>
+        <motion.p {...reveal} className="mt-6 flex flex-col items-center justify-center gap-1.5 text-center text-sm text-neutral-400 sm:flex-row sm:gap-2">
+          <span className="flex gap-0.5 text-base text-[#d10a1f]">{'★★★★★'}</span>
           4.9 de calificación promedio de nuestros clientes
         </motion.p>
 
         {/* Modelos de venta */}
-        <section className="pb-24">
+        <section className="pt-24 pb-24">
           <AboutTitle title="¿Cómo vendemos?" />
           <div className="mt-12 grid gap-5 md:grid-cols-2">
             {salesModels.map(({ icon: Icon, title, text, cta, action }) => (

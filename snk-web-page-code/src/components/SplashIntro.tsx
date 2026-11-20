@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 
-// Duración total de la apertura (logo + desvanecido). No debe pasar de 3 s.
-const SPLASH_MS = 3000;
+// Duración total de la apertura (logo + desvanecido). No debe pasar de 1.5 s.
+const SPLASH_MS = 1400;
 // Momento en que la apertura empieza a desvanecerse y aparece la página.
-const REVEAL_MS = 2550;
+const REVEAL_MS = 1000;
 
 interface SplashIntroProps {
   onReveal: () => void;
@@ -35,7 +35,7 @@ export const SplashIntro: React.FC<SplashIntroProps> = ({ onReveal, onFinish }) 
 
     const fallbackTimer = window.setTimeout(() => {
       if (videoRef.current?.paused) setShowFallback(true);
-    }, 700);
+    }, 400);
     const revealTimer = window.setTimeout(() => {
       setIsLeaving(true);
       callbacks.current.onReveal();
