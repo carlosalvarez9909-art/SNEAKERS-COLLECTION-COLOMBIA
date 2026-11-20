@@ -318,3 +318,57 @@ export async function removeCoupon(couponId: string) {
   const { error } = await supabase.from('coupons').delete().eq('id', couponId);
   if (error) throw error;
 }
+
+// ---------- Pedidos (solo administradores) ----------
+export type AdminOrder = {
+  id: string;
+  reference: string;
+  createdAt: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  address: string;
+  city: string;
+  items: { productId: string; productName: string; size: number; color: string; quantity: number; price: number }[];
+  total: number;
+  paymentStatus: 'pending' | 'paid' | 'failed';
+  paymentMethod: 'bold' | 'contraentrega';
+  fulfillment: 'por_despachar' | 'despachado' | 'entregado' | 'cancelado';
+};
+
+export async function fetchAdminOrders(): Promise<AdminOrder[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(300);
+  if (error) throw error;
+  return (data ?? []).map((row: Record<string, any>) => ({
+    id: row.id,
+    reference: row.reference,
+    createdAt: new Date(row.created_at).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }),
+    customerName: row.customer_name,
+    customerPhone: row.customer_phone,
+    customerEmail: row.customer_email,
+    address: row.customer_address,
+    city: row.customer_city,
+    items: row.items ?? [],
+    total: Number(row.total),
+    paymentStatus: row.status,
+    paymentMethod: row.payment_method ?? 'bold',
+    fulfillment: row.fulfillment ?? 'por_despachar'
+  }));
+}
+
+export async function updateOrderFulfillment(id: string, fulfillment: AdminOrder['fulfillment']) {
+  if (!supabase) throw new Error('Configura Supabase.');
+  const { error } = await supabase.from('orders').update({ fulfillment }).eq('id', id);
+  if (error) throw error;
+}
+
+export async function markOrderPaid(id: string) {
+  if (!supabase) throw new Error('Configura Supabase.');
+  const { error } = await supabase.from('orders').update({ status: 'paid' }).eq('id', id);
+  if (error) throw error;
+}

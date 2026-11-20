@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { LogoRow, PAYMENT_LOGOS } from './TrustLogos';
+import { isSupabaseConfigured } from '../lib/supabase';
 import { 
   X, Check, ShoppingBag, ShieldCheck, Truck, Sparkles, 
   ArrowRight, AlertCircle, ShoppingCart 
@@ -79,10 +80,53 @@ export const CheckoutView: React.FC = () => {
       return;
     }
 
-    const orderObj = placeOrder(customer);
-    setGeneratedOrder(orderObj);
-    setIsCompleted(true);
-    clearCart();
+    void handleCashOnDelivery();
+  };
+
+  // Pedido contra entrega: queda registrado en Supabase y aparece en el panel de administración.
+  const handleCashOnDelivery = async () => {
+    if (!isSupabaseConfigured) {
+      const orderObj = placeOrder(customer);
+      setGeneratedOrder(orderObj);
+      setIsCompleted(true);
+      clearCart();
+      return;
+    }
+    setIsCreatingPayment(true);
+    setPaymentError('');
+    try {
+      const response = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cart.map(item => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+            size: item.selectedSize,
+            color: item.selectedColor.name
+          })),
+          customer,
+          couponCode: activeCoupon?.code
+        })
+      });
+      const result = await response.json() as { reference?: string; total?: number; error?: string };
+      if (!response.ok || !result.reference) {
+        throw new Error(result.error || 'No se pudo registrar el pedido.');
+      }
+      setGeneratedOrder({
+        id: result.reference.slice(0, 12).toUpperCase(),
+        customerName: customer.name,
+        city: customer.city,
+        address: customer.address,
+        totalPrice: result.total
+      });
+      setIsCompleted(true);
+      clearCart();
+    } catch (error) {
+      setPaymentError(error instanceof Error ? error.message : 'No se pudo registrar el pedido.');
+    } finally {
+      setIsCreatingPayment(false);
+    }
   };
 
   const handleBoldPayment = async () => {
@@ -421,9 +465,10 @@ export const CheckoutView: React.FC = () => {
                     <button
                       id="checkout-traditional-submit-btn"
                       onClick={() => document.querySelector<HTMLFormElement>('#checkout-customer-form')?.requestSubmit()}
-                      className="w-full rounded-full bg-white hover:bg-neutral-200 text-neutral-950 font-extrabold text-xs py-4 px-6 tracking-widest transition-all uppercase"
+                      disabled={isCreatingPayment}
+                      className="w-full rounded-full bg-white hover:bg-neutral-200 disabled:cursor-wait disabled:opacity-60 text-neutral-950 font-extrabold text-xs py-4 px-6 tracking-widest transition-all uppercase"
                     >
-                      COMPLETAR PEDIDO CONTRA ENTREGA
+                      {isCreatingPayment ? 'REGISTRANDO PEDIDO...' : 'COMPLETAR PEDIDO CONTRA ENTREGA'}
                     </button>
                   )}
 

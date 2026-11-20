@@ -222,3 +222,20 @@ where id = 'product-images';
 
 -- Puntuación asignada por la tienda (sin reseñas públicas).
 alter table public.products add column if not exists is_top_rated boolean not null default false;
+
+-- Pedidos: método de pago, estado de despacho y acceso de administradores.
+alter table public.orders
+  add column if not exists payment_method text not null default 'bold'
+    check (payment_method in ('bold', 'contraentrega')),
+  add column if not exists fulfillment text not null default 'por_despachar'
+    check (fulfillment in ('por_despachar', 'despachado', 'entregado', 'cancelado'));
+create index if not exists orders_created_at_idx on public.orders (created_at desc);
+drop policy if exists "Admins can read orders" on public.orders;
+create policy "Admins can read orders"
+  on public.orders for select to authenticated
+  using (public.is_admin());
+drop policy if exists "Admins can update orders" on public.orders;
+create policy "Admins can update orders"
+  on public.orders for update to authenticated
+  using (public.is_admin()) with check (public.is_admin());
+grant select, update on public.orders to authenticated;

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Product, Brand, Coupon, HeroBanner } from '../types';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { fetchAdminOrders, updateOrderFulfillment, markOrderPaid, type AdminOrder } from '../lib/catalog';
 import { 
   Settings, Database, Plus, Trash2, Edit3, Save, CheckCircle, 
   X, ShoppingBag, Tag, Sparkles, RefreshCw, AlertCircle, 
@@ -43,6 +44,8 @@ export const AdminPanel: React.FC = () => {
   // Form states - Products
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [dbOrders, setDbOrders] = useState<AdminOrder[]>([]);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(false);
   const [isDraggingImages, setIsDraggingImages] = useState(false);
   const [prodForm, setProdForm] = useState<Partial<Product>>({
     id: '',
@@ -153,6 +156,42 @@ export const AdminPanel: React.FC = () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  // Pedidos reales guardados en Supabase (Bold y contra entrega).
+  const loadOrders = async () => {
+    if (!isSupabaseConfigured) return;
+    setIsLoadingOrders(true);
+    try {
+      setDbOrders(await fetchAdminOrders());
+    } catch (error) {
+      setAdminMessage(error instanceof Error ? error.message : 'No se pudieron cargar los pedidos.');
+    } finally {
+      setIsLoadingOrders(false);
+    }
+  };
+
+  useEffect(() => {
+    // Al entrar se cargan los pedidos (para el contador) y se refrescan al abrir la pestaña.
+    if (isAuthenticated) void loadOrders();
+  }, [isAuthenticated, activeTab === 'orders']);
+
+  const changeFulfillment = async (order: AdminOrder, fulfillment: AdminOrder['fulfillment']) => {
+    try {
+      await updateOrderFulfillment(order.id, fulfillment);
+      setDbOrders(prev => prev.map(o => (o.id === order.id ? { ...o, fulfillment } : o)));
+    } catch (error) {
+      setAdminMessage(error instanceof Error ? error.message : 'No se pudo actualizar el pedido.');
+    }
+  };
+
+  const confirmCashPayment = async (order: AdminOrder) => {
+    try {
+      await markOrderPaid(order.id);
+      setDbOrders(prev => prev.map(o => (o.id === order.id ? { ...o, paymentStatus: 'paid' } : o)));
+    } catch (error) {
+      setAdminMessage(error instanceof Error ? error.message : 'No se pudo marcar como pagado.');
+    }
+  };
 
   // Imagen o video del banner: se sube a Supabase y queda su enlace en el banner.
   const [isUploadingBannerMedia, setIsUploadingBannerMedia] = useState(false);
@@ -599,9 +638,9 @@ export const AdminPanel: React.FC = () => {
               className={`relative rounded-lg px-4 py-2 text-xs font-mono tracking-wider uppercase transition-colors ${activeTab === 'orders' ? 'bg-amber-500 text-neutral-950 font-bold' : 'bg-neutral-900 text-neutral-400 hover:text-white'}`}
             >
               Pedidos
-              {orders.filter(o => o.status === 'pendiente').length > 0 && (
+              {dbOrders.filter(o => o.fulfillment === 'por_despachar' && o.paymentStatus !== 'failed').length > 0 && (
                 <span className="absolute -right-1.5 -top-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white font-mono">
-                  {orders.filter(o => o.status === 'pendiente').length}
+                  {dbOrders.filter(o => o.fulfillment === 'por_despachar' && o.paymentStatus !== 'failed').length}
                 </span>
               )}
             </button>
@@ -1002,71 +1041,98 @@ export const AdminPanel: React.FC = () => {
           </div>
         )}
 
-        {/* 2. ORDERS LOG BOOK VIEW */}
+        {/* 2. PEDIDOS (Supabase) */}
         {activeTab === 'orders' && (
           <div className="space-y-6">
-            <h3 className="font-sans text-md font-bold text-white uppercase">Registro de Órdenes ({orders.length})</h3>
-            
-            {orders.length > 0 ? (
+            <div className="flex items-center justify-between">
+              <h3 className="font-sans text-md font-bold text-white uppercase">Pedidos ({dbOrders.length})</h3>
+              <button
+                type="button"
+                onClick={() => void loadOrders()}
+                className="flex items-center gap-1.5 rounded-full border border-neutral-800 px-4 py-2 text-[10px] font-bold uppercase text-neutral-300 hover:text-white"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${isLoadingOrders ? 'animate-spin' : ''}`} />
+                Actualizar
+              </button>
+            </div>
+
+            {dbOrders.length > 0 ? (
               <div className="space-y-4">
-                {orders.map(order => (
+                {dbOrders.map(order => (
                   <div
                     id={`admin-order-row-${order.id}`}
                     key={order.id}
                     className="rounded-2xl border border-neutral-900 bg-neutral-900/10 p-5 space-y-4"
                   >
-                    {/* Header info */}
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-neutral-900 pb-3 gap-2">
-                      <div className="flex items-center space-x-3">
-                        <span className="font-mono font-black text-amber-500">#{order.id}</span>
+                    <div className="flex flex-col gap-3 border-b border-neutral-900 pb-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono text-xs font-black text-white">#{order.reference.slice(0, 12)}</span>
                         <span className="text-[10px] font-mono text-neutral-500">{order.createdAt}</span>
+                        <span className="rounded-full border border-neutral-800 px-2 py-0.5 text-[9px] font-bold uppercase text-neutral-300">
+                          {order.paymentMethod === 'bold' ? 'Bold' : 'Contra entrega'}
+                        </span>
+                        <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
+                          order.paymentStatus === 'paid'
+                            ? 'bg-emerald-600/15 text-emerald-400'
+                            : order.paymentStatus === 'failed'
+                              ? 'bg-red-600/15 text-red-400'
+                              : 'bg-yellow-600/15 text-yellow-400'
+                        }`}>
+                          {order.paymentStatus === 'paid' ? 'Pagado' : order.paymentStatus === 'failed' ? 'Pago fallido' : 'Pago pendiente'}
+                        </span>
                       </div>
-                      
-                      {/* Order status dropdown */}
-                      <div className="flex items-center space-x-2.5">
-                        <span className="text-[10px] font-mono uppercase text-neutral-500">Estado</span>
+
+                      <div className="flex items-center gap-2">
+                        {order.paymentMethod === 'contraentrega' && order.paymentStatus !== 'paid' && (
+                          <button
+                            type="button"
+                            onClick={() => void confirmCashPayment(order)}
+                            className="rounded-lg border border-emerald-700 px-3 py-1 text-[10px] font-bold uppercase text-emerald-400 hover:bg-emerald-700/10"
+                          >
+                            Marcar pagado
+                          </button>
+                        )}
                         <select
                           id={`admin-order-status-select-${order.id}`}
-                          value={order.status}
-                          onChange={(e) => updateOrderStatus(order.id, e.target.value as any)}
-                          className={`rounded-lg border px-3 py-1 text-xs font-bold font-mono outline-none cursor-pointer ${order.status === 'pendiente' ? 'border-yellow-600 bg-yellow-600/10 text-yellow-500' : order.status === 'completado' ? 'border-emerald-600 bg-emerald-600/10 text-emerald-500' : 'border-red-600 bg-red-600/10 text-red-500'}`}
+                          value={order.fulfillment}
+                          onChange={(e) => void changeFulfillment(order, e.target.value as AdminOrder['fulfillment'])}
+                          className="cursor-pointer rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-white outline-none"
                         >
-                          <option value="pendiente">Pendiente</option>
-                          <option value="completado">Completado</option>
+                          <option value="por_despachar">Por despachar</option>
+                          <option value="despachado">Despachado</option>
+                          <option value="entregado">Entregado</option>
                           <option value="cancelado">Cancelado</option>
                         </select>
                       </div>
                     </div>
 
-                    {/* Client & Items grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans">
-                      {/* Client parameters */}
                       <div className="space-y-1.5">
-                        <p className="text-[10px] font-mono uppercase text-neutral-500">Destinatario y Envío</p>
+                        <p className="text-[10px] font-mono uppercase text-neutral-500">Cliente y envío</p>
                         <p className="font-bold text-white">{order.customerName}</p>
-                        <p className="font-mono text-neutral-400">Tel: {order.customerPhone}</p>
+                        <p className="font-mono text-neutral-400">
+                          Tel: <a className="hover:underline" href={`https://wa.me/57${order.customerPhone.replace(/\D/g, '').replace(/^57/, '')}`} target="_blank" rel="noreferrer">{order.customerPhone}</a>
+                        </p>
                         <p className="font-mono text-neutral-400">Mail: {order.customerEmail}</p>
                         <p className="text-neutral-400">Dirección: {order.address}, {order.city}</p>
                       </div>
 
-                      {/* Items pre-ordered */}
                       <div className="space-y-1.5">
-                        <p className="text-[10px] font-mono uppercase text-neutral-500">Calzado Solicitado</p>
+                        <p className="text-[10px] font-mono uppercase text-neutral-500">Productos</p>
                         <div className="space-y-1 bg-neutral-950 p-2.5 rounded-lg font-mono text-[11px] text-neutral-400">
                           {order.items.map((item, idx) => (
-                            <div key={idx} className="flex justify-between">
-                              <span className="truncate max-w-[200px]">{item.productName} (EU {item.size})</span>
-                              <span>x{item.quantity} - {formatPrice(item.price * item.quantity)}</span>
+                            <div key={idx} className="flex justify-between gap-3">
+                              <span className="truncate">{item.productName} (EU {item.size}, {item.color})</span>
+                              <span className="shrink-0">x{item.quantity} · {formatPrice(item.price * item.quantity)}</span>
                             </div>
                           ))}
                           <div className="flex justify-between border-t border-neutral-900 pt-1.5 mt-1.5 text-xs text-white font-black">
-                            <span>TOTAL DE ORDEN</span>
-                            <span>{formatPrice(order.totalPrice)}</span>
+                            <span>TOTAL</span>
+                            <span>{formatPrice(order.total)}</span>
                           </div>
                         </div>
                       </div>
                     </div>
-
                   </div>
                 ))}
               </div>
