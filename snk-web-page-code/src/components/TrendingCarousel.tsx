@@ -147,7 +147,7 @@ export const TrendingCarousel: React.FC = () => {
         <div className="mb-12 flex flex-col gap-5 border-b border-white/5 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-red-500">
-              Top ventas
+              Top Products
             </p>
 
             <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">

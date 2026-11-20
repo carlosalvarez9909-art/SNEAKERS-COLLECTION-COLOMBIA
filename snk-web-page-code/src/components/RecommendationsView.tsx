@@ -151,6 +151,17 @@ const CollectionCard: React.FC<{
   );
 };
 
+// Estrella roja de 5 puntas con brillo (acompaña el título Top rankings).
+const GlowStar: React.FC = () => (
+  <svg viewBox="-31 -31 62 62" className="h-6 w-6 shrink-0 sm:h-9 sm:w-9" aria-hidden="true">
+    <path
+      d="M0 -30 L7.3 -10.1 L28.5 -9.3 L11.8 3.8 L17.6 24.3 L0 12.5 L-17.6 24.3 L-11.8 3.8 L-28.5 -9.3 L-7.3 -10.1 Z"
+      fill="#e0102a"
+      style={{ filter: 'drop-shadow(0 0 8px rgba(209,10,31,0.8))' }}
+    />
+  </svg>
+);
+
 const TopRankings: React.FC = () => {
   const { products, navigateTo, formatPrice } = useApp();
   const [activeList, setActiveList] = useState<TopListId>('sold');
@@ -160,9 +171,13 @@ const TopRankings: React.FC = () => {
   return (
     <section className="mt-28">
       <div className="text-center">
-        <h2 className="red-glow-label font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-5xl">
-          Top rankings
-        </h2>
+        <div className="float-y inline-flex items-center gap-3 sm:gap-5">
+          <GlowStar />
+          <h2 className="red-glow-label font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-5xl">
+            Top rankings
+          </h2>
+          <GlowStar />
+        </div>
       </div>
 
       <div className="mt-10 flex flex-wrap justify-center gap-2" role="tablist">
@@ -263,11 +278,11 @@ export const RecommendationsView: React.FC = () => {
     <div id="recommendations-page" className="relative min-h-screen bg-transparent text-white">
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="text-center">
-          <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-neutral-500">
+          <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-red-500">
             Sneakers Collection
           </p>
           <WaveTitle
-            text="Recomendaciones"
+            text="¿Quieres algo único?"
             className="mt-3 cursor-default font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-5xl"
           />
           <p className="mx-auto mt-4 max-w-xl text-xs leading-relaxed text-neutral-400 sm:text-sm">
