@@ -644,6 +644,11 @@ select {
   box-shadow: 0 0 0 1px rgba(209, 10, 31, 0.35), 0 0 22px rgba(209, 10, 31, 0.45);
 }
 
+/* Botón activo con el brillo rojo fijo (pestañas del Top) */
+.red-glow-active {
+  box-shadow: 0 0 0 1px rgba(209, 10, 31, 0.35), 0 0 22px rgba(209, 10, 31, 0.45);
+}
+
 /* Título con ola: al pasar el cursor las letras se mueven de derecha a izquierda */
 .wave-title:hover .wave-letter {
   animation: waveLetter 0.6s ease var(--wave-delay, 0ms) both;

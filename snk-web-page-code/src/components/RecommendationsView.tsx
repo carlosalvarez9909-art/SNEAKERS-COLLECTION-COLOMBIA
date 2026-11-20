@@ -162,30 +162,26 @@ const GlowStar: React.FC = () => (
   </svg>
 );
 
-// Mismo encabezado para las dos secciones: 5 estrellas, título blanco con resplandor rojo y línea roja.
-const ShowcaseHeader: React.FC<{ title: string; subtitle?: string; wave?: boolean; as?: 'h1' | 'h2' }> = ({
+// Encabezado de sección: título grande; opcionalmente con resplandor rojo o con línea roja debajo.
+const ShowcaseHeader: React.FC<{ title: string; wave?: boolean; glow?: boolean; line?: boolean; as?: 'h1' | 'h2' }> = ({
   title,
-  subtitle,
   wave = false,
+  glow = false,
+  line = false,
   as = 'h2'
 }) => {
   const Tag = as;
-  const titleClass =
-    'white-glow-title mt-4 cursor-default font-sans text-4xl font-black uppercase tracking-[-0.06em] sm:text-6xl';
+  const titleClass = `${glow ? 'white-glow-title ' : ''}cursor-default font-sans text-4xl font-black uppercase tracking-[-0.06em] sm:text-6xl`;
   return (
     <div className="flex flex-col items-center text-center">
-      <div className="flex items-center gap-1.5 sm:gap-2" aria-hidden="true">
-        {[0, 1, 2, 3, 4].map(i => (
-          <GlowStar key={i} />
-        ))}
-      </div>
       {wave ? (
         <WaveTitle as={as} text={title} className={titleClass} />
       ) : (
         <Tag className={`luxury-title ${titleClass}`}>{title}</Tag>
       )}
-      <span className="mt-5 block h-px w-full max-w-md bg-gradient-to-r from-transparent via-[#d10a1f] to-transparent shadow-[0_0_10px_rgba(209,10,31,0.7)]" />
-      {subtitle && <p className="mt-5 max-w-xl text-sm leading-relaxed text-neutral-400">{subtitle}</p>}
+      {line && (
+        <span className="mt-5 block h-px w-full max-w-md bg-gradient-to-r from-transparent via-[#d10a1f] to-transparent shadow-[0_0_12px_rgba(209,10,31,0.85)]" />
+      )}
     </div>
   );
 };
@@ -197,7 +193,7 @@ const TopRankings: React.FC = () => {
 
   return (
     <section className="mt-28">
-      <ShowcaseHeader title="Top rankings" />
+      <ShowcaseHeader title="Top rankings" glow />
 
       <div className="mt-10 flex flex-wrap justify-center gap-2" role="tablist">
         {TOP_LISTS.map(list => (
@@ -207,10 +203,10 @@ const TopRankings: React.FC = () => {
             role="tab"
             aria-selected={activeList === list.id}
             onClick={() => setActiveList(list.id)}
-            className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${
+            className={`red-glow-hover rounded-full border px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${
               activeList === list.id
-                ? 'border-white bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.35)]'
-                : 'border-white/15 bg-white/[0.03] text-white/70 hover:border-white/35 hover:text-white'
+                ? 'red-glow-active border-[#d10a1f] bg-white/[0.06] text-white'
+                : 'border-white/15 bg-white/[0.03] text-white/70 hover:text-white'
             }`}
           >
             {list.label}
@@ -294,12 +290,7 @@ export const RecommendationsView: React.FC = () => {
   return (
     <div id="recommendations-page" className="relative min-h-screen bg-transparent text-white">
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <ShowcaseHeader
-          as="h1"
-          wave
-          title="¿Quieres algo único?"
-          subtitle="Explora por colección o descubre los rankings de la casa."
-        />
+        <ShowcaseHeader as="h1" wave line title="¿Quieres algo único?" />
 
         <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
           {collections.map(({ collection, items }, index) => (

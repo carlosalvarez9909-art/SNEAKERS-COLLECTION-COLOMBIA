@@ -237,38 +237,39 @@ export const CatalogView: React.FC = () => {
     <div className="bg-transparent text-white min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
-        {/* Encabezado: título arriba y buscador debajo en celular; lado a lado en computador */}
-        <div className="mb-6 flex flex-col gap-5 border-b border-white/10 pb-6 md:flex-row md:items-end md:justify-between md:gap-8">
+        {/* Encabezado: solo el título */}
+        <div className="mb-6 border-b border-white/10 pb-6">
           <h2 className="white-glow-title luxury-title text-[2rem] font-black uppercase leading-[0.95] tracking-[-0.05em] sm:text-5xl">
             Catálogo de
             <br className="sm:hidden" /> Sneakers
           </h2>
-
-          <div className="relative w-full md:w-80">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
-            <input
-              id="catalog-search-inline"
-              type="text"
-              placeholder="Buscar por modelo, marca o SKU..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="red-glow-hover w-full rounded-full border border-white/10 bg-white/[0.03] py-3 pl-11 pr-5 text-left text-sm text-white placeholder-neutral-500 outline-none backdrop-blur-[2px]"
-            />
-          </div>
         </div>
 
         {/* Resultados a la izquierda y botón de filtros en la esquina derecha */}
         <div ref={filtersRef} className="relative flex items-center justify-between gap-3">
-          <span className="text-[11px] uppercase tracking-[0.2em] text-neutral-500">
+          <span className="shrink-0 text-[10px] uppercase tracking-[0.2em] text-neutral-500 sm:text-[11px]">
             {processedProducts.length} {processedProducts.length === 1 ? 'resultado' : 'resultados'}
           </span>
+
+          <div className="flex min-w-0 items-center gap-2">
+          <div className="relative min-w-0">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            <input
+              id="catalog-search-inline"
+              type="text"
+              placeholder="Buscar..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="red-glow-hover h-10 w-[128px] rounded-full border border-white/15 bg-white/[0.03] pl-9 pr-3 text-xs text-white placeholder-neutral-500 outline-none transition-[width] duration-300 sm:w-56 sm:focus:w-64"
+            />
+          </div>
 
           <button
             id="catalog-filters-btn"
             type="button"
             aria-expanded={filtersOpen}
             onClick={() => setFiltersOpen(open => !open)}
-            className={`red-glow-hover inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
+            className={`red-glow-hover inline-flex h-10 items-center gap-2 rounded-full border px-3 text-[11px] sm:px-4 font-bold uppercase tracking-[0.18em] transition-colors ${
               filtersOpen || activeChips.length > 0
                 ? 'border-white/40 bg-white/10 text-white'
                 : 'border-white/15 bg-white/[0.03] text-white/80 hover:border-white/35 hover:text-white'
@@ -281,8 +282,10 @@ export const CatalogView: React.FC = () => {
                 {activeChips.length}
               </span>
             )}
-            <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${filtersOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`hidden h-3.5 w-3.5 transition-transform duration-300 sm:block ${filtersOpen ? 'rotate-180' : ''}`} />
           </button>
+
+          </div>
 
           {filtersOpen && (
             <div
