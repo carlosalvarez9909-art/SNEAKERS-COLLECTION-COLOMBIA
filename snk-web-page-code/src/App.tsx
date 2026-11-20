@@ -28,7 +28,9 @@ import {
   Store,
   ClipboardCheck,
   PackageCheck,
-  Clock
+  Clock,
+  Play,
+  Camera
 } from 'lucide-react';
 import { LogoRow, PAYMENT_LOGOS, CARRIER_LOGOS } from './components/TrustLogos';
 import type { ViewState } from './types';
@@ -200,20 +202,59 @@ const FavoritesView: React.FC = () => {
   );
 };
 
-const storyBlocks = [
-  {
-    title: 'Hecho en la calle',
-    text: 'Nacimos en Cali, entre parches y esquinas. Aquí cada par se gana en la calle, no en la vitrina.'
-  },
-  {
-    title: 'Rotación pesada',
-    text: 'Pares para usar, gastar y lucir. Lo que llega se mueve, y lo que se mueve se vuelve leyenda.'
-  },
-  {
-    title: 'Corona en los pies',
-    text: 'La corona no se hereda: se pisa. Para los que caminan como dueños del barrio.'
-  }
+const evidenceVideos = [
+  { src: '/evidencia/video-1.mp4', poster: '/evidencia/video-1.jpg', title: 'Nike', caption: 'Recién llegados' },
+  { src: '/evidencia/video-2.mp4', poster: '/evidencia/video-2.jpg', title: 'Salomon', caption: 'Revisión previa' },
+  { src: '/evidencia/video-3.mp4', poster: '/evidencia/video-3.jpg', title: 'Listos', caption: 'Rumbo al cliente' }
 ];
+
+const evidencePhotos = [
+  { src: '/evidencia/foto-1.jpg', title: 'NB 9060', caption: 'Full black' },
+  { src: '/evidencia/foto-2.jpg', title: 'Campus 00s', caption: 'Adidas' },
+  { src: '/evidencia/foto-3.jpg', title: 'Tommy', caption: 'Hilfiger' }
+];
+
+const EvidenceCaption: React.FC<{ title: string; caption: string; kind: 'video' | 'photo' }> = ({ title, caption, kind }) => (
+  <>
+    <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-black/55 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.15em] text-white backdrop-blur-sm sm:left-3 sm:top-3 sm:text-[10px]">
+      {kind === 'video' ? <Play className="h-2.5 w-2.5 fill-current sm:h-3 sm:w-3" /> : <Camera className="h-2.5 w-2.5 sm:h-3 sm:w-3" />}
+      <span className="hidden sm:inline">{kind === 'video' ? 'Video' : 'Foto'}</span>
+    </span>
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent px-2 pb-2 pt-10 sm:px-4 sm:pb-4">
+      <p className="glow-title truncate font-sans text-[11px] font-black uppercase tracking-[-0.02em] text-white sm:text-base">{title}</p>
+      <p className="truncate text-[9px] text-neutral-300 sm:text-xs">{caption}</p>
+    </div>
+  </>
+);
+
+// Video que se reproduce solo cuando está en pantalla (ahorra datos en celular).
+const EvidenceVideo: React.FC<(typeof evidenceVideos)[number]> = ({ src, poster, title, caption }) => {
+  const ref = useRef<HTMLVideoElement>(null);
+  const inView = useInView(ref, { amount: 0.4 });
+
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    if (inView) video.play().catch(() => undefined);
+    else video.pause();
+  }, [inView]);
+
+  return (
+    <div className="glow-card group relative aspect-[3/4] overflow-hidden rounded-xl border border-white/10 bg-neutral-900 sm:rounded-2xl">
+      <video
+        ref={ref}
+        src={src}
+        poster={poster}
+        muted
+        loop
+        playsInline
+        preload="none"
+        className="h-full w-full object-cover"
+      />
+      <EvidenceCaption title={title} caption={caption} kind="video" />
+    </div>
+  );
+};
 
 const aboutStats = [
   { value: 2, label: 'años vendiendo' },
@@ -367,18 +408,47 @@ const AboutView: React.FC = () => {
           </div>
         </section>
 
-        {/* Manifiesto */}
+        {/* Evidencia: videos arriba y fotos abajo */}
         <section className="pb-24">
-          <div className="grid gap-10 md:grid-cols-3">
-            {storyBlocks.map(block => (
-              <motion.div key={block.title} {...reveal} className="text-center">
-                <h3 className="luxury-title font-sans text-2xl font-black uppercase tracking-[-0.06em] sm:text-3xl">
-                  {block.title}
-                </h3>
-                <p className="mx-auto mt-3 max-w-xs text-sm leading-7 text-neutral-400">{block.text}</p>
-              </motion.div>
+          <AboutTitle kicker="Directo de la calle" title="Pruebas reales" />
+          <motion.p {...reveal} className="mx-auto mt-4 max-w-xl text-center text-sm leading-7 text-neutral-400">
+            Pares de verdad, revisados y despachados por nosotros. Así se mueve la rotación.
+          </motion.p>
+
+          <motion.div {...reveal} className="mt-10 grid grid-cols-3 gap-2 sm:gap-4">
+            {evidenceVideos.map(video => (
+              <EvidenceVideo key={video.src} {...video} />
             ))}
-          </div>
+          </motion.div>
+
+          <motion.div {...reveal} className="mt-2 grid grid-cols-3 gap-2 sm:mt-4 sm:gap-4">
+            {evidencePhotos.map(photo => (
+              <div
+                key={photo.src}
+                className="glow-card group relative aspect-[3/4] overflow-hidden rounded-xl border border-white/10 bg-neutral-900 sm:rounded-2xl"
+              >
+                <img
+                  src={photo.src}
+                  alt={photo.title}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <EvidenceCaption title={photo.title} caption={photo.caption} kind="photo" />
+              </div>
+            ))}
+          </motion.div>
+
+          <motion.div {...reveal} className="mt-8 text-center">
+            <a
+              href="https://www.instagram.com/sneakerscollectionsc/"
+              target="_blank"
+              rel="noreferrer"
+              className="glow-button inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold uppercase tracking-[0.18em]"
+            >
+              <img src="/social/instagram.png" alt="" className="h-4 w-4" />
+              Ver más en Instagram
+            </a>
+          </motion.div>
         </section>
 
         {/* Envíos */}
