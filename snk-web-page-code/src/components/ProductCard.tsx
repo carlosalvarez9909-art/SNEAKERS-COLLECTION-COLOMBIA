@@ -145,7 +145,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
             </div>
 
             <div className="mt-2">
-              <StarRating rating={product.rating} reviewsCount={product.reviewsCount} />
+              {product.rating > 0 && <StarRating rating={product.rating} />}
             </div>
 
             <h3

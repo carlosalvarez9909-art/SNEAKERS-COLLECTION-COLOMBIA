@@ -25,6 +25,7 @@ type ProductRow = {
   is_limited: boolean;
   is_best_seller: boolean;
   is_trending: boolean;
+  is_top_rated: boolean;
   rating: number;
   reviews_count: number;
   materials: string[];
@@ -84,6 +85,7 @@ export const toProductRow = (product: Product): ProductRow => ({
   is_limited: product.isLimited,
   is_best_seller: product.isBestSeller,
   is_trending: product.isTrending,
+  is_top_rated: product.isTopRated ?? false,
   rating: product.rating,
   reviews_count: product.reviewsCount,
   materials: product.materials
@@ -106,6 +108,7 @@ export const fromProductRow = (row: ProductRow): Product => ({
   isLimited: row.is_limited,
   isBestSeller: row.is_best_seller,
   isTrending: row.is_trending,
+  isTopRated: row.is_top_rated ?? false,
   rating: Number(row.rating),
   reviewsCount: row.reviews_count,
   materials: row.materials ?? []
@@ -266,13 +269,6 @@ export async function importInitialCatalog() {
     .from('catalog_imports')
     .insert({ id: 'initial_catalog_v1' });
   if (markerError) throw markerError;
-}
-
-// Reseña de un cliente: queda guardada en Supabase para todos (la calificación del producto se recalcula sola).
-export async function insertReview(review: Review) {
-  if (!supabase) return;
-  const { error } = await supabase.from('reviews').insert(toReviewRow(review));
-  if (error) throw error;
 }
 
 export async function upsertProduct(product: Product) {

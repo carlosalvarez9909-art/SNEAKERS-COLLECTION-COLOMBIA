@@ -72,7 +72,7 @@ const COLLECTIONS: Collection[] = [
     accent: '#ffffff',
     icon: Star,
     filters: { sortBy: 'rating' },
-    pick: products => [...products].sort((a, b) => b.rating - a.rating)
+    pick: products => products.filter(p => p.isTopRated).sort((a, b) => b.rating - a.rating)
   }
 ];
 
@@ -253,7 +253,7 @@ const TopRankings: React.FC = () => {
                       {product.name}
                     </h3>
                     <div className="mt-2">
-                      <StarRating rating={product.rating} reviewsCount={product.reviewsCount} />
+                      <StarRating rating={product.rating} />
                     </div>
                     <div className="mt-2 flex flex-wrap items-baseline gap-1.5">
                       <span className="text-sm font-black text-white">{formatPrice(finalPrice)}</span>

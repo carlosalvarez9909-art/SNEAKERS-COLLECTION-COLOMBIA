@@ -52,6 +52,7 @@ create table if not exists public.products (
   is_limited boolean not null default false,
   is_best_seller boolean not null default false,
   is_trending boolean not null default false,
+  is_top_rated boolean not null default false,
   rating numeric(3, 2) not null default 0 check (rating between 0 and 5),
   reviews_count integer not null default 0 check (reviews_count >= 0),
   materials jsonb not null default '[]'::jsonb,
@@ -213,45 +214,11 @@ create policy "Admins can delete product images"
   on storage.objects for delete to authenticated
   using (bucket_id = 'product-images' and public.is_admin());
 
--- Los clientes (sin sesión) pueden dejar reseñas, con límites básicos.
-drop policy if exists "Anyone can add a review" on public.reviews;
-create policy "Anyone can add a review"
-  on public.reviews for insert to anon, authenticated
-  with check (
-    rating between 1 and 5
-    and char_length(customer_name) between 2 and 80
-    and char_length(comment) between 3 and 1000
-    and exists (select 1 from public.products p where p.id = product_id)
-  );
-grant insert on public.reviews to anon;
-
--- La calificación y el número de reseñas del producto se recalculan solos.
-create or replace function public.refresh_product_rating()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  pid text := coalesce(new.product_id, old.product_id);
-begin
-  update public.products p
-  set rating = coalesce((select round(avg(r.rating)::numeric, 2) from public.reviews r where r.product_id = pid), 0),
-      reviews_count = (select count(*) from public.reviews r where r.product_id = pid),
-      updated_at = now()
-  where p.id = pid;
-  return null;
-end;
-$$;
-revoke execute on function public.refresh_product_rating() from public, anon, authenticated;
-
-drop trigger if exists reviews_refresh_rating on public.reviews;
-create trigger reviews_refresh_rating
-  after insert or update or delete on public.reviews
-  for each row execute function public.refresh_product_rating();
-
 -- Banners con video: el almacenamiento acepta también MP4/WebM (hasta 50 MB).
 update storage.buckets
-set allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'video/quicktime'],
+set allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm'],
     file_size_limit = 52428800
 where id = 'product-images';
+
+-- Puntuación asignada por la tienda (sin reseñas públicas).
+alter table public.products add column if not exists is_top_rated boolean not null default false;

@@ -17,6 +17,7 @@ export interface Product {
   isTrending: boolean;
   rating: number;
   reviewsCount: number;
+  isTopRated?: boolean; // Marcado por la tienda para Top rating
   materials: string[];
 }
 

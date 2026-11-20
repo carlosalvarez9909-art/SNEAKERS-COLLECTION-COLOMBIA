@@ -270,8 +270,9 @@ export const AdminPanel: React.FC = () => {
       isLimited: false,
       isBestSeller: false,
       isTrending: false,
-      rating: 0,
+      rating: 5,
       reviewsCount: 0,
+      isTopRated: false,
       slug: ''
     });
     setListText({ sizes: '38, 39, 40, 41, 42, 43', materials: '', technologies: '' });
@@ -742,6 +743,21 @@ export const AdminPanel: React.FC = () => {
                     </div>
                   </div>
 
+                  <div className="sm:col-span-3 grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Puntuación (0 a 5)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        value={prodForm.rating ?? 5}
+                        onChange={(e) => setProdForm({ ...prodForm, rating: Math.min(5, Math.max(0, Number(e.target.value))) })}
+                        className="w-full rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-xs text-white outline-none focus:border-amber-500/50"
+                      />
+                    </div>
+                  </div>
+
                   <div className="sm:col-span-3">
                     <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Tallas disponibles (EU, separadas por coma) *</label>
                     <input
@@ -837,7 +853,7 @@ export const AdminPanel: React.FC = () => {
                   </div>
 
                   {/* Badges indicators toggles */}
-                  <div className="sm:col-span-3 grid grid-cols-1 gap-3 border-t border-neutral-900 pt-4 sm:grid-cols-3 sm:gap-4">
+                  <div className="sm:col-span-3 grid grid-cols-1 gap-3 border-t border-neutral-900 pt-4 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
                     <label className="flex items-center space-x-3 cursor-pointer">
                       <input
                         type="checkbox"
@@ -866,6 +882,16 @@ export const AdminPanel: React.FC = () => {
                         className="rounded border-neutral-800 bg-neutral-900 text-amber-500 focus:ring-0"
                       />
                       <span className="text-xs text-neutral-300 font-sans">Tendencia <span className="text-neutral-500">(Recomendaciones)</span></span>
+                    </label>
+
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={prodForm.isTopRated ?? false}
+                        onChange={(e) => setProdForm({ ...prodForm, isTopRated: e.target.checked })}
+                        className="rounded border-neutral-800 bg-neutral-900 text-amber-500 focus:ring-0"
+                      />
+                      <span className="text-xs text-neutral-300 font-sans">Top rating <span className="text-neutral-500">(Top rating y Mejor calificados)</span></span>
                     </label>
                   </div>
 

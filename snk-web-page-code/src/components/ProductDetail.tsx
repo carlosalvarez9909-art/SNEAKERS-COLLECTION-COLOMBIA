@@ -212,12 +212,11 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                   SKU: {product.sku}
                 </span>
                 
-                {/* Rating summary */}
-                <div className="flex items-center space-x-1 border-l border-neutral-800 pl-4">
+                {/* Puntuación asignada por la tienda */}
+                {product.rating > 0 && <div className="flex items-center space-x-1 border-l border-neutral-800 pl-4">
                   <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
-                  <span className="text-xs font-mono font-bold text-white">{product.rating}</span>
-                  <span className="text-xs text-neutral-500 font-mono">({productReviews.length} reseñas)</span>
-                </div>
+                  <span className="text-xs font-mono font-bold text-white">{product.rating.toFixed(1)}</span>
+                </div>}
               </div>
             </div>
 
@@ -403,130 +402,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
           </div>
 
         </div>
-
-        {/* REVIEW CENTER SECTION */}
-        <section className="mt-16 border-t border-neutral-900 pt-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            
-            {/* Left: Star Breakdown and list (7 columns) */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="flex items-center space-x-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500">
-                  <MessageSquare className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-sans text-lg font-bold uppercase text-white">Opiniones de la Comunidad</h3>
-                  <p className="text-[10px] font-mono tracking-wider text-neutral-500 uppercase">Testimonios verificados de compradores reales</p>
-                </div>
-              </div>
-
-              {/* Reviews List */}
-              <div className="space-y-4 max-h-[450px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin' }}>
-                {productReviews.length > 0 ? (
-                  productReviews.map(review => (
-                    <div
-                      id={`review-item-${review.id}`}
-                      key={review.id}
-                      className="rounded-xl border border-neutral-900 bg-neutral-900/10 p-5 space-y-2.5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <div className="h-7 w-7 rounded-full bg-neutral-800 flex items-center justify-center text-[10px] font-bold font-mono">
-                            {review.customerName.charAt(0)}
-                          </div>
-                          <span className="text-xs font-bold">{review.customerName}</span>
-                        </div>
-                        <span className="text-[9px] text-neutral-500 font-mono">{review.createdAt}</span>
-                      </div>
-                      <div className="flex items-center space-x-0.5">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star 
-                            key={i} 
-                            className={`h-3 w-3 ${i < review.rating ? 'fill-amber-500 text-amber-500' : 'text-neutral-700'}`} 
-                          />
-                        ))}
-                      </div>
-                      <p className="text-xs text-neutral-300 font-sans leading-relaxed">
-                        {review.comment}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-xs text-neutral-500 font-sans">Aún no hay reseñas para este modelo. ¡Sé el primero en dejar tu opinión!</p>
-                )}
-              </div>
-            </div>
-
-            {/* Right: Add Review form (5 columns) */}
-            <div className="lg:col-span-5 rounded-2xl border border-neutral-900 bg-neutral-950 p-6 self-start space-y-4">
-              <h4 className="text-xs font-mono tracking-widest text-amber-400 uppercase">Escribir una reseña</h4>
-              
-              <form onSubmit={handleReviewSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Nombre Completo</label>
-                  <input
-                    id="review-name-input"
-                    type="text"
-                    required
-                    placeholder="Ej. Juan Pérez"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    className="w-full rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-xs text-white placeholder-neutral-600 outline-none focus:border-amber-500/50"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Puntuación</label>
-                  <div className="flex space-x-1.5">
-                    {Array.from({ length: 5 }).map((_, i) => {
-                      const starVal = i + 1;
-                      return (
-                        <button
-                          id={`review-form-star-${starVal}`}
-                          key={i}
-                          type="button"
-                          onClick={() => setNewRating(starVal)}
-                          className="text-neutral-500 hover:scale-110 transition-transform"
-                        >
-                          <Star className={`h-5 w-5 ${starVal <= newRating ? 'fill-amber-500 text-amber-500' : 'text-neutral-700'}`} />
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Comentario</label>
-                  <textarea
-                    id="review-comment-textarea"
-                    required
-                    rows={4}
-                    placeholder="Comparte tu opinión sobre la comodidad, los acabados y el tallaje del producto..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className="w-full rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-xs text-white placeholder-neutral-600 outline-none focus:border-amber-500/50 resize-none"
-                  />
-                </div>
-
-                <button
-                  id="review-submit-btn"
-                  type="submit"
-                  className="w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3 text-xs font-bold text-neutral-950 shadow-lg shadow-amber-500/10 transition-all hover:opacity-90"
-                >
-                  ENVIAR RESEÑA VERIFICADA
-                </button>
-
-                {showReviewSuccess && (
-                  <div id="review-success" className="text-center text-xs font-medium text-emerald-500">
-                    ¡Gracias! Tu reseña ha sido guardada y publicada.
-                  </div>
-                )}
-              </form>
-
-            </div>
-
-          </div>
-        </section>
 
         {/* RELATED PRODUCTS */}
         {recommendations.length > 0 && (
