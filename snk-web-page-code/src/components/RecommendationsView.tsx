@@ -181,13 +181,7 @@ const TopRankings: React.FC = () => {
           Top rankings
         </h2>
 
-        <div className="mt-4 flex w-full max-w-md items-center gap-4">
-          <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[#d10a1f]" />
-          <p className="red-glow-label shrink-0 text-xs font-bold uppercase tracking-[0.3em] sm:text-sm">
-            La grasa pa&apos; tu outfit
-          </p>
-          <span className="h-px flex-1 bg-gradient-to-l from-transparent to-[#d10a1f]" />
-        </div>
+        <span className="mt-5 block h-px w-full max-w-md bg-gradient-to-r from-transparent via-[#d10a1f] to-transparent shadow-[0_0_10px_rgba(209,10,31,0.7)]" />
       </div>
 
       <div className="mt-10 flex flex-wrap justify-center gap-2" role="tablist">
