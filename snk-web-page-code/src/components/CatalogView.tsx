@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { BrandLogo } from './BrandLogo';
 import { ProductCard } from './ProductCard';
-import { SlidersHorizontal, Sliders, X, Check, Star, Trash2, ChevronDown } from 'lucide-react';
+import { SlidersHorizontal, Sliders, X, Check, Star, Trash2, ChevronDown, Search } from 'lucide-react';
 import { finalPriceOf, salesScore } from '../lib/productMetrics';
 
 type SortOption = 'default' | 'best-sellers' | 'price-asc' | 'price-desc' | 'rating' | 'discount';
@@ -237,22 +237,24 @@ export const CatalogView: React.FC = () => {
     <div className="bg-transparent text-white min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
-        {/* Page Header */}
-        <div className="mb-6 flex flex-col gap-4 border-b border-white/10 pb-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h2 className="white-glow-title text-4xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
-              Catálogo de Sneakers
-            </h2>
-          </div>
+        {/* Encabezado: título arriba y buscador debajo en celular; lado a lado en computador */}
+        <div className="mb-6 flex flex-col gap-5 border-b border-white/10 pb-6 md:flex-row md:items-end md:justify-between md:gap-8">
+          <h2 className="white-glow-title luxury-title text-[2rem] font-black uppercase leading-[0.95] tracking-[-0.05em] sm:text-5xl">
+            Catálogo de
+            <br className="sm:hidden" /> Sneakers
+          </h2>
 
-          <input
-            id="catalog-search-inline"
-            type="text"
-            placeholder="Buscar por modelo, marca o SKU..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="red-glow-hover w-full rounded-full border border-white/10 bg-white/[0.03] px-5 py-2.5 text-xs text-white placeholder-neutral-500 outline-none backdrop-blur-[2px] md:w-72"
-          />
+          <div className="relative w-full md:w-80">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            <input
+              id="catalog-search-inline"
+              type="text"
+              placeholder="Buscar por modelo, marca o SKU..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="red-glow-hover w-full rounded-full border border-white/10 bg-white/[0.03] py-3 pl-11 pr-5 text-left text-sm text-white placeholder-neutral-500 outline-none backdrop-blur-[2px]"
+            />
+          </div>
         </div>
 
         {/* Resultados a la izquierda y botón de filtros en la esquina derecha */}

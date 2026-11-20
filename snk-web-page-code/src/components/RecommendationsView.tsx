@@ -162,6 +162,34 @@ const GlowStar: React.FC = () => (
   </svg>
 );
 
+// Mismo encabezado para las dos secciones: 5 estrellas, título blanco con resplandor rojo y línea roja.
+const ShowcaseHeader: React.FC<{ title: string; subtitle?: string; wave?: boolean; as?: 'h1' | 'h2' }> = ({
+  title,
+  subtitle,
+  wave = false,
+  as = 'h2'
+}) => {
+  const Tag = as;
+  const titleClass =
+    'white-glow-title mt-4 cursor-default font-sans text-4xl font-black uppercase tracking-[-0.06em] sm:text-6xl';
+  return (
+    <div className="flex flex-col items-center text-center">
+      <div className="flex items-center gap-1.5 sm:gap-2" aria-hidden="true">
+        {[0, 1, 2, 3, 4].map(i => (
+          <GlowStar key={i} />
+        ))}
+      </div>
+      {wave ? (
+        <WaveTitle as={as} text={title} className={titleClass} />
+      ) : (
+        <Tag className={`luxury-title ${titleClass}`}>{title}</Tag>
+      )}
+      <span className="mt-5 block h-px w-full max-w-md bg-gradient-to-r from-transparent via-[#d10a1f] to-transparent shadow-[0_0_10px_rgba(209,10,31,0.7)]" />
+      {subtitle && <p className="mt-5 max-w-xl text-sm leading-relaxed text-neutral-400">{subtitle}</p>}
+    </div>
+  );
+};
+
 const TopRankings: React.FC = () => {
   const { products, navigateTo, formatPrice } = useApp();
   const [activeList, setActiveList] = useState<TopListId>('sold');
@@ -169,20 +197,7 @@ const TopRankings: React.FC = () => {
 
   return (
     <section className="mt-28">
-      {/* Encabezado: estrellas, título y eslogan alineados al centro, como el logotipo de la marca */}
-      <div className="flex flex-col items-center text-center">
-        <div className="flex items-center gap-1.5 sm:gap-2" aria-hidden="true">
-          {[0, 1, 2, 3, 4].map(i => (
-            <GlowStar key={i} />
-          ))}
-        </div>
-
-        <h2 className="white-glow-title luxury-title mt-4 font-sans text-4xl font-black uppercase tracking-[-0.06em] sm:text-6xl">
-          Top rankings
-        </h2>
-
-        <span className="mt-5 block h-px w-full max-w-md bg-gradient-to-r from-transparent via-[#d10a1f] to-transparent shadow-[0_0_10px_rgba(209,10,31,0.7)]" />
-      </div>
+      <ShowcaseHeader title="Top rankings" />
 
       <div className="mt-10 flex flex-wrap justify-center gap-2" role="tablist">
         {TOP_LISTS.map(list => (
@@ -279,18 +294,12 @@ export const RecommendationsView: React.FC = () => {
   return (
     <div id="recommendations-page" className="relative min-h-screen bg-transparent text-white">
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-red-500">
-            Sneakers Collection
-          </p>
-          <WaveTitle
-            text="¿Quieres algo único?"
-            className="mt-3 cursor-default font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-5xl"
-          />
-          <p className="mx-auto mt-4 max-w-xl text-xs leading-relaxed text-neutral-400 sm:text-sm">
-            Explora por colección o descubre los rankings de la casa.
-          </p>
-        </div>
+        <ShowcaseHeader
+          as="h1"
+          wave
+          title="¿Quieres algo único?"
+          subtitle="Explora por colección o descubre los rankings de la casa."
+        />
 
         <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
           {collections.map(({ collection, items }, index) => (
