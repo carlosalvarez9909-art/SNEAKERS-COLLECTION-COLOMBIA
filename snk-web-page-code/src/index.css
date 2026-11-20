@@ -760,13 +760,6 @@ select {
   50% { opacity: 1; transform: scale(1.12); }
 }
 
-/* Barra de progreso de lectura en el inicio */
-.scroll-progress {
-  transform-origin: 0 50%;
-  background: linear-gradient(90deg, #8a0614, #e0102a, #ffffff);
-  box-shadow: 0 0 12px rgba(224, 16, 42, 0.8);
-}
-
 /* Aviso suave cuando falta elegir talla */
 @keyframes nudge {
   0%, 100% { transform: translateX(0); }
@@ -782,4 +775,17 @@ select {
   .trust-ring::after {
     animation: none;
   }
+}
+
+/* Botón principal: fondo transparente con borde rojo brillante */
+.glow-outline-button {
+  background: rgba(209, 10, 31, 0.12);
+  color: #fff;
+  border: 1px solid rgba(224, 16, 42, 0.9);
+  box-shadow: 0 0 18px rgba(209, 10, 31, 0.45), inset 0 0 14px rgba(209, 10, 31, 0.25);
+  transition: box-shadow 0.3s ease, background-color 0.3s ease, transform 0.2s ease;
+}
+.glow-outline-button:hover {
+  background: rgba(209, 10, 31, 0.2);
+  box-shadow: 0 0 30px rgba(209, 10, 31, 0.7), inset 0 0 18px rgba(209, 10, 31, 0.35);
 }

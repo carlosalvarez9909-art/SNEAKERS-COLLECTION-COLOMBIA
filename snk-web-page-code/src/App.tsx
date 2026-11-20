@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import { LogoRow, PAYMENT_LOGOS, CARRIER_LOGOS } from './components/TrustLogos';
 import type { ViewState } from './types';
-import { motion, AnimatePresence, useInView, useScroll, useSpring } from 'motion/react';
+import { motion, AnimatePresence, useInView } from 'motion/react';
 
 // Mismo formato de título para todas las secciones del sitio.
 const SectionTitle: React.FC<{
@@ -587,13 +587,6 @@ const footerLinks: { label: string; view: ViewState }[] = [
   { label: 'Tus favoritos', view: { type: 'favorites' } }
 ];
 
-// Línea roja arriba que avanza mientras el cliente baja por el inicio.
-const HomeScrollProgress: React.FC = () => {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.3 });
-  return <motion.div style={{ scaleX }} className="scroll-progress fixed inset-x-0 top-0 z-[60] h-[3px]" />;
-};
-
 // Inner App Layout that can safely consume useApp context
 function MainLayout() {
   const { activeView, navigateTo, products } = useApp();
@@ -610,7 +603,6 @@ function MainLayout() {
       case 'home':
         return (
           <div id="home-view" className="space-y-4">
-            <HomeScrollProgress />
 
             {/* Cinematic Carousel Portada */}
             <HeroIntro />
@@ -619,9 +611,7 @@ function MainLayout() {
             <LatestDrops />
 
             {/* Tendencias del momento slider */}
-            <motion.div {...reveal}>
-              <TrendingCarousel />
-            </motion.div>
+            <TrendingCarousel />
 
             <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
               <motion.div {...reveal} className="mb-8">
@@ -653,9 +643,7 @@ function MainLayout() {
             </section>
 
             {/* Carrusel de marcas, al final del inicio */}
-            <motion.div {...reveal}>
-              <BrandMarquee />
-            </motion.div>
+            <BrandMarquee />
           </div>
         );
 
