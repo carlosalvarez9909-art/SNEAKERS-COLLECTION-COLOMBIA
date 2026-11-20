@@ -154,6 +154,45 @@ export const AdminPanel: React.FC = () => {
     };
   }, []);
 
+  // Imagen o video del banner: se sube a Supabase y queda su enlace en el banner.
+  const [isUploadingBannerMedia, setIsUploadingBannerMedia] = useState(false);
+  const handleBannerMedia = async (file?: File) => {
+    if (!file) return;
+    if (!supabase) {
+      setAdminMessage('Configura Supabase antes de subir archivos.');
+      return;
+    }
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type === 'video/mp4' || file.type === 'video/webm';
+    if (!isImage && !isVideo) {
+      setAdminMessage('Sube una imagen (JPG, PNG, WEBP) o un video MP4. Los .MOV del iPhone hay que convertirlos a MP4.');
+      return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      setAdminMessage('El archivo supera el límite de 50 MB.');
+      return;
+    }
+    setIsUploadingBannerMedia(true);
+    setAdminMessage('');
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Inicia sesión antes de subir archivos.');
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
+      const objectPath = `${user.id}/banners/${crypto.randomUUID()}-${safeName}`;
+      const { error } = await supabase.storage
+        .from('product-images')
+        .upload(objectPath, file, { contentType: file.type, upsert: false });
+      if (error) throw error;
+      const { data } = supabase.storage.from('product-images').getPublicUrl(objectPath);
+      setBannerForm(prev => ({ ...prev, image: data.publicUrl }));
+      setAdminMessage(isVideo ? 'Video del banner subido.' : 'Imagen del banner subida.');
+    } catch (error) {
+      setAdminMessage(error instanceof Error ? error.message : 'No se pudo subir el archivo.');
+    } finally {
+      setIsUploadingBannerMedia(false);
+    }
+  };
+
   const handleImageFiles = async (fileList: FileList | File[]) => {
     const remainingSlots = Math.max(0, 10 - (prodForm.images?.length ?? 0));
     const files = Array.from(fileList).slice(0, remainingSlots);
@@ -1177,15 +1216,29 @@ export const AdminPanel: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Imagen URL del Banner (Opcional)</label>
-                  <input
-                    id="admin-banner-img"
-                    type="text"
-                    placeholder="Dejar vacío para usar la imagen del calzado"
-                    value={bannerForm.image}
-                    onChange={(e) => setBannerForm({ ...bannerForm, image: e.target.value })}
-                    className="w-full rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-xs text-white outline-none focus:border-amber-500/50"
-                  />
+                  <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Imagen o video del banner (opcional)</label>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <input
+                      id="admin-banner-img"
+                      type="text"
+                      placeholder="Dejar vacío para usar la foto del calzado, o subir un archivo"
+                      value={bannerForm.image}
+                      onChange={(e) => setBannerForm({ ...bannerForm, image: e.target.value })}
+                      className="w-full rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-xs text-white outline-none focus:border-amber-500/50"
+                    />
+                    <label className={`shrink-0 cursor-pointer rounded-xl border border-amber-500/40 px-4 py-3 text-center text-[10px] font-bold uppercase tracking-wider text-amber-400 ${isUploadingBannerMedia ? 'pointer-events-none opacity-50' : ''}`}>
+                      {isUploadingBannerMedia ? 'Subiendo…' : 'Subir imagen o video'}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
+                        className="hidden"
+                        onChange={(e) => {
+                          void handleBannerMedia(e.target.files?.[0]);
+                          e.target.value = '';
+                        }}
+                      />
+                    </label>
+                  </div>
                 </div>
 
                 <button

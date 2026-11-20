@@ -17,7 +17,8 @@ import {
   upsertBanner,
   upsertBrand,
   upsertCoupon,
-  upsertProduct
+  upsertProduct,
+  insertReview
 } from '../lib/catalog';
 
 export interface AppContextType {
@@ -397,8 +398,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       customerName,
       rating,
       comment,
-      createdAt: 'Justo ahora'
+      createdAt: new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })
     };
+    insertReview(newReview).catch(error => console.error('No se pudo guardar la reseña en Supabase:', error));
     const updatedReviews = [newReview, ...reviews];
     setReviews(updatedReviews);
     saveToLocal('snk_reviews', updatedReviews);

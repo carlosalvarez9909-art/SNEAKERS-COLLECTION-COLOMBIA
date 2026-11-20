@@ -268,6 +268,13 @@ export async function importInitialCatalog() {
   if (markerError) throw markerError;
 }
 
+// Reseña de un cliente: queda guardada en Supabase para todos (la calificación del producto se recalcula sola).
+export async function insertReview(review: Review) {
+  if (!supabase) return;
+  const { error } = await supabase.from('reviews').insert(toReviewRow(review));
+  if (error) throw error;
+}
+
 export async function upsertProduct(product: Product) {
   if (!supabase) throw new Error('Configura Supabase para guardar productos.');
   const { error } = await supabase.from('products').upsert(toProductRow(product));

@@ -22,7 +22,7 @@ export const HeroIntro: React.FC = () => {
 
   const currentBanner = activeBanners[currentIdx];
   const linkedProduct = products.find(p => p.id === currentBanner.productId);
-  const isVideoBanner = /\.mp4($|\?)/i.test(currentBanner.image);
+  const isVideoBanner = /\.(mp4|webm)($|\?)/i.test(currentBanner.image);
 
   const handleNext = () => {
     setCurrentIdx((prev) => (prev + 1) % activeBanners.length);

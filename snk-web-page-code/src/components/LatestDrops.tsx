@@ -4,9 +4,8 @@ import { useApp } from '../context/AppContext';
 export const LatestDrops: React.FC = () => {
   const { products, brands, navigateTo, formatPrice } = useApp();
  
-  // "Recién llegados" = productos destacados del catálogo.
-  // Si luego agregas un campo real (ej. createdAt) a Product, cambia este filtro por un sort por fecha.
-  const drops = products.filter((p) => p.isTrending || p.isBestSeller);
+  // "Recién llegados" = los últimos productos agregados (el catálogo llega del más nuevo al más antiguo).
+  const drops = products.slice(0, 10);
   const track = drops.length ? [...drops, ...drops] : []; // se duplica para el loop continuo
  
   const brandName = (brandId: string) =>
