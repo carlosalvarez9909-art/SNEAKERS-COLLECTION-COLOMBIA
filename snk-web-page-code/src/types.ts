@@ -10,7 +10,7 @@ export interface Product {
   discount: number; // percentage (e.g., 15 for 15% off)
   images: string[]; // array of images for gallery / 360 simulation
   colors: { name: string; hex: string }[];
-  sizes: number[]; // Available US sizes
+  sizes: number[]; // Tallas EU (europeas) disponibles
   technologies: string[];
   isLimited: boolean;
   isBestSeller: boolean;

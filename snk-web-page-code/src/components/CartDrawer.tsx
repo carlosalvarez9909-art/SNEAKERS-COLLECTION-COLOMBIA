@@ -106,7 +106,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   <div className="flex-1 overflow-hidden">
                     <h4 className="truncate text-xs font-bold text-white">{item.product.name}</h4>
                     <p className="text-[10px] text-neutral-500 font-mono">
-                      US {item.selectedSize} | {item.selectedColor.name}
+                      EU {item.selectedSize} | {item.selectedColor.name}
                     </p>
                     
                     {/* Price Tag */}

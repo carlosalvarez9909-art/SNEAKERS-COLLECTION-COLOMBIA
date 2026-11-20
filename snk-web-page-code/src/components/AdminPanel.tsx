@@ -55,7 +55,7 @@ export const AdminPanel: React.FC = () => {
     discount: 0,
     images: [],
     colors: [{ name: 'Black', hex: '#000000' }],
-    sizes: [7, 8, 9, 10, 11],
+    sizes: [38, 39, 40, 41, 42, 43],
     technologies: ['Visible Air-Sole Unit'],
     materials: ['Cuero premium', 'Suela de goma'],
     isLimited: false,
@@ -67,7 +67,7 @@ export const AdminPanel: React.FC = () => {
   });
 
   // Campos de lista escritos como texto separado por comas (tallas, materiales, tecnologías).
-  const [listText, setListText] = useState({ sizes: '7, 8, 9, 10, 11', materials: '', technologies: '' });
+  const [listText, setListText] = useState({ sizes: '38, 39, 40, 41, 42, 43', materials: '', technologies: '' });
   const loadListText = (product: Partial<Product>) =>
     setListText({
       sizes: (product.sizes ?? []).join(', '),
@@ -225,7 +225,7 @@ export const AdminPanel: React.FC = () => {
       discount: 0,
       images: [],
       colors: [{ name: 'Negro', hex: '#000000' }],
-      sizes: [7, 8, 9, 10, 11],
+      sizes: [38, 39, 40, 41, 42, 43],
       technologies: [],
       materials: [],
       isLimited: false,
@@ -235,7 +235,7 @@ export const AdminPanel: React.FC = () => {
       reviewsCount: 0,
       slug: ''
     });
-    setListText({ sizes: '7, 8, 9, 10, 11', materials: '', technologies: '' });
+    setListText({ sizes: '38, 39, 40, 41, 42, 43', materials: '', technologies: '' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -704,10 +704,10 @@ export const AdminPanel: React.FC = () => {
                   </div>
 
                   <div className="sm:col-span-3">
-                    <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Tallas disponibles (US, separadas por coma) *</label>
+                    <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Tallas disponibles (EU, separadas por coma) *</label>
                     <input
                       type="text"
-                      placeholder="Ej: 7, 7.5, 8, 8.5, 9, 10"
+                      placeholder="Ej: 38, 39, 40, 41, 42, 43"
                       value={listText.sizes}
                       onChange={(e) => setListText({ ...listText, sizes: e.target.value })}
                       className="w-full rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-xs text-white outline-none focus:border-amber-500/50"
@@ -990,7 +990,7 @@ export const AdminPanel: React.FC = () => {
                         <div className="space-y-1 bg-neutral-950 p-2.5 rounded-lg font-mono text-[11px] text-neutral-400">
                           {order.items.map((item, idx) => (
                             <div key={idx} className="flex justify-between">
-                              <span className="truncate max-w-[200px]">{item.productName} (US {item.size})</span>
+                              <span className="truncate max-w-[200px]">{item.productName} (EU {item.size})</span>
                               <span>x{item.quantity} - {formatPrice(item.price * item.quantity)}</span>
                             </div>
                           ))}

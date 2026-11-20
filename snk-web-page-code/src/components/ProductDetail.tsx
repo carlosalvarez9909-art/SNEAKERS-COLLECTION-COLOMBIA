@@ -94,9 +94,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
   const handleWhatsAppBuy = () => {
     if (!selectedSize) return;
     const currencySym = formatPrice(finalPrice);
-    const text = `Hola Sneakers Collection! 👋 Estoy interesado en comprar una referencia desde el sitio web:\n\n*Referencia:* ${product.name}\n*SKU:* ${product.sku}\n*Talla:* US ${selectedSize}\n*Color:* ${selectedColor.name}\n*Precio:* ${currencySym}\n\n¿Tienen disponibilidad para envío inmediato? ¡Muchas gracias!`;
+    const text = `Hola Sneakers Collection! 👋 Estoy interesado en comprar una referencia desde el sitio web:\n\n*Referencia:* ${product.name}\n*SKU:* ${product.sku}\n*Talla:* EU ${selectedSize}\n*Color:* ${selectedColor.name}\n*Precio:* ${currencySym}\n\n¿Tienen disponibilidad para envío inmediato? ¡Muchas gracias!`;
     const encodedText = encodeURIComponent(text);
-    window.open(`https://wa.me/573000000000?text=${encodedText}`, '_blank');
+    window.open(`https://wa.me/573208646516?text=${encodedText}`, '_blank');
   };
 
   const handleReviewSubmit = (e: React.FormEvent) => {
@@ -285,11 +285,8 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <h4 className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-                    Tallas Disponibles (US)
+                    Tallas disponibles (EU)
                   </h4>
-                  <span className="text-[10px] font-mono text-neutral-500 underline cursor-pointer">
-                    Guía de tallas
-                  </span>
                 </div>
                 <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
                   {product.sizes.map(size => (
@@ -299,7 +296,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                       onClick={() => setSelectedSize(size)}
                       className={`rounded-lg border py-2.5 text-xs font-mono tracking-wider font-bold transition-colors ${selectedSize === size ? 'bg-amber-500 border-amber-500 text-neutral-950' : 'border-neutral-900 text-neutral-300 hover:border-neutral-700 hover:text-white'}`}
                     >
-                      US {size}
+                      EU {size}
                     </button>
                   ))}
                 </div>

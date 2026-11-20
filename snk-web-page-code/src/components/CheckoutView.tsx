@@ -133,7 +133,7 @@ export const CheckoutView: React.FC = () => {
     const orderId = `SNK-WA-${Date.now().toString().slice(-5)}`;
     const itemsText = cart.map((item, idx) => {
       const unitFinalP = item.product.basePrice * (1 - item.product.discount / 100);
-      return `${idx + 1}. *${item.product.name}* \n   [Talla: US ${item.selectedSize} | Color: ${item.selectedColor.name} | Qty: ${item.quantity}] \n   Precio: ${formatPrice(unitFinalP * item.quantity)}`;
+      return `${idx + 1}. *${item.product.name}* \n   [Talla: EU ${item.selectedSize} | Color: ${item.selectedColor.name} | Qty: ${item.quantity}] \n   Precio: ${formatPrice(unitFinalP * item.quantity)}`;
     }).join('\n\n');
 
     const couponText = activeCoupon ? `\n*Cupón Aplicado:* ${activeCoupon.code} (-${activeCoupon.type === 'percent' ? `${activeCoupon.value}%` : formatPrice(activeCoupon.value)})` : '';
@@ -460,7 +460,7 @@ export const CheckoutView: React.FC = () => {
                         <div className="flex-1 overflow-hidden">
                           <h4 className="truncate font-bold text-white">{item.product.name}</h4>
                           <p className="text-[10px] text-neutral-500 font-sans">
-                            US {item.selectedSize} | {item.selectedColor.name}
+                            EU {item.selectedSize} | {item.selectedColor.name}
                           </p>
                           <p className="text-[10px] text-neutral-400 font-sans mt-0.5">
                             Cant: {item.quantity} × {formatPrice(discountedUnit)}

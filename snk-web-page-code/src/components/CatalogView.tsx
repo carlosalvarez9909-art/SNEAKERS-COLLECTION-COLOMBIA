@@ -34,7 +34,7 @@ const PRICE_RANGES = [
 type PriceRangeId = typeof PRICE_RANGES[number]['id'];
 
 const RATING_OPTIONS = [4.5, 4, 3.5];
-const FALLBACK_SIZES = [6, 7, 8, 8.5, 9, 9.5, 10, 10.5, 11, 12, 13];
+const FALLBACK_SIZES = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
 const currencyOptions = ['COP', 'USD', 'EUR', 'MXN'] as const;
 
 const toggleIn = <T,>(list: T[], value: T) =>
@@ -215,7 +215,7 @@ export const CatalogView: React.FC = () => {
     })),
     ...selectedSizes.map(size => ({
       key: `size-${size}`,
-      label: `Talla ${size}`,
+      label: `Talla EU ${size}`,
       onRemove: () => setSelectedSizes(prev => prev.filter(item => item !== size))
     })),
     ...selectedPrices.map(id => ({
@@ -329,7 +329,7 @@ export const CatalogView: React.FC = () => {
               ))}
             </div>
               </FilterSection>
-              <FilterSection id="size" label="Talla US" summary={selectedSizes.length ? selectedSizes.join(', ') : 'Todas'} openId={openSection} setOpenId={setOpenSection}>
+              <FilterSection id="size" label="Talla EU" summary={selectedSizes.length ? selectedSizes.join(', ') : 'Todas'} openId={openSection} setOpenId={setOpenSection}>
             <div className="grid grid-cols-4 gap-1.5">
               {sizeOptions.map(size => (
                 <button

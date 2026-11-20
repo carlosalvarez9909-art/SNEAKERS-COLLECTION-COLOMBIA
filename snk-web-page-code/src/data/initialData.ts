@@ -112,7 +112,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       { name: 'Black/Black-Light Graphite', hex: '#111111' },
       { name: 'Dark Slate', hex: '#2C2E35' }
     ],
-    sizes: [7, 8, 8.5, 9, 9.5, 10, 10.5, 11, 12],
+    sizes: [40, 41, 42, 42.5, 43, 44, 44.5, 45, 46],
     technologies: ['Visible Air-Sole Unit', 'Encapsulated Forefoot Air', 'Premium Nubuck Upper'],
     isLimited: true,
     isBestSeller: true,
@@ -140,7 +140,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       { name: 'White/Black', hex: '#ffffff' },
       { name: 'Black Accent', hex: '#000000' }
     ],
-    sizes: [6, 7, 8, 8.5, 9, 9.5, 10, 10.5, 11, 12],
+    sizes: [39, 40, 41, 42, 42.5, 43, 44, 44.5, 45, 46],
     technologies: ['Cupsole Construction', 'Perforated Toe Box', 'Padded Low-Cut Collar'],
     isLimited: false,
     isBestSeller: true,
@@ -168,7 +168,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       { name: 'Varsity Red/Black-Sail-Muslin', hex: '#C61E34' },
       { name: 'Sail/Black', hex: '#F0EAD6' }
     ],
-    sizes: [7, 8, 8.5, 9, 9.5, 10, 10.5, 11, 12, 13],
+    sizes: [40, 41, 42, 42.5, 43, 44, 44.5, 45, 46, 47.5],
     technologies: ['Encapsulated Air-Sole Unit', 'High-Top Support Collar', 'Full-Grain Cracked Leather'],
     isLimited: true,
     isBestSeller: true,
@@ -195,7 +195,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     colors: [
       { name: 'Onyx/Core Black', hex: '#1C1C1C' }
     ],
-    sizes: [6, 7, 8, 8.5, 9, 9.5, 10, 10.5, 11, 12],
+    sizes: [39, 40, 41, 42, 42.5, 43, 44, 44.5, 45, 46],
     technologies: ['Full-Length Boost Cushioning', 'Primeknit Engineered Upper', 'Translucent TPU Cage'],
     isLimited: true,
     isBestSeller: false,
@@ -223,7 +223,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       { name: 'White/Green', hex: '#ffffff' },
       { name: 'Green Accent', hex: '#1B4D3E' }
     ],
-    sizes: [7, 8, 8.5, 9, 9.5, 10, 10.5, 11],
+    sizes: [40, 41, 42, 42.5, 43, 44, 44.5, 45],
     technologies: ['Ortholite Comfort Insole', 'Perforated Leather Side Panels', 'Non-Marking Rubber Cupsole'],
     isLimited: false,
     isBestSeller: true,
@@ -251,7 +251,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       { name: 'White/Black-Cool Grey-Infrared', hex: '#FF3366' },
       { name: 'Cool Grey', hex: '#8A8D8F' }
     ],
-    sizes: [7, 8, 8.5, 9, 9.5, 10, 10.5, 11, 12],
+    sizes: [40, 41, 42, 42.5, 43, 44, 44.5, 45, 46],
     technologies: ['Visible Max Air Heel Unit', 'Padded Mesh & Suede Spliced Upper', 'Waffle Pattern Rubber Outsole'],
     isLimited: false,
     isBestSeller: false,
