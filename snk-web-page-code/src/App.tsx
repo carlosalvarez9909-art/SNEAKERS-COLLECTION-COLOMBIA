@@ -263,27 +263,35 @@ const aboutStats = [
   { value: 20, label: 'ciudades con envíos' }
 ];
 
-// Número que sube desde 0 cuando entra en pantalla.
-const CountUp: React.FC<{ to: number; prefix?: string; duration?: number }> = ({ to, prefix = '', duration = 1.8 }) => {
+// Cifra estilo tragamonedas: cada dígito gira y se detiene en su número, de izquierda a derecha.
+const SlotNumber: React.FC<{ value: number; prefix?: string }> = ({ value, prefix = '' }) => {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.6 });
-  const [value, setValue] = useState(0);
+  const digits = String(value).split('').map(Number);
+  const SPINS = 3; // vueltas completas antes de detenerse
 
-  useEffect(() => {
-    if (!inView) return;
-    let frame = 0;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const progress = Math.min((now - start) / (duration * 1000), 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(to * eased));
-      if (progress < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [inView, to, duration]);
-
-  return <span ref={ref}>{prefix}{value}</span>;
+  return (
+    <span ref={ref} className="slot-number inline-flex items-center" aria-label={`${prefix}${value}`}>
+      {prefix && <span aria-hidden="true" className="leading-[1.1em]">{prefix}</span>}
+      {digits.map((digit, i) => {
+        const reel = Array.from({ length: SPINS * 10 + digit + 1 }, (_, n) => n % 10);
+        return (
+          <span key={i} aria-hidden="true" className="relative inline-block h-[1.1em] overflow-hidden">
+            <motion.span
+              className="flex flex-col"
+              initial={{ y: '0em' }}
+              animate={inView ? { y: `-${(reel.length - 1) * 1.1}em` } : { y: '0em' }}
+              transition={{ duration: 1.6 + i * 0.45, ease: [0.12, 0.75, 0.2, 1] }}
+            >
+              {reel.map((n, k) => (
+                <span key={k} className="block h-[1.1em] leading-[1.1em]">{n}</span>
+              ))}
+            </motion.span>
+          </span>
+        );
+      })}
+    </span>
+  );
 };
 
 const salesModels = [
@@ -314,9 +322,9 @@ const WHOLESALE_URL =
   'https://wa.me/573208646516?text=' +
   encodeURIComponent('Hola, quiero información para comprar al por mayor en Sneakers Collection.');
 
-const AboutTitle: React.FC<{ kicker: string; title: string }> = ({ kicker, title }) => (
+const AboutTitle: React.FC<{ kicker?: string; title: string }> = ({ kicker, title }) => (
   <div className="text-center">
-    <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-neutral-500">{kicker}</p>
+    {kicker && <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-neutral-500">{kicker}</p>}
     <h2 className="luxury-title mt-3 font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-5xl">
       {title}
     </h2>
@@ -341,13 +349,13 @@ const AboutView: React.FC = () => {
         {/* Portada */}
         <section className="flex min-h-[70vh] flex-col items-center justify-center py-16 text-center">
           <motion.img
-            src="/sneakers-world.png"
-            alt="Top Quality Shoes · Sneakers World®"
+            src="/logo-sneakers-collection.png"
+            alt="Sneakers Collection"
             draggable={false}
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.9, ease: 'easeOut' }}
-            className="logo-float h-auto w-[92%] max-w-[760px] select-none"
+            className="logo-float h-auto w-[62%] max-w-[340px] select-none"
           />
           <motion.p {...reveal} className="mt-10 max-w-2xl text-base leading-8 text-neutral-300 sm:text-lg">
             Somos una red de distribución y comercialización de calzado importado en Colombia.
@@ -360,8 +368,8 @@ const AboutView: React.FC = () => {
         <motion.section {...reveal} className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 md:grid-cols-4">
           {aboutStats.map(stat => (
             <div key={stat.label} className="bg-[#050506] px-4 py-8 text-center">
-              <p className="luxury-title font-sans text-4xl font-black tabular-nums tracking-[-0.06em] sm:text-5xl">
-                <CountUp to={stat.value} prefix="+" />
+              <p className="font-sans text-4xl font-black tabular-nums tracking-[-0.04em] sm:text-5xl">
+                <SlotNumber value={stat.value} prefix="+" />
               </p>
               <p className="mt-2 text-xs uppercase tracking-[0.2em] text-neutral-400">{stat.label}</p>
             </div>
@@ -374,7 +382,7 @@ const AboutView: React.FC = () => {
 
         {/* Modelos de venta */}
         <section className="pb-24">
-          <AboutTitle kicker="Cómo vendemos" title="Al detal y al por mayor" />
+          <AboutTitle title="¿Cómo vendemos?" />
           <div className="mt-12 grid gap-5 md:grid-cols-2">
             {salesModels.map(({ icon: Icon, title, text, cta, action }) => (
               <motion.div
@@ -410,10 +418,12 @@ const AboutView: React.FC = () => {
 
         {/* Evidencia: videos arriba y fotos abajo */}
         <section className="pb-24">
-          <AboutTitle kicker="Directo de la calle" title="Pruebas reales" />
-          <motion.p {...reveal} className="mx-auto mt-4 max-w-xl text-center text-sm leading-7 text-neutral-400">
-            Pares de verdad, revisados y despachados por nosotros. Así se mueve la rotación.
-          </motion.p>
+          <motion.h2
+            {...reveal}
+            className="luxury-title mx-auto max-w-3xl text-center font-sans text-2xl font-black tracking-[-0.04em] sm:text-4xl"
+          >
+            Pares de verdad, revisados y despachados por nosotros mismos.
+          </motion.h2>
 
           <motion.div {...reveal} className="mt-10 grid grid-cols-3 gap-2 sm:gap-4">
             {evidenceVideos.map(video => (
@@ -438,17 +448,6 @@ const AboutView: React.FC = () => {
             ))}
           </motion.div>
 
-          <motion.div {...reveal} className="mt-8 text-center">
-            <a
-              href="https://www.instagram.com/sneakerscollectionsc/"
-              target="_blank"
-              rel="noreferrer"
-              className="glow-button inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold uppercase tracking-[0.18em]"
-            >
-              <img src="/social/instagram.png" alt="" className="h-4 w-4" />
-              Ver más en Instagram
-            </a>
-          </motion.div>
         </section>
 
         {/* Envíos */}
@@ -476,7 +475,7 @@ const AboutView: React.FC = () => {
             ))}
           </div>
           <motion.div {...reveal} className="mt-12 text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-500">Transportadoras</p>
+            <p className="red-glow-label text-xs font-bold uppercase tracking-[0.3em]">Transportadoras</p>
             <LogoRow items={CARRIER_LOGOS} fit={{ area: 3200, maxWidth: 140, maxHeight: 48 }} className="mt-6 gap-x-12 gap-y-8" />
           </motion.div>
         </section>
@@ -484,15 +483,15 @@ const AboutView: React.FC = () => {
         {/* Medios de pago */}
         <section className="pb-24">
           <motion.div {...reveal} className="text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-500">Medios de pago</p>
+            <p className="red-glow-label text-xs font-bold uppercase tracking-[0.3em]">Medios de pago</p>
             <LogoRow items={PAYMENT_LOGOS} fit={{ area: 3200, maxWidth: 140, maxHeight: 52 }} className="mt-6 gap-x-12 gap-y-8" />
           </motion.div>
         </section>
 
         {/* Cierre */}
         <motion.section {...reveal} className="flex flex-col items-center pb-28 text-center">
-          <h2 className="luxury-title font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-4xl">
-            Encuentra tu próximo par
+          <h2 className="red-glow-label font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-4xl">
+            ¡Encuentra tu próximo par!
           </h2>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <button

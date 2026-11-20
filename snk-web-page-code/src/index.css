@@ -618,3 +618,16 @@ select {
   background: #e3112a;
   transform: translateY(-1px);
 }
+
+/* Texto rojo con brillo (etiquetas y cierre de Sobre nosotros) */
+.red-glow-label {
+  color: #e0102a;
+  text-shadow: 0 0 12px rgba(209, 10, 31, 0.75), 0 0 28px rgba(209, 10, 31, 0.35);
+}
+
+/* Cifras estilo casino */
+.slot-number {
+  color: #e0102a;
+  text-shadow: 0 0 14px rgba(209, 10, 31, 0.7), 0 0 34px rgba(209, 10, 31, 0.35);
+  font-variant-numeric: tabular-nums;
+}
