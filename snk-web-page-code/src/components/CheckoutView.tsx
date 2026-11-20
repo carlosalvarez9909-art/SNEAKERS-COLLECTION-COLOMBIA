@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { LogoRow, PAYMENT_LOGOS } from './TrustLogos';
 import { 
   X, Check, ShoppingBag, ShieldCheck, Truck, Sparkles, 
   ArrowRight, AlertCircle, ShoppingCart 
@@ -425,6 +426,11 @@ export const CheckoutView: React.FC = () => {
                       COMPLETAR PEDIDO CONTRA ENTREGA
                     </button>
                   )}
+
+                  <div className="pt-4 text-center">
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-neutral-500">Medios de pago</p>
+                    <LogoRow items={PAYMENT_LOGOS} fit={{ area: 900, maxWidth: 64, maxHeight: 24 }} className="mt-3 gap-x-5" />
+                  </div>
                 </div>
 
               </div>

@@ -25,8 +25,12 @@ import {
   ArrowRight,
   CornerDownRight,
   MessageCircle,
-  Store
+  Store,
+  ClipboardCheck,
+  PackageCheck,
+  Clock
 } from 'lucide-react';
+import { LogoRow, PAYMENT_LOGOS, CARRIER_LOGOS } from './components/TrustLogos';
 import type { ViewState } from './types';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -206,117 +210,232 @@ const storyBlocks = [
     text: 'Para quienes ven en cada par una historia y se atreven a imaginar más grande.'
   },
   {
-    title: 'Gente de lujo underground',
+    title: 'Lujo underground',
     text: 'Para quienes entienden que el verdadero lujo está en lo que no todos conocen.'
   }
 ];
 
-const howItWorks = [
-  { title: 'Elige tu par', text: 'Explora el catálogo, escoge tu modelo y tu talla.' },
-  { title: 'Paga en línea', text: 'Pagas de forma segura con Bold, directamente desde la tienda.' },
-  { title: 'Recíbelo en casa', text: 'Despachamos a todo el país y te acompañamos por WhatsApp.' }
+const aboutStats = [
+  { value: '2', label: 'años vendiendo' },
+  { value: '+40', label: 'proveedores aliados' },
+  { value: '+500', label: 'pares entregados' },
+  { value: '+20', label: 'ciudades con envíos' }
 ];
 
-// Sobre nosotros: logo flotante centrado, descripción y storytelling con scroll.
+const salesModels = [
+  {
+    icon: ShoppingBag,
+    title: 'Consumidor final',
+    text: 'Compra tu par desde la tienda, paga en línea y recíbelo en la puerta de tu casa.',
+    cta: 'Ver catálogo',
+    action: 'catalog' as const
+  },
+  {
+    icon: Store,
+    title: 'Al por mayor',
+    text: 'Para tiendas, emprendedores y revendedores: precios por volumen y surtido de calzado importado.',
+    cta: 'Cotizar por WhatsApp',
+    action: 'wholesale' as const
+  }
+];
+
+const shippingSteps = [
+  { icon: ClipboardCheck, title: 'Procesamos tu pedido', text: 'Apenas compras, tu pedido entra a preparación de inmediato.' },
+  { icon: PackageCheck, title: 'Verificamos el stock', text: 'Confirmamos tu talla y revisamos el par antes de empacarlo.' },
+  { icon: Truck, title: 'Lo despachamos', text: 'Sale con transportadora y te compartimos la guía por WhatsApp.' },
+  { icon: Clock, title: 'Llega en 1 a 3 días hábiles', text: 'Según tu ciudad y la transportadora, después de enviado.' }
+];
+
+const WHOLESALE_URL =
+  'https://wa.me/573208646516?text=' +
+  encodeURIComponent('Hola, quiero información para comprar al por mayor en Sneakers Collection.');
+
+const AboutTitle: React.FC<{ kicker: string; title: string }> = ({ kicker, title }) => (
+  <div className="text-center">
+    <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-neutral-500">{kicker}</p>
+    <h2 className="luxury-title mt-3 font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-5xl">
+      {title}
+    </h2>
+  </div>
+);
+
+const reveal = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.3 },
+  transition: { duration: 0.8, ease: 'easeOut' as const }
+};
+
+// Sobre nosotros: quiénes somos, cifras, modelos de venta, envíos y medios de pago.
 const AboutView: React.FC = () => {
   const { navigateTo } = useApp();
 
   return (
-    <div
-      id="about-page"
-      className="relative overflow-hidden bg-transparent text-white min-h-screen"
-    >
-      <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-4 text-center">
-        {/* Logo flotante centrado */}
-        <section className="flex min-h-[75vh] w-full flex-col items-center justify-center py-20">
-          <div className="origin-center scale-[1.5] sm:scale-[2]">
-            <div className="logo-float">
-              <OriginalLogo
-                size="md"
-                showTagline={true}
-                className="!items-center !justify-center"
-              />
-            </div>
-          </div>
+    <div id="about-page" className="relative overflow-hidden bg-transparent text-white min-h-screen">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
-          <motion.p
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.8 }}
-            className="mt-24 max-w-2xl text-base leading-8 text-neutral-300 sm:text-lg"
-          >
-            Sneakers Collection es una tienda online colombiana de zapatillas de colección
-            y alta calidad. Seleccionamos cada referencia con criterio y la ponemos a tu
-            alcance con un proceso simple: eliges tu modelo y talla, pagas de forma segura
-            en línea y despachamos tu pedido a todo el país, con acompañamiento por WhatsApp
-            en cada paso.
+        {/* Portada */}
+        <section className="flex min-h-[70vh] flex-col items-center justify-center py-16 text-center">
+          <motion.img
+            src="/sneakers-world.png"
+            alt="Top Quality Shoes · Sneakers World®"
+            draggable={false}
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            className="logo-float h-auto w-[92%] max-w-[760px] select-none"
+          />
+          <motion.p {...reveal} className="mt-10 max-w-2xl text-base leading-8 text-neutral-300 sm:text-lg">
+            Somos una red de distribución y comercialización de calzado importado en Colombia.
+            Nacimos en Cali y hoy llevamos sneakers de alta calidad a todo el país, tanto al
+            consumidor final como a tiendas y revendedores.
           </motion.p>
         </section>
 
-        {/* Storytelling de marca */}
-        <section className="w-full space-y-28 py-16">
-          {storyBlocks.map(block => (
-            <motion.div
-              key={block.title}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 0.9, ease: 'easeOut' }}
-              className="flex flex-col items-center"
-            >
-              <h2 className="font-sans text-3xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
-                {block.title}
-              </h2>
-              <p className="mt-5 max-w-md text-sm leading-7 text-neutral-400 sm:text-base">
-                {block.text}
-              </p>
-            </motion.div>
+        {/* Cifras */}
+        <motion.section {...reveal} className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 md:grid-cols-4">
+          {aboutStats.map(stat => (
+            <div key={stat.label} className="bg-[#050506] px-4 py-8 text-center">
+              <p className="luxury-title font-sans text-4xl font-black tracking-[-0.06em] sm:text-5xl">{stat.value}</p>
+              <p className="mt-2 text-xs uppercase tracking-[0.2em] text-neutral-400">{stat.label}</p>
+            </div>
           ))}
+        </motion.section>
+        <motion.p {...reveal} className="mt-5 flex items-center justify-center gap-2 text-sm text-neutral-400">
+          <span className="flex gap-0.5 text-[#d10a1f]">{'★★★★★'}</span>
+          4.9 de calificación promedio de nuestros clientes
+        </motion.p>
+
+        {/* Historia */}
+        <section className="py-24">
+          <AboutTitle kicker="Nuestra historia" title="De Cali para todo el país" />
+          <motion.div {...reveal} className="mx-auto mt-10 max-w-3xl space-y-5 text-center text-base leading-8 text-neutral-300">
+            <p>
+              Hace dos años empezamos en Cali con una idea sencilla: que conseguir buenos sneakers
+              en Colombia fuera fácil, rápido y confiable. Pedido a pedido fuimos creciendo gracias
+              a clientes que volvían y nos recomendaban.
+            </p>
+            <p>
+              Hoy trabajamos en alianza con más de 40 proveedores de calzado importado, lo que nos
+              permite tener variedad de marcas, modelos y tallas, y despachar a más de 20 ciudades
+              del país.
+            </p>
+          </motion.div>
         </section>
 
-        {/* Cómo funciona (aquí sí es una secuencia real) */}
-        <section className="w-full py-24">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8 }}
-          >
-            <SectionTitle align="center" title="Cómo funciona" />
-          </motion.div>
-
-          <div className="mt-14 space-y-12">
-            {howItWorks.map((step, index) => (
+        {/* Modelos de venta */}
+        <section className="pb-24">
+          <AboutTitle kicker="Cómo vendemos" title="Al detal y al por mayor" />
+          <div className="mt-12 grid gap-5 md:grid-cols-2">
+            {salesModels.map(({ icon: Icon, title, text, cta, action }) => (
               <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.6 }}
-                transition={{ duration: 0.7, delay: index * 0.1 }}
+                key={title}
+                {...reveal}
+                className="flex flex-col items-center rounded-3xl border border-white/10 bg-white/[0.02] px-6 py-10 text-center"
               >
-                <p className="font-mono text-[11px] tracking-[0.3em] text-neutral-500">
-                  PASO {index + 1}
-                </p>
-                <h3 className="mt-2 font-sans text-xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-2xl">
-                  {step.title}
-                </h3>
-                <p className="mx-auto mt-2 max-w-sm text-sm text-neutral-400">
-                  {step.text}
-                </p>
+                <Icon className="h-8 w-8 text-white/80" />
+                <h3 className="luxury-title mt-5 font-sans text-2xl font-black uppercase tracking-[-0.05em]">{title}</h3>
+                <p className="mt-3 max-w-sm text-sm leading-7 text-neutral-400">{text}</p>
+                {action === 'catalog' ? (
+                  <button
+                    type="button"
+                    onClick={() => navigateTo({ type: 'catalog' })}
+                    className="mt-7 rounded-full bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-black transition-colors hover:bg-neutral-200"
+                  >
+                    {cta}
+                  </button>
+                ) : (
+                  <a
+                    href={WHOLESALE_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-7 rounded-full border border-white/25 px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition-colors hover:border-white/60"
+                  >
+                    {cta}
+                  </a>
+                )}
               </motion.div>
             ))}
           </div>
-
-          <button
-            type="button"
-            onClick={() => navigateTo({ type: 'catalog' })}
-            className="group mt-16 inline-flex items-center space-x-2 rounded-full border border-white/10 bg-white/5 px-7 py-3.5 text-xs font-bold uppercase tracking-[0.22em] text-white/80 transition-colors hover:border-white/30 hover:text-white"
-          >
-            <span>Ver catálogo</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </button>
         </section>
+
+        {/* Manifiesto */}
+        <section className="pb-24">
+          <div className="grid gap-10 md:grid-cols-3">
+            {storyBlocks.map(block => (
+              <motion.div key={block.title} {...reveal} className="text-center">
+                <h3 className="luxury-title font-sans text-2xl font-black uppercase tracking-[-0.06em] sm:text-3xl">
+                  {block.title}
+                </h3>
+                <p className="mx-auto mt-3 max-w-xs text-sm leading-7 text-neutral-400">{block.text}</p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* Envíos */}
+        <section className="pb-24">
+          <motion.img
+            {...reveal}
+            src="/shipping/logistica.png"
+            alt=""
+            className="mx-auto mb-8 h-20 w-auto opacity-80"
+          />
+          <AboutTitle kicker="Envíos a todo Colombia" title="Así llega tu pedido" />
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {shippingSteps.map(({ icon: Icon, title, text }, index) => (
+              <motion.div
+                key={title}
+                {...reveal}
+                transition={{ ...reveal.transition, delay: index * 0.1 }}
+                className="rounded-3xl border border-white/10 bg-white/[0.02] p-6 text-center"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-500">Paso {index + 1}</p>
+                <Icon className="mx-auto mt-4 h-7 w-7 text-white/80" />
+                <h3 className="mt-4 font-sans text-lg font-black uppercase tracking-[-0.03em] text-white">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-neutral-400">{text}</p>
+              </motion.div>
+            ))}
+          </div>
+          <motion.div {...reveal} className="mt-12 text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-500">Transportadoras</p>
+            <LogoRow items={CARRIER_LOGOS} fit={{ area: 3200, maxWidth: 130, maxHeight: 48 }} className="mt-6 gap-x-12" />
+          </motion.div>
+        </section>
+
+        {/* Medios de pago */}
+        <section className="pb-24">
+          <AboutTitle kicker="Pagos seguros" title="Medios de pago" />
+          <motion.div {...reveal}>
+            <LogoRow items={PAYMENT_LOGOS} fit={{ area: 3200, maxWidth: 140, maxHeight: 52 }} className="mt-12 gap-x-12 gap-y-8" />
+          </motion.div>
+        </section>
+
+        {/* Cierre */}
+        <motion.section {...reveal} className="flex flex-col items-center pb-28 text-center">
+          <h2 className="luxury-title font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-4xl">
+            Encuentra tu próximo par
+          </h2>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigateTo({ type: 'catalog' })}
+              className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-black transition-colors hover:bg-neutral-200"
+            >
+              Ver catálogo
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </button>
+            <a
+              href="https://wa.me/573208646516"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-7 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-white/85 transition-colors hover:border-white/50 hover:text-white"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Escríbenos
+            </a>
+          </div>
+        </motion.section>
       </div>
     </div>
   );
@@ -589,7 +708,7 @@ function MainLayout() {
               <ul className="mt-5 space-y-4 text-sm">
                 <li>
                   <Truck className="mr-2 inline h-4 w-4 align-[-3px] text-neutral-500" />
-                  Envíos a todo Colombia con transportadoras aseguradas.
+                  Envíos a todo Colombia: llega en 1 a 3 días hábiles.
                 </li>
 
                 <li>
@@ -616,6 +735,18 @@ function MainLayout() {
               className="h-auto w-[92%] max-w-[880px] select-none"
               draggable={false}
             />
+          </div>
+
+          {/* Medios de pago y transportadoras */}
+          <div className="mt-12 grid gap-8 border-t border-neutral-900 pt-10 md:grid-cols-2">
+            <div className="text-center">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-500">Medios de pago</p>
+              <LogoRow items={PAYMENT_LOGOS} fit={{ area: 1300, maxWidth: 80, maxHeight: 30 }} className="mt-5" />
+            </div>
+            <div className="text-center">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-500">Envíos con</p>
+              <LogoRow items={CARRIER_LOGOS} fit={{ area: 1300, maxWidth: 80, maxHeight: 30 }} className="mt-5" />
+            </div>
           </div>
 
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-neutral-900 pt-8 text-xs text-neutral-600 sm:flex-row">
