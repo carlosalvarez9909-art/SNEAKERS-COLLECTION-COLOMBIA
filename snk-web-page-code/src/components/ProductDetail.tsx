@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useApp } from '../context/AppContext';
 import {
   ArrowLeft, ShoppingBag, Star, ShieldCheck, Truck, Headset, AlertCircle,
-  ChevronDown, ChevronLeft, ChevronRight, Minus, Plus, Check, Share2
+  ChevronDown, ChevronLeft, ChevronRight, Minus, Plus, Check, Share2, Heart
 } from 'lucide-react';
 
 interface ProductDetailProps {
@@ -19,7 +19,7 @@ const TRUST = [
 ];
 
 export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
-  const { products, brands, addToCart, formatPrice, navigateTo } = useApp();
+  const { products, brands, addToCart, formatPrice, navigateTo, toggleFavorite, isFavorite } = useApp();
   const product = products.find(p => p.id === productId);
 
   const [activeImgIdx, setActiveImgIdx] = useState(0);
@@ -203,6 +203,15 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                   </div>
                 ))}
               </div>
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.8 }}
+                onClick={() => toggleFavorite(product.id)}
+                aria-label={isFavorite(product.id) ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                className="absolute right-2 top-2 z-10 rounded-full border border-neutral-800 bg-black/60 p-3 backdrop-blur transition-colors hover:border-red-600"
+              >
+                <Heart className={`h-5 w-5 transition-colors ${isFavorite(product.id) ? 'fill-red-600 text-red-600' : 'text-white'}`} />
+              </motion.button>
               {/* sombra de piso */}
               <div className="pointer-events-none mx-auto -mt-6 h-4 w-2/3 rounded-[100%] bg-black/70 blur-md" />
 
@@ -245,7 +254,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                   <button
                     key={idx}
                     onClick={() => goToImage(idx)}
-                    className={`aspect-square w-16 shrink-0 overflow-hidden rounded-xl border p-1.5 transition-all duration-300 sm:w-20 ${activeImgIdx === idx ? 'border-red-600 shadow-[0_0_14px_rgba(209,10,31,0.45)]' : 'border-neutral-900 opacity-60 hover:opacity-100'}`}
+                    className={`aspect-square w-16 shrink-0 overflow-hidden rounded-xl border p-1.5 transition-all duration-300 sm:w-20 ${activeImgIdx === idx ? 'border-red-600' : 'border-neutral-900 opacity-60 hover:opacity-100'}`}
                   >
                     <img src={img} alt="" className="h-full w-full object-contain" referrerPolicy="no-referrer" />
                   </button>
@@ -390,9 +399,11 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                   onClick={handleWhatsAppBuy}
                   className="flex h-16 flex-col items-center justify-center gap-1 rounded-2xl border border-emerald-600/70 bg-emerald-600/10 text-[10px] font-black uppercase tracking-wider text-white transition-all hover:bg-emerald-600/20 hover:shadow-[0_0_18px_rgba(16,185,129,0.45)] active:scale-95"
                 >
-                  <svg className="h-5 w-5 fill-emerald-400" viewBox="0 0 24 24" aria-hidden>
+                  <span className="flex h-5 w-5 items-center justify-center">
+                  <svg className="h-[17px] w-[17px] fill-emerald-400" viewBox="0 0 24 24" aria-hidden>
                     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.588 2.012 14.114.992 11.537.992c-5.451 0-9.875 4.372-9.88 9.802-.002 1.77.475 3.497 1.38 5.018l-.993 3.623 3.755-.98c1.472.8 3.111 1.222 4.808 1.222zm11.303-7.84c-.33-.162-1.953-.949-2.251-1.057-.298-.108-.517-.162-.734.162-.218.324-.844 1.057-1.036 1.272-.192.215-.384.243-.715.082-.33-.162-1.393-.506-2.656-1.615-.983-.865-1.647-1.933-1.84-2.257-.193-.324-.02-.501.144-.661.15-.143.33-.385.496-.577.165-.192.22-.324.33-.54.11-.217.056-.407-.028-.57-.085-.162-.735-1.745-1.007-2.39-.265-.63-.535-.544-.734-.554-.19-.01-.407-.01-.624-.01s-.57.081-.869.407c-.298.324-1.141 1.099-1.141 2.68s1.171 3.115 1.332 3.333c.163.217 2.305 3.468 5.586 4.847.78.328 1.389.524 1.864.673.784.245 1.498.21 2.062.127.629-.093 1.953-.787 2.229-1.547.276-.759.276-1.41.194-1.547-.082-.136-.298-.218-.628-.38z" />
                   </svg>
+                  </span>
                   WhatsApp
                 </button>
                 <button
