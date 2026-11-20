@@ -66,6 +66,16 @@ export const AdminPanel: React.FC = () => {
     slug: ''
   });
 
+  // Campos de lista escritos como texto separado por comas (tallas, materiales, tecnologías).
+  const [listText, setListText] = useState({ sizes: '7, 8, 9, 10, 11', materials: '', technologies: '' });
+  const loadListText = (product: Partial<Product>) =>
+    setListText({
+      sizes: (product.sizes ?? []).join(', '),
+      materials: (product.materials ?? []).join(', '),
+      technologies: (product.technologies ?? []).join(', ')
+    });
+  const splitList = (text: string) => text.split(',').map(item => item.trim()).filter(Boolean);
+
   // Form states - Coupons
   const [couponForm, setCouponForm] = useState<Partial<Coupon>>({
     code: '',
@@ -196,6 +206,7 @@ export const AdminPanel: React.FC = () => {
   const handleEditProdClick = (prod: Product) => {
     setEditingProduct(prod);
     setProdForm(prod);
+    loadListText(prod);
     setIsAddingNew(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -213,17 +224,18 @@ export const AdminPanel: React.FC = () => {
       basePrice: 600000,
       discount: 0,
       images: [],
-      colors: [{ name: 'Black', hex: '#000000' }],
+      colors: [{ name: 'Negro', hex: '#000000' }],
       sizes: [7, 8, 9, 10, 11],
-      technologies: ['Visible Air'],
-      materials: ['Cuero', 'Suela de goma'],
+      technologies: [],
+      materials: [],
       isLimited: false,
       isBestSeller: false,
       isTrending: false,
-      rating: 4.8,
-      reviewsCount: 1,
+      rating: 0,
+      reviewsCount: 0,
       slug: ''
     });
+    setListText({ sizes: '7, 8, 9, 10, 11', materials: '', technologies: '' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -231,8 +243,12 @@ export const AdminPanel: React.FC = () => {
     e.preventDefault();
     if (!prodForm.name || !prodForm.sku) return;
 
+    const sizes = splitList(listText.sizes).map(Number).filter(n => !Number.isNaN(n) && n > 0);
     const finalProduct: Product = {
       ...(prodForm as Product),
+      sizes: sizes.length ? sizes : prodForm.sizes ?? [],
+      materials: splitList(listText.materials),
+      technologies: splitList(listText.technologies),
       slug: prodForm.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
     };
 
@@ -667,6 +683,60 @@ export const AdminPanel: React.FC = () => {
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Color principal</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={prodForm.colors?.[0]?.hex ?? '#000000'}
+                        onChange={(e) => setProdForm({ ...prodForm, colors: [{ name: prodForm.colors?.[0]?.name ?? '', hex: e.target.value }] })}
+                        className="h-[42px] w-12 shrink-0 cursor-pointer rounded-xl border border-neutral-800 bg-neutral-900/50 p-1"
+                        title="Elegir color"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Ej: Negro / Rojo"
+                        value={prodForm.colors?.[0]?.name ?? ''}
+                        onChange={(e) => setProdForm({ ...prodForm, colors: [{ name: e.target.value, hex: prodForm.colors?.[0]?.hex ?? '#000000' }] })}
+                        className="w-full rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-xs text-white outline-none focus:border-amber-500/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Tallas disponibles (US, separadas por coma) *</label>
+                    <input
+                      type="text"
+                      placeholder="Ej: 7, 7.5, 8, 8.5, 9, 10"
+                      value={listText.sizes}
+                      onChange={(e) => setListText({ ...listText, sizes: e.target.value })}
+                      className="w-full rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-xs text-white outline-none focus:border-amber-500/50"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-3 grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Materiales (opcional, separados por coma)</label>
+                      <input
+                        type="text"
+                        placeholder="Ej: Cuero, Gamuza, Suela de goma"
+                        value={listText.materials}
+                        onChange={(e) => setListText({ ...listText, materials: e.target.value })}
+                        className="w-full rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-xs text-white outline-none focus:border-amber-500/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Tecnologías (opcional, separadas por coma)</label>
+                      <input
+                        type="text"
+                        placeholder="Ej: Air, Boost, Gore-Tex"
+                        value={listText.technologies}
+                        onChange={(e) => setListText({ ...listText, technologies: e.target.value })}
+                        className="w-full rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-xs text-white outline-none focus:border-amber-500/50"
+                      />
+                    </div>
+                  </div>
+
                   <div className="sm:col-span-3">
                     <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">Fotos del producto (máx. 10) *</label>
                     <div
@@ -728,7 +798,7 @@ export const AdminPanel: React.FC = () => {
                   </div>
 
                   {/* Badges indicators toggles */}
-                  <div className="sm:col-span-3 grid grid-cols-3 gap-4 border-t border-neutral-900 pt-4">
+                  <div className="sm:col-span-3 grid grid-cols-1 gap-3 border-t border-neutral-900 pt-4 sm:grid-cols-3 sm:gap-4">
                     <label className="flex items-center space-x-3 cursor-pointer">
                       <input
                         type="checkbox"
@@ -736,7 +806,7 @@ export const AdminPanel: React.FC = () => {
                         onChange={(e) => setProdForm({ ...prodForm, isLimited: e.target.checked })}
                         className="rounded border-neutral-800 bg-neutral-900 text-amber-500 focus:ring-0"
                       />
-                      <span className="text-xs text-neutral-300 font-sans">Edición Limitada</span>
+                      <span className="text-xs text-neutral-300 font-sans">Edición Limitada <span className="text-neutral-500">(La casa de los sneakers)</span></span>
                     </label>
 
                     <label className="flex items-center space-x-3 cursor-pointer">
@@ -746,7 +816,7 @@ export const AdminPanel: React.FC = () => {
                         onChange={(e) => setProdForm({ ...prodForm, isBestSeller: e.target.checked })}
                         className="rounded border-neutral-800 bg-neutral-900 text-amber-500 focus:ring-0"
                       />
-                      <span className="text-xs text-neutral-300 font-sans">Top Ventas (Best Seller)</span>
+                      <span className="text-xs text-neutral-300 font-sans">Top Ventas <span className="text-neutral-500">(Más vendidos)</span></span>
                     </label>
 
                     <label className="flex items-center space-x-3 cursor-pointer">
@@ -756,7 +826,7 @@ export const AdminPanel: React.FC = () => {
                         onChange={(e) => setProdForm({ ...prodForm, isTrending: e.target.checked })}
                         className="rounded border-neutral-800 bg-neutral-900 text-amber-500 focus:ring-0"
                       />
-                      <span className="text-xs text-neutral-300 font-sans">Habilitar en Tendencias</span>
+                      <span className="text-xs text-neutral-300 font-sans">Tendencia <span className="text-neutral-500">(Recomendaciones)</span></span>
                     </label>
                   </div>
 
