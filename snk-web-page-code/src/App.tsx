@@ -159,8 +159,7 @@ const FavoritesView: React.FC = () => {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-10 border-b border-neutral-900 pb-6">
           <SectionTitle
-            title="Tus Favoritos Curados"
-            subtitle="Piezas guardadas en tu bóveda personal de estilo"
+            title="Tus favoritos"
           />
         </div>
 
@@ -178,7 +177,7 @@ const FavoritesView: React.FC = () => {
             id="favorites-empty-card"
             className="mx-auto max-w-md text-center py-16 px-6 border border-neutral-900 rounded-3xl bg-neutral-900/10 space-y-4"
           >
-            <Heart className="mx-auto h-12 w-12 text-neutral-700" />
+            <Heart className="mx-auto h-12 w-12 text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.55)]" />
 
             <h4 className="text-sm font-bold text-white uppercase">
               Tu bóveda está vacía
