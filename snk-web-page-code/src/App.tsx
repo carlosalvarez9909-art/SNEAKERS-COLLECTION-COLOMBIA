@@ -617,7 +617,7 @@ function MainLayout() {
             <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
               <div className="mb-8">
                 <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-red-500">Exclusivo</p>
-                <h2 className="fire-text mt-3 text-4xl font-black uppercase tracking-[-0.06em] sm:text-5xl">
+                <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
                   La casa de los sneakers
                 </h2>
               </div>

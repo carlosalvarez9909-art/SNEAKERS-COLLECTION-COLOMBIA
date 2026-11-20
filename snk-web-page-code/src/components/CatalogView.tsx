@@ -240,7 +240,7 @@ export const CatalogView: React.FC = () => {
         {/* Page Header */}
         <div className="mb-6 flex flex-col gap-4 border-b border-white/10 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="outline-glow-text font-sans text-2xl font-black uppercase tracking-[-0.04em] sm:text-4xl">
+            <h2 className="white-glow-title text-4xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
               Catálogo de Sneakers
             </h2>
           </div>

@@ -660,33 +660,9 @@ select {
   .wave-title:hover .wave-letter { animation: none; }
 }
 
-/* Letras en fuego (La casa de los sneakers) */
-.fire-text {
-  background: linear-gradient(0deg, #8b0000 0%, #d10a1f 30%, #ff5a1f 55%, #ffb23f 78%, #fff1a8 100%);
-  background-size: 100% 220%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 6px rgba(255, 90, 31, 0.55)) drop-shadow(0 -2px 14px rgba(209, 10, 31, 0.45));
-  animation: fireFlow 2.4s ease-in-out infinite alternate, fireFlicker 1.6s steps(1) infinite;
-}
-
-@keyframes fireFlow {
-  0% { background-position: 50% 0%; }
-  100% { background-position: 50% 100%; }
-}
-
-@keyframes fireFlicker {
-  0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 90, 31, 0.55)) drop-shadow(0 -2px 14px rgba(209, 10, 31, 0.45)); }
-  33% { filter: drop-shadow(0 0 9px rgba(255, 120, 40, 0.7)) drop-shadow(0 -4px 18px rgba(209, 10, 31, 0.55)); }
-  66% { filter: drop-shadow(0 0 5px rgba(255, 70, 20, 0.5)) drop-shadow(0 -1px 12px rgba(209, 10, 31, 0.4)); }
-}
-
-/* Solo bordes rojos con brillo fijo (Catálogo de Sneakers) */
-.outline-glow-text {
-  color: transparent;
-  -webkit-text-stroke: 1.5px #ff2a40;
-  filter: drop-shadow(0 0 4px rgba(209, 10, 31, 0.9)) drop-shadow(0 0 14px rgba(209, 10, 31, 0.6));
+/* Título blanco con brillo (Catálogo de Sneakers) */
+.white-glow-title {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35)) drop-shadow(0 0 24px rgba(255, 255, 255, 0.18));
 }
 
 /* Flotación suave (Top rankings) */
@@ -700,5 +676,5 @@ select {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fire-text, .float-y { animation: none; }
+  .float-y { animation: none; }
 }

@@ -173,14 +173,16 @@ const TopRankings: React.FC = () => {
       <div className="text-center">
         <div className="float-y inline-flex items-center gap-3 sm:gap-5">
           <GlowStar />
-          <h2 className="red-glow-label font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-5xl">
+          <h2 className="luxury-title font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-5xl">
             Top rankings
           </h2>
           <GlowStar />
         </div>
       </div>
 
-      <div className="mt-10 flex flex-wrap justify-center gap-2" role="tablist">
+      <p className="mt-6 text-center text-sm text-neutral-400">{activeMeta.hint}</p>
+
+      <div className="mt-6 flex flex-wrap justify-center gap-2" role="tablist">
         {TOP_LISTS.map(list => (
           <button
             key={list.id}
@@ -198,8 +200,6 @@ const TopRankings: React.FC = () => {
           </button>
         ))}
       </div>
-
-      <p className="mt-4 text-center text-xs text-neutral-500">{activeMeta.hint}</p>
 
       <AnimatePresence mode="wait">
         <motion.ol
