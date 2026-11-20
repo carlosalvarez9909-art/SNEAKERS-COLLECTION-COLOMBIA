@@ -6,7 +6,7 @@ export const PAYMENT_LOGOS = [
   { src: '/payments/bancolombia.png', alt: 'Bancolombia' },
   { src: '/payments/visa.png', alt: 'Visa' },
   { src: '/payments/mastercard.png', alt: 'Mastercard' },
-  { src: '/payments/paypal.png', alt: 'PayPal' }
+  { src: '/payments/pse.png', alt: 'PSE' }
 ];
 
 export const CARRIER_LOGOS = [
