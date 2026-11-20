@@ -5,6 +5,7 @@ import { useApp } from '../context/AppContext';
 import type { Product, ViewState } from '../types';
 import { StarRating } from './StarRating';
 import { BrandMarquee } from './BrandMarquee';
+import { WaveTitle } from './WaveTitle';
 import { TOP_LISTS, TopListId, finalPriceOf, salesScore, topProducts } from '../lib/productMetrics';
 
 type CatalogFilters = Extract<ViewState, { type: 'catalog' }>['filters'];
@@ -159,9 +160,8 @@ const TopRankings: React.FC = () => {
   return (
     <section className="mt-28">
       <div className="text-center">
-        <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-neutral-500">Rankings</p>
-        <h2 className="mt-3 font-sans text-3xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
-          Top 5
+        <h2 className="red-glow-label font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-5xl">
+          Top rankings
         </h2>
       </div>
 
@@ -264,11 +264,12 @@ export const RecommendationsView: React.FC = () => {
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="text-center">
           <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-neutral-500">
-            Curaduría Sneakers Collection
+            Sneakers Collection
           </p>
-          <h1 className="mt-3 font-sans text-3xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
-            Recomendaciones
-          </h1>
+          <WaveTitle
+            text="Recomendaciones"
+            className="mt-3 cursor-default font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-5xl"
+          />
           <p className="mx-auto mt-4 max-w-xl text-xs leading-relaxed text-neutral-400 sm:text-sm">
             Explora por colección o descubre los rankings de la casa.
           </p>

@@ -593,7 +593,11 @@ function MainLayout() {
   const { activeView, navigateTo, products } = useApp();
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const homeNewArrivals = products.slice(0, 5);
+  // Ediciones limitadas primero; si hay pocas, se completa con el resto del catálogo.
+  const homeNewArrivals = [
+    ...products.filter(p => p.isLimited),
+    ...products.filter(p => !p.isLimited)
+  ].slice(0, 5);
 
   const renderCurrentView = () => {
     switch (activeView.type) {
@@ -615,7 +619,10 @@ function MainLayout() {
 
             <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
               <div className="mb-8">
-                <SectionTitle title="Los favoritos de la casa" />
+                <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-red-500">Exclusivo</p>
+                <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
+                  Ediciones limitadas
+                </h2>
               </div>
 
               <div

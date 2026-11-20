@@ -124,7 +124,7 @@ export const TrendingCarousel: React.FC = () => {
   const { products, brands, navigateTo } = useApp();
 
   const trendingProducts = useMemo(() => {
-    const trending = products.filter((product) => product.isTrending);
+    const trending = products.filter((product) => product.isBestSeller);
     const mixed = [...trending, ...products];
 
     return mixed
@@ -146,17 +146,13 @@ export const TrendingCarousel: React.FC = () => {
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 flex flex-col gap-5 border-b border-white/5 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-amber-500 font-mono text-[10px] uppercase tracking-[0.4em]">
-              Selección curada
+            <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-red-500">
+              Top ventas
             </p>
 
             <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
-              Tendencias Ahora
+              Más vendidos
             </h2>
-
-            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-neutral-500">
-              Los modelos más buscados por coleccionistas globales.
-            </p>
           </div>
 
         </div>

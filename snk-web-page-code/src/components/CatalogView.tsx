@@ -240,12 +240,9 @@ export const CatalogView: React.FC = () => {
         {/* Page Header */}
         <div className="mb-6 flex flex-col gap-4 border-b border-white/10 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="font-sans text-2xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-3xl">
+            <h2 className="red-glow-label font-sans text-2xl font-black uppercase tracking-[-0.06em] sm:text-3xl">
               Catálogo de Sneakers
             </h2>
-            <p className="text-[10px] font-mono tracking-wider text-neutral-500 uppercase mt-1">
-              Colección completa con piezas curadas de autenticidad absoluta
-            </p>
           </div>
 
           <input
@@ -254,7 +251,7 @@ export const CatalogView: React.FC = () => {
             placeholder="Buscar por modelo, marca o SKU..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-full border border-white/10 bg-white/[0.03] px-5 py-2.5 text-xs text-white placeholder-neutral-500 outline-none backdrop-blur-[2px] focus:border-white/30 md:w-72"
+            className="red-glow-hover w-full rounded-full border border-white/10 bg-white/[0.03] px-5 py-2.5 text-xs text-white placeholder-neutral-500 outline-none backdrop-blur-[2px] md:w-72"
           />
         </div>
 
@@ -269,7 +266,7 @@ export const CatalogView: React.FC = () => {
             type="button"
             aria-expanded={filtersOpen}
             onClick={() => setFiltersOpen(open => !open)}
-            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
+            className={`red-glow-hover inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
               filtersOpen || activeChips.length > 0
                 ? 'border-white/40 bg-white/10 text-white'
                 : 'border-white/15 bg-white/[0.03] text-white/80 hover:border-white/35 hover:text-white'
