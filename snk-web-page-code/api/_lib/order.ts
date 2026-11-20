@@ -79,6 +79,8 @@ export async function priceOrder(
     .from('products')
     .select('id, name, base_price, discount, sizes, colors')
     .in('id', productIds)
+    .eq('is_published', true)
+    .gt('base_price', 0)
     .returns<ProductPrice[]>();
 
   if (error) throw error;

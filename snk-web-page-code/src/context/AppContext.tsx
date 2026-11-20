@@ -17,11 +17,15 @@ import {
   upsertBanner,
   upsertBrand,
   upsertCoupon,
-  upsertProduct
+  upsertProduct,
+  setProductsPublished
 } from '../lib/catalog';
 
 export interface AppContextType {
   products: Product[];
+  allProducts: Product[];
+  refreshCatalog: () => Promise<void>;
+  publishProducts: (ids: string[], published: boolean) => Promise<void>;
   brands: Brand[];
   isCatalogLoading: boolean;
   catalogError: string;
@@ -90,7 +94,9 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Global States
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [allProducts, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  // La tienda solo muestra los publicados; el panel ve todos (incluye borradores).
+  const products = allProducts.filter(p => p.isPublished !== false);
   const [brands, setBrands] = useState<Brand[]>(INITIAL_BRANDS);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -301,20 +307,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addProduct = async (product: Product) => {
     await ensureBrandSaved(product.brandId);
     await upsertProduct(product);
-    const updated = [product, ...products];
+    const updated = [product, ...allProducts];
     setProducts(updated);
   };
 
   const updateProduct = async (updatedProd: Product) => {
     await ensureBrandSaved(updatedProd.brandId);
     await upsertProduct(updatedProd);
-    const updated = products.map(p => p.id === updatedProd.id ? updatedProd : p);
+    const updated = allProducts.map(p => p.id === updatedProd.id ? updatedProd : p);
     setProducts(updated);
   };
 
   const deleteProduct = async (productId: string) => {
     await removeProductFromDatabase(productId);
-    const updated = products.filter(p => p.id !== productId);
+    const updated = allProducts.filter(p => p.id !== productId);
     setProducts(updated);
     setBanners(banners.filter(banner => banner.productId !== productId));
     setReviews(reviews.filter(review => review.productId !== productId));
@@ -327,6 +333,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const newFavorites = favorites.filter(id => id !== productId);
     setFavorites(newFavorites);
     saveToLocal('snk_favorites', newFavorites);
+  };
+
+  // Vuelve a leer el catálogo (al entrar como admin trae también los borradores).
+  const refreshCatalog = async () => {
+    const catalog = await fetchCatalog();
+    setProducts(catalog.products);
+    setBrands(catalog.brands);
+    setBanners(catalog.banners);
+    setCoupons(catalog.coupons);
+  };
+
+  const publishProducts = async (ids: string[], published: boolean) => {
+    await setProductsPublished(ids, published);
+    setProducts(prev => prev.map(p => (ids.includes(p.id) ? { ...p, isPublished: published } : p)));
   };
 
   const importInitialProducts = async () => {
@@ -407,7 +427,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const prodReviews = updatedReviews.filter(r => r.productId === productId);
     const avgRating = prodReviews.reduce((sum, r) => sum + r.rating, 0) / prodReviews.length;
     
-    const updatedProducts = products.map(p => {
+    const updatedProducts = allProducts.map(p => {
       if (p.id === productId) {
         return {
           ...p,
@@ -423,6 +443,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   return (
     <AppContext.Provider value={{
       products,
+      allProducts,
+      refreshCatalog,
+      publishProducts,
       brands,
       isCatalogLoading,
       catalogError,

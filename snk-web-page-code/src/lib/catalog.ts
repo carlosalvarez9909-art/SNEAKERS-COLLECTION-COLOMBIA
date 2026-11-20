@@ -26,6 +26,7 @@ type ProductRow = {
   is_best_seller: boolean;
   is_trending: boolean;
   is_top_rated: boolean;
+  is_published?: boolean;
   rating: number;
   reviews_count: number;
   materials: string[];
@@ -86,6 +87,7 @@ export const toProductRow = (product: Product): ProductRow => ({
   is_best_seller: product.isBestSeller,
   is_trending: product.isTrending,
   is_top_rated: product.isTopRated ?? false,
+  is_published: product.isPublished ?? true,
   rating: product.rating,
   reviews_count: product.reviewsCount,
   materials: product.materials
@@ -109,6 +111,7 @@ export const fromProductRow = (row: ProductRow): Product => ({
   isBestSeller: row.is_best_seller,
   isTrending: row.is_trending,
   isTopRated: row.is_top_rated ?? false,
+  isPublished: row.is_published ?? true,
   rating: Number(row.rating),
   reviewsCount: row.reviews_count,
   materials: row.materials ?? []
@@ -404,4 +407,19 @@ export async function deleteCustomer(id: string) {
   if (!supabase) return;
   const { error } = await supabase.from('customers').delete().eq('id', id);
   if (error) throw error;
+}
+
+// Publica u oculta varios productos a la vez (borrador ↔ publicado).
+export async function setProductsPublished(ids: string[], published: boolean) {
+  if (!supabase) throw new Error('Configura Supabase para publicar productos.');
+  const { error } = await supabase.from('products').update({ is_published: published }).in('id', ids);
+  if (error) throw error;
+}
+
+// Costo del proveedor (solo lo ve el admin).
+export async function fetchProductCosts(): Promise<Record<string, { cost: number; supplier: string }>> {
+  if (!supabase) return {};
+  const { data, error } = await supabase.from('product_costs').select('product_id, cost, supplier');
+  if (error) return {};
+  return Object.fromEntries((data ?? []).map((row: Record<string, any>) => [row.product_id, { cost: Number(row.cost), supplier: row.supplier }]));
 }

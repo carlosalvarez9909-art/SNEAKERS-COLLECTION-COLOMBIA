@@ -256,3 +256,22 @@ create policy "admin borra clientes" on public.customers for delete to authentic
 revoke all on public.customers from anon;
 grant select, delete on public.customers to authenticated;
 create index if not exists customers_created_at_idx on public.customers (created_at desc);
+
+-- Borradores: los productos con is_published = false solo los ve el admin.
+alter table public.products add column if not exists is_published boolean not null default true;
+drop policy if exists "Public can read products" on public.products;
+create policy "Visitantes leen productos publicados" on public.products for select to anon using (is_published);
+create policy "Usuarios leen publicados y admin todo" on public.products for select to authenticated using (is_published or public.is_admin());
+create index if not exists products_is_published_idx on public.products (is_published);
+
+-- Costo del proveedor por producto (privado, solo admin).
+create table if not exists public.product_costs (
+  product_id text primary key references public.products(id) on delete cascade,
+  supplier text not null default '',
+  cost numeric not null check (cost >= 0),
+  updated_at timestamptz not null default now()
+);
+alter table public.product_costs enable row level security;
+create policy "admin gestiona costos" on public.product_costs for all to authenticated using (public.is_admin()) with check (public.is_admin());
+revoke all on public.product_costs from anon;
+grant select, insert, update, delete on public.product_costs to authenticated;

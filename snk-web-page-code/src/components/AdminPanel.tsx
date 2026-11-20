@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Product, Brand, Coupon, HeroBanner } from '../types';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import { fetchAdminOrders, updateOrderFulfillment, markOrderPaid, fetchCustomers, deleteCustomer, type AdminOrder, type RegisteredCustomer } from '../lib/catalog';
+import { fetchAdminOrders, updateOrderFulfillment, markOrderPaid, fetchCustomers, deleteCustomer, fetchProductCosts, type AdminOrder, type RegisteredCustomer } from '../lib/catalog';
 import { CustomerSignup } from './CustomerSignup';
 import { 
   Settings, Database, Plus, Trash2, Edit3, Save, CheckCircle, 
@@ -13,6 +13,9 @@ import {
 export const AdminPanel: React.FC = () => {
   const { 
     products, 
+    allProducts,
+    refreshCatalog,
+    publishProducts,
     brands, 
     catalogError,
     coupons, 
@@ -175,6 +178,40 @@ export const AdminPanel: React.FC = () => {
     // Al entrar se cargan los pedidos (para el contador) y se refrescan al abrir la pestaña.
     if (isAuthenticated) void loadOrders();
   }, [isAuthenticated, activeTab === 'orders']);
+
+  // Borradores y publicados: el admin ve todo el catálogo (incluye lo que no se muestra en la tienda).
+  const [productFilter, setProductFilter] = useState<'all' | 'draft' | 'published'>('all');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [productCosts, setProductCosts] = useState<Record<string, { cost: number; supplier: string }>>({});
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    void refreshCatalog().catch(() => undefined);
+    void fetchProductCosts().then(setProductCosts);
+  }, [isAuthenticated]);
+
+  const draftCount = allProducts.filter(p => p.isPublished === false).length;
+  const listedProducts = allProducts.filter(p =>
+    productFilter === 'all' ? true : productFilter === 'draft' ? p.isPublished === false : p.isPublished !== false
+  );
+  const toggleSelected = (id: string) =>
+    setSelectedIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
+
+  const changePublished = async (ids: string[], published: boolean) => {
+    if (published) {
+      const withoutPrice = allProducts.filter(p => ids.includes(p.id) && !(p.basePrice > 0));
+      if (withoutPrice.length) {
+        setAdminMessage(`No se pudo publicar: ${withoutPrice.length} producto(s) no tienen precio de venta. Edítalos y ponles precio primero.`);
+        return;
+      }
+    }
+    try {
+      await publishProducts(ids, published);
+      setSelectedIds([]);
+      setAdminMessage(published ? `${ids.length} producto(s) publicados en la tienda.` : `${ids.length} producto(s) pasaron a borrador.`);
+    } catch (error) {
+      setAdminMessage(error instanceof Error ? error.message : 'No se pudo cambiar el estado.');
+    }
+  };
 
   // Clientes registrados en la Familia Sneakers Collection (tabla customers).
   const [customers, setCustomers] = useState<RegisteredCustomer[]>([]);
@@ -750,6 +787,11 @@ export const AdminPanel: React.FC = () => {
                       onChange={(e) => setProdForm({ ...prodForm, basePrice: Number(e.target.value) })}
                       className="w-full rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-xs text-white outline-none focus:border-amber-500/50"
                     />
+                    {prodForm.id && productCosts[prodForm.id] && (
+                      <p className="mt-1 text-[10px] text-neutral-500">
+                        Costo proveedor ({productCosts[prodForm.id].supplier}): {formatPrice(productCosts[prodForm.id].cost)}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -952,7 +994,10 @@ export const AdminPanel: React.FC = () => {
 
             {/* PRODUCT TABLE LIST */}
             <div className="flex justify-between items-center">
-              <h3 className="font-sans text-md font-bold text-white uppercase">Zapatillas en Catálogo ({products.length})</h3>
+              <h3 className="font-sans text-md font-bold text-white uppercase">
+                Zapatillas ({allProducts.length})
+                {draftCount > 0 && <span className="ml-2 text-amber-400">· {draftCount} borradores</span>}
+              </h3>
               <div className="flex flex-wrap gap-2">
                 <button
                   id="admin-import-initial-products"
@@ -974,35 +1019,98 @@ export const AdminPanel: React.FC = () => {
               </div>
             </div>
 
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex gap-2">
+                {([['all', 'Todos'], ['draft', `Borradores (${draftCount})`], ['published', 'Publicados']] as const).map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => { setProductFilter(key); setSelectedIds([]); }}
+                    className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase ${productFilter === key ? 'bg-white text-neutral-950' : 'border border-neutral-800 text-neutral-400 hover:text-white'}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {selectedIds.length > 0 && (
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void changePublished(selectedIds, true)}
+                    className="rounded-full bg-emerald-600 px-4 py-2 text-[10px] font-bold uppercase text-white hover:bg-emerald-500"
+                  >
+                    Publicar {selectedIds.length}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void changePublished(selectedIds, false)}
+                    className="rounded-full border border-neutral-700 px-4 py-2 text-[10px] font-bold uppercase text-neutral-300 hover:text-white"
+                  >
+                    Pasar a borrador
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div className="rounded-xl border border-neutral-900 bg-neutral-950 overflow-x-auto" style={{ scrollbarWidth: 'thin' }}>
               <table className="w-full min-w-[700px] text-left text-xs text-neutral-400 font-sans">
                 <thead className="bg-neutral-900 text-[10px] font-mono tracking-wider text-neutral-500 uppercase border-b border-neutral-900">
                   <tr>
+                    <th className="p-4">
+                      <input
+                        type="checkbox"
+                        aria-label="Seleccionar todos"
+                        checked={listedProducts.length > 0 && selectedIds.length === listedProducts.length}
+                        onChange={e => setSelectedIds(e.target.checked ? listedProducts.map(p => p.id) : [])}
+                        className="h-4 w-4 accent-red-600"
+                      />
+                    </th>
                     <th className="p-4">Visual</th>
                     <th className="p-4">Modelo</th>
                     <th className="p-4">SKU / Marca</th>
                     <th className="p-4">Precio Real</th>
-                    <th className="p-4">Tags</th>
+                    <th className="p-4">Estado / Tags</th>
                     <th className="p-4 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-900">
-                  {products.map(p => (
-                    <tr key={p.id} className="hover:bg-neutral-900/40 transition-colors">
+                  {listedProducts.map(p => (
+                    <tr key={p.id} className={`hover:bg-neutral-900/40 transition-colors ${selectedIds.includes(p.id) ? 'bg-neutral-900/60' : ''}`}>
+                      <td className="p-4">
+                        <input
+                          type="checkbox"
+                          aria-label={`Seleccionar ${p.name}`}
+                          checked={selectedIds.includes(p.id)}
+                          onChange={() => toggleSelected(p.id)}
+                          className="h-4 w-4 accent-red-600"
+                        />
+                      </td>
                       <td className="p-4">
                         <img src={p.images[0]} alt="" className="h-10 w-10 object-contain rounded bg-neutral-900 p-1" referrerPolicy="no-referrer" />
                       </td>
-                      <td className="p-4 font-bold text-white truncate max-w-[200px]">{p.name}</td>
+                      <td className="p-4 max-w-[220px]">
+                        <p className="truncate font-bold text-white">{p.name}</p>
+                        <p className="truncate text-[10px] text-neutral-500">{p.colors[0]?.name} · EU {p.sizes[0]}–{p.sizes[p.sizes.length - 1]}</p>
+                      </td>
                       <td className="p-4 font-mono">
                         <p>{p.sku}</p>
                         <p className="text-[10px] text-amber-500 uppercase font-semibold">{p.brandId}</p>
                       </td>
                       <td className="p-4 font-mono text-white">
-                        <p>{formatPrice(p.basePrice * (1 - p.discount / 100))}</p>
+                        {p.basePrice > 0 ? <p>{formatPrice(p.basePrice * (1 - p.discount / 100))}</p> : <p className="font-bold text-amber-400">Sin precio</p>}
+                        {productCosts[p.id] && <p className="text-[10px] text-neutral-500">Costo: {formatPrice(productCosts[p.id].cost)}</p>}
                         {p.discount > 0 && <p className="text-[10px] text-neutral-500 line-through">{formatPrice(p.basePrice)}</p>}
                       </td>
                       <td className="p-4">
                         <div className="flex flex-wrap gap-1">
+                          <button
+                            type="button"
+                            onClick={() => void changePublished([p.id], p.isPublished === false)}
+                            title={p.isPublished === false ? 'Tocar para publicar' : 'Tocar para pasar a borrador'}
+                            className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${p.isPublished === false ? 'border border-amber-500/40 text-amber-400' : 'bg-emerald-600/20 text-emerald-400'}`}
+                          >
+                            {p.isPublished === false ? 'Borrador' : 'Publicado'}
+                          </button>
                           {p.isLimited && <span className="rounded bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 text-[8px] font-bold text-amber-500 uppercase">LTD</span>}
                           {p.isBestSeller && <span className="rounded bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 text-[8px] font-bold text-blue-400 uppercase">BEST</span>}
                           {p.isTrending && <span className="rounded bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 text-[8px] font-bold text-purple-400 uppercase">TREND</span>}

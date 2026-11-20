@@ -17,7 +17,8 @@ export interface Product {
   isTrending: boolean;
   rating: number;
   reviewsCount: number;
-  isTopRated?: boolean; // Marcado por la tienda para Top rating
+  isTopRated?: boolean;
+  isPublished?: boolean; // false = borrador (solo lo ve el admin) // Marcado por la tienda para Top rating
   materials: string[];
 }
 

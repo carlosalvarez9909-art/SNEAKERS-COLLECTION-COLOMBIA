@@ -13,7 +13,7 @@ interface ProductDetailProps {
 type Question = 'size' | 'color' | 'qty';
 
 const TRUST = [
-  { icon: ShieldCheck, title: '100% Original', text: 'Pares verificados' },
+  { icon: ShieldCheck, title: 'Calidad premium', text: 'Alta gama, revisados uno a uno' },
   { icon: Truck, title: 'Envío exprés', text: '1 a 3 días hábiles' },
   { icon: Headset, title: 'Soporte VIP', text: 'Asesoría por WhatsApp' }
 ];

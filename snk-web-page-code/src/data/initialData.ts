@@ -295,7 +295,7 @@ export const INITIAL_REVIEWS: Review[] = [
     productId: 'jordan-4-black-cat',
     customerName: 'Valeria Gómez',
     rating: 5,
-    comment: 'Completamente originales. Llegó con el certificado de Sneakers Collection y el embalaje impecable. El envío a Bogotá fue ultra rápido.',
+    comment: 'Calidad top, terminados impecables y el embalaje perfecto. El envío a Bogotá fue ultra rápido.',
     createdAt: 'Hace 1 semana'
   },
   {

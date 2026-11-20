@@ -97,7 +97,7 @@ const BrandView: React.FC<{ brandId: string }> = ({ brandId }) => {
 
         <div className="relative z-10 mx-auto max-w-5xl px-4 text-center space-y-3">
           <span className="rounded-full bg-white px-3.5 py-1 text-[10px] font-mono font-extrabold text-neutral-950 tracking-widest uppercase">
-            CASA DE DISEÑO ORIGINAL
+            COLECCIÓN EXCLUSIVA
           </span>
 
           <div className="flex justify-center py-2">
@@ -120,7 +120,7 @@ const BrandView: React.FC<{ brandId: string }> = ({ brandId }) => {
         <div className="mb-8 border-b border-neutral-900 pb-5">
           <SectionTitle
             title={`Colección ${brand.name} (${brandProducts.length})`}
-            subtitle="Zapatillas icónicas de procedencia verificada por Sneakers Collection"
+            subtitle="Zapatillas icónicas de alta gama, seleccionadas por Sneakers Collection"
           />
         </div>
 
