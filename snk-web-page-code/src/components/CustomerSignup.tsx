@@ -41,7 +41,7 @@ export const CustomerSignup: React.FC = () => {
 
   return (
     <div className="glow-card rounded-3xl border border-neutral-900 bg-neutral-950 p-6 sm:p-8">
-      <p className="red-glow-label text-[11px] font-bold uppercase tracking-[0.25em] text-red-500">Club Sneakers Collection</p>
+      <p className="red-glow-label text-[11px] font-bold uppercase tracking-[0.25em] text-red-500">Familia Sneakers Collection</p>
       <h2 className="mt-2 text-2xl font-black uppercase text-white sm:text-3xl">Regístrate y ahorra</h2>
       <ul className="mt-5 space-y-2.5">
         {PERKS.map(({ icon: Icon, text }) => (
@@ -55,7 +55,7 @@ export const CustomerSignup: React.FC = () => {
       {status === 'done' ? (
         <div className="mt-7 rounded-2xl border border-red-900/60 bg-red-950/20 p-5 text-center">
           <CheckCircle className="mx-auto h-8 w-8 text-red-500" />
-          <p className="mt-3 font-bold uppercase text-white">¡Ya eres parte del club!</p>
+          <p className="mt-3 font-bold uppercase text-white">¡Ya eres parte de la familia!</p>
           <p className="mt-1 text-sm text-neutral-400">Te escribiremos con las próximas promos y descuentos.</p>
         </div>
       ) : (

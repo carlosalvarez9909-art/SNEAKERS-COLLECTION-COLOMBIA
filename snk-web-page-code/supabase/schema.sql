@@ -240,7 +240,7 @@ create policy "Admins can update orders"
   using (public.is_admin()) with check (public.is_admin());
 grant select, update on public.orders to authenticated;
 
--- Clientes registrados en el club (promos y descuentos). Solo el servidor inserta; el admin lee y borra.
+-- Clientes registrados en la Familia Sneakers Collection (promos y descuentos). Solo el servidor inserta; el admin lee y borra.
 create table if not exists public.customers (
   id uuid primary key default gen_random_uuid(),
   name text not null check (char_length(name) between 2 and 80),

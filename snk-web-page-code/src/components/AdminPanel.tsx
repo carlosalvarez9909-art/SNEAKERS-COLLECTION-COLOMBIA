@@ -176,7 +176,7 @@ export const AdminPanel: React.FC = () => {
     if (isAuthenticated) void loadOrders();
   }, [isAuthenticated, activeTab === 'orders']);
 
-  // Clientes registrados en el club (tabla customers).
+  // Clientes registrados en la Familia Sneakers Collection (tabla customers).
   const [customers, setCustomers] = useState<RegisteredCustomer[]>([]);
   const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
   const loadCustomers = async () => {
