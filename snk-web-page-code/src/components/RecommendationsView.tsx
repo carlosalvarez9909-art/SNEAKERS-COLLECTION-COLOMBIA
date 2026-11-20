@@ -153,7 +153,7 @@ const CollectionCard: React.FC<{
 
 // Estrella roja de 5 puntas con brillo (acompaña el título Top rankings).
 const GlowStar: React.FC = () => (
-  <svg viewBox="-31 -31 62 62" className="h-6 w-6 shrink-0 sm:h-9 sm:w-9" aria-hidden="true">
+  <svg viewBox="-31 -31 62 62" className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" aria-hidden="true">
     <path
       d="M0 -30 L7.3 -10.1 L28.5 -9.3 L11.8 3.8 L17.6 24.3 L0 12.5 L-17.6 24.3 L-11.8 3.8 L-28.5 -9.3 L-7.3 -10.1 Z"
       fill="#e0102a"
@@ -169,19 +169,28 @@ const TopRankings: React.FC = () => {
 
   return (
     <section className="mt-28">
-      <div className="text-center">
-        <div className="inline-flex items-center gap-3 sm:gap-5">
-          <GlowStar />
-          <h2 className="white-glow-title luxury-title font-sans text-3xl font-black uppercase tracking-[-0.06em] sm:text-5xl">
-            Top rankings
-          </h2>
-          <GlowStar />
+      {/* Encabezado: estrellas, título y eslogan alineados al centro, como el logotipo de la marca */}
+      <div className="flex flex-col items-center text-center">
+        <div className="flex items-center gap-1.5 sm:gap-2" aria-hidden="true">
+          {[0, 1, 2, 3, 4].map(i => (
+            <GlowStar key={i} />
+          ))}
+        </div>
+
+        <h2 className="white-glow-title luxury-title mt-4 font-sans text-4xl font-black uppercase tracking-[-0.06em] sm:text-6xl">
+          Top rankings
+        </h2>
+
+        <div className="mt-4 flex w-full max-w-md items-center gap-4">
+          <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[#d10a1f]" />
+          <p className="red-glow-label shrink-0 text-xs font-bold uppercase tracking-[0.3em] sm:text-sm">
+            La grasa pa&apos; tu outfit
+          </p>
+          <span className="h-px flex-1 bg-gradient-to-l from-transparent to-[#d10a1f]" />
         </div>
       </div>
 
-      <p className="red-glow-label mt-6 text-center text-base font-bold sm:text-lg">La Grasa pa&apos; tu Outfit</p>
-
-      <div className="mt-6 flex flex-wrap justify-center gap-2" role="tablist">
+      <div className="mt-10 flex flex-wrap justify-center gap-2" role="tablist">
         {TOP_LISTS.map(list => (
           <button
             key={list.id}
