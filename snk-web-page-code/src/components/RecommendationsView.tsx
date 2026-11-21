@@ -109,17 +109,28 @@ const CollectionCard: React.FC<{
       <div className="collection-tile-glow pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full opacity-40 blur-[90px] transition-opacity duration-500 group-hover:opacity-70" />
 
       {cover && (
-        <img
-          src={cover.images[0]}
-          alt=""
-          referrerPolicy="no-referrer"
-          draggable={false}
-          className={`pointer-events-none absolute object-contain drop-shadow-[0_30px_35px_rgba(0,0,0,0.85)] transition-transform duration-700 group-hover:-translate-y-2 group-hover:-rotate-6 group-hover:scale-105 ${
+        <div
+          className={`pointer-events-none absolute transition-transform duration-700 group-hover:-translate-y-2 group-hover:-rotate-6 group-hover:scale-105 ${
             large
               ? 'right-[-4%] top-1/2 w-[62%] -translate-y-1/2 -rotate-12'
               : 'right-[-8%] top-6 w-[70%] -rotate-12'
           }`}
-        />
+        >
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={cover.id}
+              src={cover.images[0]}
+              alt=""
+              referrerPolicy="no-referrer"
+              draggable={false}
+              initial={{ opacity: 0, x: 60, scale: 0.9 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -40, scale: 0.95 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full object-contain drop-shadow-[0_30px_35px_rgba(0,0,0,0.85)]"
+            />
+          </AnimatePresence>
+        </div>
       )}
 
       <div className="relative z-10 mt-auto flex w-full flex-col p-6 sm:p-8">
@@ -320,15 +331,54 @@ const TopRankings: React.FC = () => {
 export const RecommendationsView: React.FC = () => {
   const { products } = useApp();
   // Cada tarjetón muestra un tenis distinto: se escoge el primero que no haya salido en otra tarjeta.
-  const collections = useMemo(() => {
+  const lists = useMemo(
+    () => COLLECTIONS.map(collection => ({ collection, items: collection.pick(products) })).filter(e => e.items.length > 0),
+    [products]
+  );
+
+  // Portada de cada tarjetón: arranca con tenis distintos y cada 3 s una tarjeta cambia a otra referencia
+  // de su colección, sin repetir la que muestra otra tarjeta en ese momento.
+  const [covers, setCovers] = useState<string[]>([]);
+  React.useEffect(() => {
     const used = new Set<string>();
-    return COLLECTIONS.map(collection => {
-      const items = collection.pick(products);
-      const cover = items.find(p => !used.has(p.id)) ?? products.find(p => !used.has(p.id)) ?? items[0];
-      if (cover) used.add(cover.id);
-      return { collection, items, cover };
-    }).filter(entry => entry.items.length > 0);
-  }, [products]);
+    setCovers(lists.map(({ items }) => {
+      const pick = items.find(p => !used.has(p.id)) ?? items[0];
+      used.add(pick.id);
+      return pick.id;
+    }));
+  }, [lists]);
+
+  React.useEffect(() => {
+    if (!lists.length) return;
+    let turn = 0;
+    const timer = window.setInterval(() => {
+      if (document.hidden) return;
+      const card = turn % lists.length;
+      turn += 1;
+      setCovers(prev => {
+        const items = lists[card].items;
+        if (items.length < 2) return prev;
+        const others = new Set(prev.filter((_, i) => i !== card));
+        const start = items.findIndex(p => p.id === prev[card]);
+        for (let step = 1; step <= items.length; step++) {
+          const candidate = items[(start + step) % items.length];
+          if (!others.has(candidate.id)) {
+            const next = [...prev];
+            next[card] = candidate.id;
+            return next;
+          }
+        }
+        return prev;
+      });
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, [lists]);
+
+  const collections = lists.map(({ collection, items }, i) => ({
+    collection,
+    items,
+    cover: items.find(p => p.id === covers[i]) ?? items[0]
+  }));
 
   return (
     <div id="recommendations-page" className="relative min-h-screen bg-transparent text-white">
