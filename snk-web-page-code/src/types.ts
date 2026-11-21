@@ -106,6 +106,8 @@ export type ViewState =
       type: 'catalog';
       filters?: {
         brandId?: string;
+        color?: string;
+        style?: string;
         isLimited?: boolean;
         isBestSeller?: boolean;
         isTrending?: boolean;

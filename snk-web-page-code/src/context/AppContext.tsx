@@ -159,6 +159,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const navigateTo = (view: ViewState) => {
+    // Las marcas ya no tienen página de colección: se muestran sus tenis en el catálogo.
+    if (view.type === 'brand') view = { type: 'catalog', filters: { brandId: view.brandId } };
     setActiveView(view);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

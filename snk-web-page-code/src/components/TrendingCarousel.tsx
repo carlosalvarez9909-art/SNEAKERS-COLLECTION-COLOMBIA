@@ -76,11 +76,6 @@ const FloatingTrendCard: React.FC<{
         <div className="relative flex h-64 items-center justify-center overflow-visible">
           <div className="trend-void-glow absolute inset-0" />
 
-          {/* Nombre de la marca pintado en la pared, detrás del tenis */}
-          <div className="trend-card-tag">
-            <span>{brandLabel}</span>
-          </div>
-
           <img
             src={product.images[0]}
             alt={product.name}

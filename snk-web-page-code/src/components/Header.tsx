@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { Search, Heart, ShoppingBag, Settings, Sparkles, Home, LayoutGrid, Info } from 'lucide-react';
 import type { ViewState } from '../types';
 import { OriginalLogo } from './OriginalLogo';
-import { BrandLogo } from './BrandLogo';
+import { COLOR_FAMILIES, STYLES, colorFamiliesOf, styleOf } from '../lib/productFacets';
 
 interface HeaderProps {
   onOpenCart: () => void;
@@ -240,31 +240,54 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart }) => {
                   ))}
                 </div>
 
-                {brands.length > 0 && (
-                  <div className="mt-3 border-t border-neutral-900 pt-3">
-                    <div className="mb-2 px-1 text-[10px] font-mono tracking-wider text-neutral-500 uppercase">
-                      Marcas
+                {(() => {
+                  const chip = 'rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] font-medium text-neutral-300 transition-colors hover:border-white/30 hover:bg-white/[0.08] hover:text-white';
+                  const label = 'mb-2 px-1 text-[10px] font-mono tracking-wider text-neutral-500 uppercase';
+                  const brandList = brands.filter(b => products.some(p => p.brandId === b.id));
+                  const colorList = COLOR_FAMILIES.filter(f => products.some(p => colorFamiliesOf(p).includes(f.id)));
+                  const styleList = STYLES.filter(st => products.some(p => styleOf(p) === st.id));
+                  return (
+                    <div className="mt-3 space-y-3 border-t border-neutral-900 pt-3">
+                      {brandList.length > 0 && (
+                        <div>
+                          <div className={label}>Marcas</div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {brandList.map(b => (
+                              <button key={b.id} type="button" className={chip} onClick={() => goTo({ type: 'catalog', filters: { brandId: b.id } })}>
+                                {b.name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {colorList.length > 0 && (
+                        <div>
+                          <div className={label}>Colores</div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {colorList.map(f => (
+                              <button key={f.id} type="button" className={`${chip} inline-flex items-center gap-1.5`} onClick={() => goTo({ type: 'catalog', filters: { color: f.id } })}>
+                                <span className="h-2.5 w-2.5 rounded-full border border-white/25" style={{ backgroundColor: f.hex }} />
+                                {f.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {styleList.length > 0 && (
+                        <div>
+                          <div className={label}>Estilos</div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {styleList.map(st => (
+                              <button key={st.id} type="button" className={chip} onClick={() => goTo({ type: 'catalog', filters: { style: st.id } })}>
+                                {st.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {brands.map(b => (
-                        <button
-                          key={b.id}
-                          type="button"
-                          title={b.name}
-                          onClick={() => goTo({ type: 'brand', brandId: b.id })}
-                          className="group flex h-14 items-center justify-center rounded-xl border border-white/5 bg-white/[0.03] px-2 transition-colors hover:border-white/20 hover:bg-white/[0.07]"
-                        >
-                          <BrandLogo
-                            brand={b}
-                            fit={{ area: 1500, maxWidth: 88, maxHeight: 38 }}
-                            className="brand-logo-img h-8 w-auto max-w-[88px]"
-                            fallbackClassName="text-[10px] font-bold uppercase text-neutral-300"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 <div className="mt-4 flex justify-center border-t border-neutral-900 pt-5 pb-1">
                   <img

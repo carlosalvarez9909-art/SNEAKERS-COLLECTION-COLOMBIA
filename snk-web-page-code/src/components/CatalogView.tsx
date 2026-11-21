@@ -2,10 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { WaveTitle } from './WaveTitle';
 import { useApp } from '../context/AppContext';
-import { BrandLogo } from './BrandLogo';
 import { ProductCard } from './ProductCard';
 import { SlidersHorizontal, Sliders, X, Check, Star, Trash2, ChevronDown, Search } from 'lucide-react';
 import { finalPriceOf, salesScore } from '../lib/productMetrics';
+import { COLOR_FAMILIES, STYLES, colorFamiliesOf, styleOf, type ColorFamilyId, type StyleId } from '../lib/productFacets';
 
 type SortOption = 'default' | 'best-sellers' | 'price-asc' | 'price-desc' | 'rating' | 'discount';
 type CollectionTag = 'limited' | 'bestseller' | 'trending' | 'sale';
@@ -103,6 +103,8 @@ export const CatalogView: React.FC = () => {
 
   const [selectedBrandIds, setSelectedBrandIds] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
+  const [selectedColors, setSelectedColors] = useState<ColorFamilyId[]>([]);
+  const [selectedStyles, setSelectedStyles] = useState<StyleId[]>([]);
   const [selectedPrices, setSelectedPrices] = useState<PriceRangeId[]>([]);
   const [selectedTags, setSelectedTags] = useState<CollectionTag[]>([]);
   const [minRating, setMinRating] = useState<number | null>(null);
@@ -133,6 +135,8 @@ export const CatalogView: React.FC = () => {
   useEffect(() => {
     setSelectedBrandIds(incomingFilters?.brandId ? [incomingFilters.brandId] : []);
     setSelectedSizes([]);
+    setSelectedColors(incomingFilters?.color ? [incomingFilters.color as ColorFamilyId] : []);
+    setSelectedStyles(incomingFilters?.style ? [incomingFilters.style as StyleId] : []);
     setSelectedPrices([]);
     setMinRating(null);
     const tags: CollectionTag[] = [];
@@ -153,6 +157,8 @@ export const CatalogView: React.FC = () => {
   const handleResetFilters = () => {
     setSelectedBrandIds([]);
     setSelectedSizes([]);
+    setSelectedColors([]);
+    setSelectedStyles([]);
     setSelectedPrices([]);
     setSelectedTags([]);
     setMinRating(null);
@@ -173,6 +179,8 @@ export const CatalogView: React.FC = () => {
     }
     if (selectedBrandIds.length) result = result.filter(p => selectedBrandIds.includes(p.brandId));
     if (selectedSizes.length) result = result.filter(p => selectedSizes.some(size => p.sizes.includes(size)));
+    if (selectedColors.length) result = result.filter(p => colorFamiliesOf(p).some(c => selectedColors.includes(c)));
+    if (selectedStyles.length) result = result.filter(p => selectedStyles.includes(styleOf(p)));
     if (selectedPrices.length) {
       result = result.filter(p => {
         const price = finalPriceOf(p);
@@ -198,7 +206,7 @@ export const CatalogView: React.FC = () => {
     else if (sortBy === 'best-sellers') result.sort((a, b) => salesScore(b) - salesScore(a));
 
     return result;
-  }, [products, searchQuery, selectedBrandIds, selectedSizes, selectedPrices, selectedTags, minRating, sortBy]);
+  }, [products, searchQuery, selectedBrandIds, selectedSizes, selectedColors, selectedStyles, selectedPrices, selectedTags, minRating, sortBy]);
 
 
   const priceLabel = (range: typeof PRICE_RANGES[number]) =>
@@ -214,6 +222,16 @@ export const CatalogView: React.FC = () => {
       key: `brand-${id}`,
       label: brands.find(b => b.id === id)?.name ?? id,
       onRemove: () => setSelectedBrandIds(prev => prev.filter(item => item !== id))
+    })),
+    ...selectedColors.map(id => ({
+      key: `color-${id}`,
+      label: COLOR_FAMILIES.find(f => f.id === id)?.label ?? id,
+      onRemove: () => setSelectedColors(prev => prev.filter(item => item !== id))
+    })),
+    ...selectedStyles.map(id => ({
+      key: `style-${id}`,
+      label: STYLES.find(f => f.id === id)?.label ?? id,
+      onRemove: () => setSelectedStyles(prev => prev.filter(item => item !== id))
     })),
     ...selectedSizes.map(size => ({
       key: `size-${size}`,
@@ -314,21 +332,36 @@ export const CatalogView: React.FC = () => {
               </FilterSection>
               <FilterSection id="brand" label="Marca" summary={selectedBrandIds.length ? `${selectedBrandIds.length} seleccionadas` : 'Todas'} openId={openSection} setOpenId={setOpenSection}>
             <div className="space-y-1">
-              {brands.map(b => (
+              {brands.filter(b => products.some(p => p.brandId === b.id)).map(b => (
                 <OptionRow
                   key={b.id}
                   selected={selectedBrandIds.includes(b.id)}
                   onClick={() => setSelectedBrandIds(prev => toggleIn(prev, b.id))}
                 >
-                  <span className="flex items-center gap-2.5">
-                    <span className="flex h-5 w-10 items-center justify-center">
-                      <BrandLogo brand={b} className="h-5 w-auto max-w-[40px]" fallbackClassName="hidden" />
-                    </span>
-                    {b.name}
-                  </span>
+                  <span>{b.name}</span>
                   <span className="font-mono text-[9px] text-neutral-600">
                     {products.filter(p => p.brandId === b.id).length}
                   </span>
+                </OptionRow>
+              ))}
+            </div>
+              </FilterSection>
+              <FilterSection id="color" label="Color" summary={selectedColors.length ? `${selectedColors.length} seleccionados` : 'Todos'} openId={openSection} setOpenId={setOpenSection}>
+            <div className="grid grid-cols-2 gap-1">
+              {COLOR_FAMILIES.filter(f => products.some(p => colorFamiliesOf(p).includes(f.id))).map(f => (
+                <OptionRow key={f.id} selected={selectedColors.includes(f.id)} onClick={() => setSelectedColors(prev => toggleIn(prev, f.id))}>
+                  <span className="h-3 w-3 shrink-0 rounded-full border border-white/25" style={{ backgroundColor: f.hex }} />
+                  {f.label}
+                </OptionRow>
+              ))}
+            </div>
+              </FilterSection>
+              <FilterSection id="style" label="Estilo" summary={selectedStyles.length ? `${selectedStyles.length} seleccionados` : 'Todos'} openId={openSection} setOpenId={setOpenSection}>
+            <div className="space-y-1">
+              {STYLES.filter(st => products.some(p => styleOf(p) === st.id)).map(st => (
+                <OptionRow key={st.id} selected={selectedStyles.includes(st.id)} onClick={() => setSelectedStyles(prev => toggleIn(prev, st.id))}>
+                  <span>{st.label}</span>
+                  <span className="font-mono text-[9px] text-neutral-600">{products.filter(p => styleOf(p) === st.id).length}</span>
                 </OptionRow>
               ))}
             </div>
