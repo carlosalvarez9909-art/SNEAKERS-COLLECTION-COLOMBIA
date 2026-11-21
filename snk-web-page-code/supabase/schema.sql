@@ -293,3 +293,6 @@ grant insert, update, delete on public.top_rankings to authenticated;
 
 -- Talla EU -> id de variante en Shopify (para enviar el carrito al checkout de Shopify).
 alter table public.products add column if not exists shopify_variants jsonb;
+
+-- Id del pedido copiado a Shopify (evita duplicados).
+alter table public.orders add column if not exists shopify_order_id text;

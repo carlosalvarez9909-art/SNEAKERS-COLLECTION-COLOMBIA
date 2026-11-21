@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from './_lib/vercel';
 import { getServerSupabase } from './_lib/supabase.js';
+import { syncOrderToShopify } from './_lib/shopify.js';
 import { customerColumns, priceOrder, validateCheckout, type CheckoutItem, type Customer } from './_lib/order.js';
 
 // Pedido contra entrega: se guarda en Supabase para que aparezca en el panel de administración.
@@ -53,6 +54,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       payment_method: 'contraentrega'
     });
     if (error) throw error;
+
+    // Copia el pedido contra entrega a Shopify como pendiente de pago.
+    await syncOrderToShopify(supabase, reference, { method: 'contraentrega', paid: false });
 
     return res.status(200).json({ reference, total, items: priced.orderItems });
   } catch (error) {

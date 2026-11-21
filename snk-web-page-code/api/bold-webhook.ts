@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { VercelRequest, VercelResponse } from './_lib/vercel';
 import { getServerSupabase } from './_lib/supabase.js';
+import { syncOrderToShopify } from './_lib/shopify.js';
 
 export const config = { api: { bodyParser: false } };
 
@@ -92,7 +93,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { error: updateError } = await update;
     if (updateError) throw updateError;
 
-    // Agregar aquí el aviso de confirmación por correo o WhatsApp.
+    // Copia el pedido pagado a Shopify (pedidos y estadísticas).
+    if (nextStatus === 'paid') await syncOrderToShopify(supabase, reference, { method: 'bold', paid: true });
+
     return res.status(200).json({ received: true });
   } catch (error) {
     console.error('Error procesando el webhook de Bold:', error);
