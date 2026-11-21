@@ -112,6 +112,7 @@ export const fromProductRow = (row: ProductRow): Product => ({
   isTrending: row.is_trending,
   isTopRated: row.is_top_rated ?? false,
   isPublished: row.is_published ?? true,
+  shopifyVariants: row.shopify_variants ?? undefined,
   rating: Number(row.rating),
   reviewsCount: row.reviews_count,
   materials: row.materials ?? []

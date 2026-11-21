@@ -290,3 +290,6 @@ create policy "Todos leen el top" on public.top_rankings for select to anon, aut
 create policy "Admin gestiona el top" on public.top_rankings for all to authenticated using (public.is_admin()) with check (public.is_admin());
 grant select on public.top_rankings to anon, authenticated;
 grant insert, update, delete on public.top_rankings to authenticated;
+
+-- Talla EU -> id de variante en Shopify (para enviar el carrito al checkout de Shopify).
+alter table public.products add column if not exists shopify_variants jsonb;

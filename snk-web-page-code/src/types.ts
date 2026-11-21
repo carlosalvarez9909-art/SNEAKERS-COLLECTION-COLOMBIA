@@ -18,7 +18,8 @@ export interface Product {
   rating: number;
   reviewsCount: number;
   isTopRated?: boolean;
-  isPublished?: boolean; // false = borrador (solo lo ve el admin) // Marcado por la tienda para Top rating
+  isPublished?: boolean;
+  shopifyVariants?: Record<string, string>; // talla EU -> id de variante en Shopify // false = borrador (solo lo ve el admin) // Marcado por la tienda para Top rating
   materials: string[];
 }
 
