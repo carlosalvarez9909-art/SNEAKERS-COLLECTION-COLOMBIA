@@ -828,3 +828,13 @@ select {
 @media (prefers-reduced-motion: reduce) {
   .title-flash { animation: none; filter: drop-shadow(0 0 8px rgba(209, 10, 31, 0.85)); }
 }
+
+/* Barra que muestra cuándo cambia la pestaña del Top rankings */
+.rank-tab-progress {
+  animation: rank-tab-progress linear forwards;
+  box-shadow: 0 0 8px rgba(224, 16, 42, 0.9);
+}
+@keyframes rank-tab-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}

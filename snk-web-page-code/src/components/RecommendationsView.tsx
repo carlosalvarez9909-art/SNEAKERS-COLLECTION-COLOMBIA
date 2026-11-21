@@ -203,23 +203,16 @@ const ShowcaseHeader: React.FC<{ title: string; wave?: boolean; glow?: boolean; 
   );
 };
 
-const TopRankings: React.FC = () => {
-  const { products, brands, navigateTo, formatPrice } = useApp();
-  const [activeList, setActiveList] = useState<TopListId>('sold');
-  const ranking = useMemo(() => topProducts(products, activeList, 5), [products, activeList]);
-  const pausedUntil = React.useRef(0);
+const RANK_MS = 5000;
 
-  // Las pestañas cambian solas cada 6 s; si el cliente toca una, se respeta su elección 20 s.
-  React.useEffect(() => {
-    const timer = window.setInterval(() => {
-      if (Date.now() < pausedUntil.current || document.hidden) return;
-      setActiveList(current => {
-        const i = TOP_LISTS.findIndex(list => list.id === current);
-        return TOP_LISTS[(i + 1) % TOP_LISTS.length].id;
-      });
-    }, 6000);
-    return () => window.clearInterval(timer);
-  }, []);
+const TopRankings: React.FC<{
+  activeList: TopListId;
+  ranking: Product[];
+  cycle: number;
+  barMs: number;
+  onPick: (id: TopListId) => void;
+}> = ({ activeList, ranking, cycle, barMs, onPick }) => {
+  const { brands, navigateTo, formatPrice } = useApp();
 
   return (
     <section className="mt-28">
@@ -232,17 +225,21 @@ const TopRankings: React.FC = () => {
             type="button"
             role="tab"
             aria-selected={activeList === list.id}
-            onClick={() => {
-              pausedUntil.current = Date.now() + 20000;
-              setActiveList(list.id);
-            }}
-            className={`red-glow-hover rounded-full border px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${
+            onClick={() => onPick(list.id)}
+            className={`red-glow-hover relative overflow-hidden rounded-full border px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${
               activeList === list.id
                 ? 'red-glow-active border-[#d10a1f] bg-white/[0.06] text-white'
                 : 'border-white/15 bg-white/[0.03] text-white/70 hover:text-white'
             }`}
           >
-            {list.label}
+            <span className="relative">{list.label}</span>
+            {activeList === list.id && (
+              <span
+                key={cycle}
+                className="rank-tab-progress pointer-events-none absolute inset-x-3 bottom-1 h-[2px] origin-left rounded-full bg-red-500"
+                style={{ animationDuration: `${barMs}ms` }}
+              />
+            )}
           </button>
         ))}
       </div>
@@ -330,6 +327,32 @@ const TopRankings: React.FC = () => {
 
 export const RecommendationsView: React.FC = () => {
   const { products } = useApp();
+
+  // Top rankings: las pestañas rotan solas; si el cliente toca una, se queda ahí 20 s.
+  const [activeList, setActiveList] = useState<TopListId>('sold');
+  const [cycle, setCycle] = useState(0);
+  const [barMs, setBarMs] = useState(RANK_MS);
+  const pausedUntil = React.useRef(0);
+  React.useEffect(() => {
+    const timer = window.setInterval(() => {
+      if (Date.now() < pausedUntil.current || document.hidden) return;
+      setActiveList(current => {
+        const i = TOP_LISTS.findIndex(list => list.id === current);
+        return TOP_LISTS[(i + 1) % TOP_LISTS.length].id;
+      });
+      setBarMs(RANK_MS);
+      setCycle(c => c + 1);
+    }, RANK_MS);
+    return () => window.clearInterval(timer);
+  }, []);
+  const pickList = (id: TopListId) => {
+    pausedUntil.current = Date.now() + 20000;
+    setActiveList(id);
+    setBarMs(20000);
+    setCycle(c => c + 1);
+  };
+  const ranking = useMemo(() => topProducts(products, activeList, 5), [products, activeList]);
+  const rankingIds = useMemo(() => new Set(ranking.map(p => p.id)), [ranking]);
   // Cada tarjetón muestra un tenis distinto: se escoge el primero que no haya salido en otra tarjeta.
   const lists = useMemo(
     () => COLLECTIONS.map(collection => ({ collection, items: collection.pick(products) })).filter(e => e.items.length > 0),
@@ -339,14 +362,16 @@ export const RecommendationsView: React.FC = () => {
   // Portada de cada tarjetón: arranca con tenis distintos y cada 3 s una tarjeta cambia a otra referencia
   // de su colección, sin repetir la que muestra otra tarjeta en ese momento.
   const [covers, setCovers] = useState<string[]>([]);
+  const rankingRef = React.useRef(rankingIds);
+  rankingRef.current = rankingIds;
   React.useEffect(() => {
-    const used = new Set<string>();
+    const used = new Set<string>(rankingIds);
     setCovers(lists.map(({ items }) => {
       const pick = items.find(p => !used.has(p.id)) ?? items[0];
       used.add(pick.id);
       return pick.id;
     }));
-  }, [lists]);
+  }, [lists, rankingIds]);
 
   React.useEffect(() => {
     if (!lists.length) return;
@@ -358,7 +383,7 @@ export const RecommendationsView: React.FC = () => {
       setCovers(prev => {
         const items = lists[card].items;
         if (items.length < 2) return prev;
-        const others = new Set(prev.filter((_, i) => i !== card));
+        const others = new Set([...prev.filter((_, i) => i !== card), ...rankingRef.current]);
         const start = items.findIndex(p => p.id === prev[card]);
         for (let step = 1; step <= items.length; step++) {
           const candidate = items[(start + step) % items.length];
@@ -402,7 +427,7 @@ export const RecommendationsView: React.FC = () => {
           ))}
         </div>
 
-        <TopRankings />
+        <TopRankings activeList={activeList} ranking={ranking} cycle={cycle} barMs={barMs} onPick={pickList} />
       </div>
 
       <BrandMarquee />
