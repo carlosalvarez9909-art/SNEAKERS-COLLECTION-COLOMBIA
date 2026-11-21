@@ -77,7 +77,7 @@ export const CheckoutView: React.FC = () => {
     e.preventDefault();
     if (!customer.name || !customer.phone || !customer.email || !customer.address || !customer.city) return;
     if (paymentMethod === 'card') {
-      handleShopifyCheckout();
+      void handleBoldPayment();
       return;
     }
 
@@ -128,41 +128,6 @@ export const CheckoutView: React.FC = () => {
     } finally {
       setIsCreatingPayment(false);
     }
-  };
-
-  // Pago con el checkout seguro de Shopify: se arma el carrito con las variantes (talla) y se redirige.
-  const SHOPIFY_DOMAIN = (import.meta as any).env?.VITE_SHOPIFY_DOMAIN || 'sneakerscollectionrcol.myshopify.com';
-  const handleShopifyCheckout = () => {
-    const form = document.querySelector<HTMLFormElement>('#checkout-customer-form');
-    if (form && !form.reportValidity()) return;
-
-    const lines: string[] = [];
-    for (const item of cart) {
-      const variantId = item.product.shopifyVariants?.[String(item.selectedSize)];
-      if (!variantId) {
-        setPaymentError(`"${item.product.name}" talla ${item.selectedSize} todavía no está disponible para pago en línea. Usa contra entrega o WhatsApp.`);
-        return;
-      }
-      lines.push(`${variantId}:${item.quantity}`);
-    }
-
-    const [firstName, ...rest] = customer.name.trim().split(/\s+/);
-    const params = new URLSearchParams({
-      'checkout[email]': customer.email,
-      'checkout[shipping_address][first_name]': firstName ?? '',
-      'checkout[shipping_address][last_name]': rest.join(' ') || firstName || '',
-      'checkout[shipping_address][address1]': customer.address,
-      'checkout[shipping_address][city]': customer.city,
-      'checkout[shipping_address][country]': 'Colombia',
-      'checkout[shipping_address][phone]': customer.phone,
-      ref: 'sneakers-collection-web'
-    });
-    if (activeCoupon?.code) params.set('discount', activeCoupon.code);
-
-    setIsCreatingPayment(true);
-    setPaymentError('');
-    clearCart();
-    window.location.assign(`https://${SHOPIFY_DOMAIN}/cart/${lines.join(',')}?${params.toString()}`);
   };
 
   const handleBoldPayment = async () => {
@@ -451,7 +416,7 @@ export const CheckoutView: React.FC = () => {
                     className={`rounded-xl border p-4 cursor-pointer flex flex-col justify-between h-32 transition-colors ${paymentMethod === 'card' ? 'border-amber-500 bg-amber-500/5' : 'border-neutral-900 bg-neutral-950 hover:border-neutral-800'}`}
                   >
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400">🔒 Shopify</span>
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400">Pasarela</span>
                       <input
                         type="radio"
                         checked={paymentMethod === 'card'}
@@ -460,8 +425,8 @@ export const CheckoutView: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-white uppercase">Pago en línea</h4>
-                      <p className="text-[9px] text-neutral-500 mt-1 font-sans leading-tight">Tarjeta, PSE o Nequi en el checkout seguro de Shopify.</p>
+                      <h4 className="text-xs font-bold text-white uppercase">Tarjeta / Transf.</h4>
+                      <p className="text-[9px] text-neutral-500 mt-1 font-sans leading-tight">Paga de forma segura en el portal de Bold.</p>
                     </div>
                   </div>
 
@@ -471,7 +436,7 @@ export const CheckoutView: React.FC = () => {
                 <div className="pt-4 border-t border-neutral-900">
                   {activeCoupon && paymentMethod === 'card' && (
                     <p className="mb-3 text-[10px] text-amber-300">
-                      El cupón se envía al checkout de Shopify; solo se aplica si también existe allá.
+                      Los cupones no se aplican al pago con Bold. El total se calcula con el precio vigente en Supabase.
                     </p>
                   )}
                   {paymentError && (
@@ -489,13 +454,13 @@ export const CheckoutView: React.FC = () => {
                     </button>
                   ) : paymentMethod === 'card' ? (
                     <button
-                      id="checkout-shopify-submit-btn"
+                      id="checkout-bold-submit-btn"
                       type="button"
-                      onClick={handleShopifyCheckout}
+                      onClick={handleBoldPayment}
                       disabled={isCreatingPayment}
                       className="w-full rounded-full bg-white hover:bg-neutral-200 disabled:cursor-wait disabled:opacity-60 text-neutral-950 font-extrabold text-xs py-4 px-6 tracking-widest transition-all uppercase"
                     >
-                      {isCreatingPayment ? 'ABRIENDO CHECKOUT SEGURO...' : '🔒 PAGAR SEGURO CON SHOPIFY'}
+                      {isCreatingPayment ? 'CONECTANDO CON BOLD...' : 'PAGAR CON BOLD'}
                     </button>
                   ) : (
                     <button
