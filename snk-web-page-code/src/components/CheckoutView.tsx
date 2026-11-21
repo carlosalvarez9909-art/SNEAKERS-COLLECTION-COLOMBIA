@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { finalUnitPrice } from '../lib/price';
+import { finalUnitPrice, hasFreeShipping } from '../lib/price';
 import { useApp } from '../context/AppContext';
 import { LogoRow, PAYMENT_LOGOS } from './TrustLogos';
 import { isSupabaseConfigured } from '../lib/supabase';
@@ -528,7 +528,9 @@ export const CheckoutView: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span>Envío</span>
-                    <span className="font-bold uppercase text-emerald-400">Gratis</span>
+                    {cart.every(item => hasFreeShipping(finalUnitPrice(item.product.basePrice, item.product.discount)))
+                    ? <span className="font-bold uppercase text-emerald-400">Gratis</span>
+                    : <span className="text-right text-neutral-400">Se coordina por WhatsApp</span>}
                   </div>
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-red-500">
@@ -556,7 +558,7 @@ export const CheckoutView: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-3 text-[10px] font-mono text-neutral-400 uppercase">
                     <Truck className="h-5 w-5 text-amber-500 shrink-0" />
-                    <span>Envío gratis y asegurado a todo Colombia</span>
+                    <span>Envío gratis en pares desde $179.900</span>
                   </div>
                 </div>
 

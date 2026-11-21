@@ -7,3 +7,7 @@ export function finalUnitPrice(basePrice: number, discount: number): number {
   const raw = base * (1 - pct / 100);
   return Math.max(0, Math.ceil(raw / 1000) * 1000 - 100);
 }
+
+// Envío gratis solo para pares con precio final desde $179.900 (precio mínimo de la tienda).
+export const FREE_SHIPPING_MIN = 179900;
+export const hasFreeShipping = (finalPrice: number) => finalPrice >= FREE_SHIPPING_MIN;

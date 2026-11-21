@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { finalUnitPrice } from '../lib/price';
+import { finalUnitPrice, hasFreeShipping } from '../lib/price';
 import { AnimatePresence, motion } from 'motion/react';
 import { useApp } from '../context/AppContext';
 import {
@@ -265,7 +265,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
 
             {/* Sellos de confianza: solo íconos con anillo animado */}
             <div className="mt-10 grid grid-cols-3 gap-2">
-              {TRUST.map(({ icon: Icon, title, text }, i) => (
+              {TRUST.map(({ icon: Icon, title, text }, i) => (title === 'Envío gratis' && !hasFreeShipping(finalPrice) ? { icon: Icon, title: 'Envío nacional', text: 'A todo Colombia, 1 a 3 días' } : { icon: Icon, title, text })).map(({ icon: Icon, title, text }, i) => (
                 <motion.div
                   key={title}
                   initial={{ opacity: 0, y: 18 }}
@@ -311,10 +311,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                 )}
               </div>
               {quantity > 1 && <p className="mt-1 text-xs text-neutral-500">{quantity} pares · {formatPrice(finalPrice)} c/u</p>}
-              <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-red-600/50 bg-red-600/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white">
+              {hasFreeShipping(finalPrice) && <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-red-600/50 bg-red-600/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white">
                 <Truck className="h-3.5 w-3.5 text-red-500" />
                 Envío gratis a todo Colombia
-              </p>
+              </p>}
             </motion.div>
 
             {/* 3 preguntas */}

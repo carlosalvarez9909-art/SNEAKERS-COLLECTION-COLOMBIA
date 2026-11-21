@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { finalUnitPrice } from '../lib/price';
+import { finalUnitPrice, hasFreeShipping } from '../lib/price';
 import { useApp } from '../context/AppContext';
 import { X, Trash2, Plus, Minus, Tag, AlertCircle } from 'lucide-react';
 
@@ -227,7 +227,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               </div>
               <div className="flex justify-between">
                 <span>Envío</span>
-                <span className="font-bold uppercase text-emerald-400">Gratis</span>
+                {cart.every(item => hasFreeShipping(finalUnitPrice(item.product.basePrice, item.product.discount)))
+                    ? <span className="font-bold uppercase text-emerald-400">Gratis</span>
+                    : <span className="text-right text-neutral-400">Se coordina por WhatsApp</span>}
               </div>
               {discountAmount > 0 && (
                 <div className="flex justify-between text-red-500">

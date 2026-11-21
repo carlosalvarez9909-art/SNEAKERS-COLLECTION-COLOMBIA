@@ -313,7 +313,7 @@ const salesModels = [
 const shippingSteps = [
   { icon: ClipboardCheck, title: 'Procesamos tu pedido', text: 'Apenas compras, tu pedido entra a preparación de inmediato.' },
   { icon: PackageCheck, title: 'Verificamos el stock', text: 'Confirmamos tu talla y revisamos el par antes de empacarlo.' },
-  { icon: Truck, title: 'Lo despachamos', text: 'El envío es gratis: sale con transportadora y te compartimos la guía por WhatsApp.' },
+  { icon: Truck, title: 'Lo despachamos', text: 'Sale con transportadora (gratis en pares desde $179.900) y te compartimos la guía por WhatsApp.' },
   { icon: Clock, title: 'Llega en 1 a 3 días hábiles', text: 'Según tu ciudad y la transportadora, después de enviado.' }
 ];
 
@@ -736,7 +736,7 @@ function MainLayout() {
               <p className="mt-6 max-w-sm text-sm leading-relaxed text-neutral-400">
                 Tienda colombiana de sneakers de alta calidad. Seleccionamos cada par de Jordan,
                 Nike, Adidas, New Balance y más marcas para que encuentres tu estilo sin
-                complicaciones: compras en línea, pago seguro y envío gratis a todo el país, con
+                complicaciones: compras en línea, pago seguro y envío gratis a todo el país en pares desde $179.900, con
                 acompañamiento por WhatsApp de principio a fin.
               </p>
 
@@ -791,7 +791,7 @@ function MainLayout() {
               <ul className="mt-5 space-y-4 text-sm">
                 <li>
                   <Truck className="mr-2 inline h-4 w-4 align-[-3px] text-neutral-500" />
-                  Envío gratis a todo Colombia: llega en 1 a 3 días hábiles.
+                  Envío gratis a todo Colombia en pares desde $179.900. Llega en 1 a 3 días hábiles.
                 </li>
 
                 <li>
