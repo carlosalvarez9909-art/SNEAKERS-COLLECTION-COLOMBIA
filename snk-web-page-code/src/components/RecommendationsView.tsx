@@ -16,6 +16,7 @@ type Collection = {
   kicker: string;
   description: string;
   accent: string;
+  pill: string;
   icon: React.ElementType;
   filters: CatalogFilters;
   pick: (products: Product[]) => Product[];
@@ -29,6 +30,7 @@ const COLLECTIONS: Collection[] = [
     kicker: 'Top ventas',
     description: 'Los pares que nunca se quedan en la bóveda.',
     accent: '#ffffff',
+    pill: '#ff8a1f',
     icon: Flame,
     filters: { isBestSeller: true },
     pick: products =>
@@ -40,6 +42,7 @@ const COLLECTIONS: Collection[] = [
     kicker: 'Exclusivo',
     description: 'Piezas de tiraje corto para coleccionistas.',
     accent: '#ffffff',
+    pill: '#f5c542',
     icon: Crown,
     filters: { isLimited: true },
     pick: products => products.filter(p => p.isLimited)
@@ -50,6 +53,7 @@ const COLLECTIONS: Collection[] = [
     kicker: 'Lo más buscado',
     description: 'Lo que se está moviendo en la calle ahora.',
     accent: '#ffffff',
+    pill: '#22d3ee',
     icon: TrendingUp,
     filters: { isTrending: true },
     pick: products => products.filter(p => p.isTrending)
@@ -60,6 +64,7 @@ const COLLECTIONS: Collection[] = [
     kicker: 'Descuentos activos',
     description: 'Referencias premium con precio especial.',
     accent: '#ffffff',
+    pill: '#34d399',
     icon: BadgePercent,
     filters: { onSale: true },
     pick: products => products.filter(p => p.discount > 0).sort((a, b) => b.discount - a.discount)
@@ -70,6 +75,7 @@ const COLLECTIONS: Collection[] = [
     kicker: '5 estrellas',
     description: 'Los favoritos según nuestros clientes.',
     accent: '#ffffff',
+    pill: '#a78bfa',
     icon: Star,
     filters: { sortBy: 'rating' },
     pick: products => products.filter(p => p.isTopRated).sort((a, b) => b.rating - a.rating)
@@ -119,7 +125,7 @@ const CollectionCard: React.FC<{
       <div className="relative z-10 mt-auto flex w-full flex-col p-6 sm:p-8">
         <span
           className="inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-[9px] uppercase tracking-[0.25em]"
-          style={{ borderColor: `${collection.accent}55`, color: collection.accent }}
+          style={{ borderColor: collection.pill, color: collection.pill, boxShadow: `0 0 12px ${collection.pill}40` }}
         >
           <Icon className="h-3 w-3" />
           {collection.kicker}
@@ -190,6 +196,19 @@ const TopRankings: React.FC = () => {
   const { products, brands, navigateTo, formatPrice } = useApp();
   const [activeList, setActiveList] = useState<TopListId>('sold');
   const ranking = useMemo(() => topProducts(products, activeList, 5), [products, activeList]);
+  const pausedUntil = React.useRef(0);
+
+  // Las pestañas cambian solas cada 6 s; si el cliente toca una, se respeta su elección 20 s.
+  React.useEffect(() => {
+    const timer = window.setInterval(() => {
+      if (Date.now() < pausedUntil.current || document.hidden) return;
+      setActiveList(current => {
+        const i = TOP_LISTS.findIndex(list => list.id === current);
+        return TOP_LISTS[(i + 1) % TOP_LISTS.length].id;
+      });
+    }, 6000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   return (
     <section className="mt-28">
@@ -202,7 +221,10 @@ const TopRankings: React.FC = () => {
             type="button"
             role="tab"
             aria-selected={activeList === list.id}
-            onClick={() => setActiveList(list.id)}
+            onClick={() => {
+              pausedUntil.current = Date.now() + 20000;
+              setActiveList(list.id);
+            }}
             className={`red-glow-hover rounded-full border px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${
               activeList === list.id
                 ? 'red-glow-active border-[#d10a1f] bg-white/[0.06] text-white'
@@ -242,15 +264,6 @@ const TopRankings: React.FC = () => {
                     first ? 'rank-card-first border-red-600/50 p-6 sm:p-8' : 'border-white/10 p-4 sm:p-5'
                   }`}
                 >
-                  {/* número gigante de fondo */}
-                  <span
-                    className={`rank-number pointer-events-none absolute font-black leading-none tracking-[-0.08em] ${
-                      first ? '-bottom-6 right-2 text-[11rem] sm:text-[14rem]' : '-bottom-3 right-1 text-[6.5rem]'
-                    }`}
-                  >
-                    {index + 1}
-                  </span>
-
                   <span
                     className={`relative z-10 inline-flex w-fit items-center gap-1 rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] ${
                       first ? 'bg-red-600 text-white shadow-[0_0_16px_rgba(209,10,31,0.7)]' : 'border border-white/20 text-white/80'

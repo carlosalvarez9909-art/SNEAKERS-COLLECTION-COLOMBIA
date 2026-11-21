@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { motion } from 'motion/react';
+import { WaveTitle } from './WaveTitle';
 import { useApp } from '../context/AppContext';
 import { BrandLogo } from './BrandLogo';
 import { ProductCard } from './ProductCard';
@@ -239,10 +241,12 @@ export const CatalogView: React.FC = () => {
 
         {/* Encabezado: solo el título */}
         <div className="mb-6 border-b border-white/10 pb-6">
-          <p className="red-glow-label text-[11px] font-bold uppercase tracking-[0.35em]">Top Quality Shoes</p>
-          <h2 className="white-glow-title luxury-title mt-2 text-[2.4rem] font-black uppercase leading-[0.95] tracking-[-0.05em] sm:text-6xl">
-            Sneakers World
-          </h2>
+          <motion.p initial={{ opacity: 0, letterSpacing: '0.8em' }} animate={{ opacity: 1, letterSpacing: '0.35em' }} transition={{ duration: 0.9, ease: 'easeOut' }} className="red-glow-label text-[11px] font-bold uppercase">Top Quality Shoes</motion.p>
+          <WaveTitle
+            as="h2"
+            text="Sneakers World"
+            className="title-flash mt-2 cursor-default text-[2.4rem] font-black uppercase leading-[0.95] tracking-[-0.05em] sm:text-6xl"
+          />
         </div>
 
         {/* Resultados a la izquierda y botón de filtros en la esquina derecha */}
