@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { finalUnitPrice } from '../lib/price';
 import { useApp } from '../context/AppContext';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -105,7 +106,7 @@ export const HeroIntro: React.FC = () => {
                 className="mt-6 flex items-baseline gap-3"
               >
                 <span className="luxury-price text-2xl sm:text-4xl font-sans font-black tracking-[-0.04em]">
-                  {formatPrice(linkedProduct.basePrice * (1 - linkedProduct.discount / 100))}
+                  {formatPrice(finalUnitPrice(linkedProduct.basePrice, linkedProduct.discount))}
                 </span>
                 {linkedProduct.discount > 0 && (
                   <>

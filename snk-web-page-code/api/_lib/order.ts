@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { finalUnitPrice } from './price.js';
 
 export type CheckoutItem = {
   productId: string;
@@ -99,7 +100,7 @@ export async function priceOrder(
     ) {
       return { error: 'Una talla, color o producto ya no está disponible.' };
     }
-    const unitPrice = Math.round(Number(product.base_price) * (1 - Number(product.discount) / 100));
+    const unitPrice = finalUnitPrice(Number(product.base_price), Number(product.discount));
     orderItems.push({
       productId: product.id,
       productName: product.name,

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { finalUnitPrice } from '../lib/price';
 import { useApp } from '../context/AppContext';
 import { Product, Brand, Coupon, HeroBanner } from '../types';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
@@ -1097,7 +1098,7 @@ export const AdminPanel: React.FC = () => {
                         <p className="text-[10px] text-amber-500 uppercase font-semibold">{p.brandId}</p>
                       </td>
                       <td className="p-4 font-mono text-white">
-                        {p.basePrice > 0 ? <p>{formatPrice(p.basePrice * (1 - p.discount / 100))}</p> : <p className="font-bold text-amber-400">Sin precio</p>}
+                        {p.basePrice > 0 ? <p>{formatPrice(finalUnitPrice(p.basePrice, p.discount))}</p> : <p className="font-bold text-amber-400">Sin precio</p>}
                         {productCosts[p.id] && <p className="text-[10px] text-neutral-500">Costo: {formatPrice(productCosts[p.id].cost)}</p>}
                         {p.discount > 0 && <p className="text-[10px] text-neutral-500 line-through">{formatPrice(p.basePrice)}</p>}
                       </td>

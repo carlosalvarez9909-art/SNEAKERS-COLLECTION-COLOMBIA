@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { finalUnitPrice } from '../lib/price';
 import { AnimatePresence, motion } from 'motion/react';
 import { useApp } from '../context/AppContext';
 import {
@@ -14,7 +15,7 @@ type Question = 'size' | 'color' | 'qty';
 
 const TRUST = [
   { icon: ShieldCheck, title: 'Calidad premium', text: 'Alta gama, revisados uno a uno' },
-  { icon: Truck, title: 'Envío exprés', text: '1 a 3 días hábiles' },
+  { icon: Truck, title: 'Envío gratis', text: 'A todo Colombia, 1 a 3 días' },
   { icon: Headset, title: 'Soporte VIP', text: 'Asesoría por WhatsApp' }
 ];
 
@@ -60,7 +61,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
 
   const images = product.images.length ? product.images : [''];
   const color = selectedColor ?? product.colors[0] ?? { name: 'Único', hex: '#111111' };
-  const finalPrice = product.basePrice * (1 - product.discount / 100);
+  const finalPrice = finalUnitPrice(product.basePrice, product.discount);
   const brandName = brands.find(b => b.id === product.brandId)?.name ?? product.brandId;
 
   // Galería deslizable: el índice activo sale de la posición del scroll.
@@ -310,6 +311,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                 )}
               </div>
               {quantity > 1 && <p className="mt-1 text-xs text-neutral-500">{quantity} pares · {formatPrice(finalPrice)} c/u</p>}
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-red-600/50 bg-red-600/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white">
+                <Truck className="h-3.5 w-3.5 text-red-500" />
+                Envío gratis a todo Colombia
+              </p>
             </motion.div>
 
             {/* 3 preguntas */}
@@ -494,7 +499,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                     />
                   </div>
                   <h4 className="mt-2 truncate text-xs font-bold uppercase text-white">{prod.name}</h4>
-                  <span className="mt-1 text-xs font-bold text-neutral-300">{formatPrice(prod.basePrice * (1 - prod.discount / 100))}</span>
+                  <span className="mt-1 text-xs font-bold text-neutral-300">{formatPrice(finalUnitPrice(prod.basePrice, prod.discount))}</span>
                 </motion.button>
               ))}
             </div>

@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { finalUnitPrice } from '../lib/price';
 import { motion } from 'motion/react';
 import { Product } from '../types';
 import { useApp } from '../context/AppContext';
@@ -20,7 +21,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
 
   const cardRef = useRef<HTMLDivElement>(null);
   const isFav = isFavorite(product.id);
-  const finalPrice = product.basePrice * (1 - product.discount / 100);
+  const finalPrice = finalUnitPrice(product.basePrice, product.discount);
   const glowColor = product.colors?.[0]?.hex || '#ffffff';
 
   const handleCardClick = () => {
@@ -172,6 +173,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
                 </span>
               )}
             </div>
+            <p className="mt-1 text-[9px] font-bold uppercase tracking-wider text-emerald-400">Envío gratis</p>
           </div>
         </div>
       </div>

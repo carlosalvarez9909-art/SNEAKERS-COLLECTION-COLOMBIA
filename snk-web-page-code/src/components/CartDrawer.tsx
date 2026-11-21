@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { finalUnitPrice } from '../lib/price';
 import { useApp } from '../context/AppContext';
 import { X, Trash2, Plus, Minus, Tag, AlertCircle } from 'lucide-react';
 
@@ -45,7 +46,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   };
 
   const subtotal = cart.reduce((sum, item) => {
-    const discountedUnit = item.product.basePrice * (1 - item.product.discount / 100);
+    const discountedUnit = finalUnitPrice(item.product.basePrice, item.product.discount);
     return sum + discountedUnit * item.quantity;
   }, 0);
 
@@ -90,7 +91,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         <div className="flex-1 overflow-y-auto py-4 space-y-4" style={{ scrollbarWidth: 'thin' }}>
           {cart.length > 0 ? (
             cart.map(item => {
-              const discountedUnit = item.product.basePrice * (1 - item.product.discount / 100);
+              const discountedUnit = finalUnitPrice(item.product.basePrice, item.product.discount);
               return (
                 <div 
                   id={`cart-item-row-${item.id}`}
@@ -223,6 +224,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               <div className="flex justify-between text-neutral-400">
                 <span>Subtotal</span>
                 <span className="font-semibold text-white">{formatPrice(subtotal)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Envío</span>
+                <span className="font-bold uppercase text-emerald-400">Gratis</span>
               </div>
               {discountAmount > 0 && (
                 <div className="flex justify-between text-red-500">

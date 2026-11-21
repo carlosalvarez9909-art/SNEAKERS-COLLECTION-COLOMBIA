@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { finalUnitPrice } from '../lib/price';
 import { motion } from 'motion/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -119,7 +120,7 @@ export const LatestDrops: React.FC = () => {
       >
         {drops.map((product, index) => {
           const hasDiscount = product.discount > 0;
-          const finalPrice = product.basePrice * (1 - product.discount / 100);
+          const finalPrice = finalUnitPrice(product.basePrice, product.discount);
           const isActive = index === active;
 
           return (

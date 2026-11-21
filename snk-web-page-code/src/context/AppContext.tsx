@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { finalUnitPrice } from '../lib/price';
 import { 
   Product, Brand, CartItem, Coupon, Review, HeroBanner, Order, 
   CurrencyCode, CurrencyConfig, ViewState 
@@ -259,12 +260,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const placeOrder = (customer: { name: string; phone: string; email: string; address: string; city: string }) => {
     const discountAmount = activeCoupon
       ? activeCoupon.type === 'percent'
-        ? cart.reduce((sum, item) => sum + (item.product.basePrice * (1 - item.product.discount / 100)) * item.quantity, 0) * (activeCoupon.value / 100)
+        ? cart.reduce((sum, item) => sum + finalUnitPrice(item.product.basePrice, item.product.discount) * item.quantity, 0) * (activeCoupon.value / 100)
         : activeCoupon.value
       : 0;
 
     const subtotal = cart.reduce((sum, item) => {
-      const discountedUnit = item.product.basePrice * (1 - item.product.discount / 100);
+      const discountedUnit = finalUnitPrice(item.product.basePrice, item.product.discount);
       return sum + discountedUnit * item.quantity;
     }, 0);
 
@@ -283,7 +284,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         size: item.selectedSize,
         color: item.selectedColor.name,
         quantity: item.quantity,
-        price: item.product.basePrice * (1 - item.product.discount / 100)
+        price: finalUnitPrice(item.product.basePrice, item.product.discount)
       })),
       totalPrice: total,
       currency,

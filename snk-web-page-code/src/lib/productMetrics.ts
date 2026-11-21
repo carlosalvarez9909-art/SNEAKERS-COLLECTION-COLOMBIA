@@ -1,7 +1,8 @@
 import type { Product } from '../types';
+import { finalUnitPrice } from './price';
 
 export const finalPriceOf = (product: Product) =>
-  product.basePrice * (1 - product.discount / 100);
+  finalUnitPrice(product.basePrice, product.discount);
 
 // "Más vendidos": primero los marcados como Top ventas y luego por puntuación.
 export const salesScore = (product: Product) =>

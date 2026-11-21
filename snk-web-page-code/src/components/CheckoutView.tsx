@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { finalUnitPrice } from '../lib/price';
 import { useApp } from '../context/AppContext';
 import { LogoRow, PAYMENT_LOGOS } from './TrustLogos';
 import { isSupabaseConfigured } from '../lib/supabase';
@@ -52,7 +53,7 @@ export const CheckoutView: React.FC = () => {
 
   // Cost calculations
   const subtotal = cart.reduce((sum, item) => {
-    const discountedUnit = item.product.basePrice * (1 - item.product.discount / 100);
+    const discountedUnit = finalUnitPrice(item.product.basePrice, item.product.discount);
     return sum + discountedUnit * item.quantity;
   }, 0);
 
@@ -176,7 +177,7 @@ export const CheckoutView: React.FC = () => {
 
     const orderId = `SNK-WA-${Date.now().toString().slice(-5)}`;
     const itemsText = cart.map((item, idx) => {
-      const unitFinalP = item.product.basePrice * (1 - item.product.discount / 100);
+      const unitFinalP = finalUnitPrice(item.product.basePrice, item.product.discount);
       return `${idx + 1}. *${item.product.name}* \n   [Talla: EU ${item.selectedSize} | Color: ${item.selectedColor.name} | Qty: ${item.quantity}] \n   Precio: ${formatPrice(unitFinalP * item.quantity)}`;
     }).join('\n\n');
 
@@ -493,7 +494,7 @@ export const CheckoutView: React.FC = () => {
                 {/* Items loop list */}
                 <div className="space-y-4 max-h-72 overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
                   {cart.map(item => {
-                    const discountedUnit = item.product.basePrice * (1 - item.product.discount / 100);
+                    const discountedUnit = finalUnitPrice(item.product.basePrice, item.product.discount);
                     return (
                       <div id={`checkout-summary-item-${item.id}`} key={item.id} className="flex items-center space-x-3 text-xs">
                         <img 
@@ -525,6 +526,10 @@ export const CheckoutView: React.FC = () => {
                     <span>Subtotal</span>
                     <span className="font-semibold text-white">{formatPrice(subtotal)}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span>Envío</span>
+                    <span className="font-bold uppercase text-emerald-400">Gratis</span>
+                  </div>
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-red-500">
                       <span>Descuento</span>
@@ -551,7 +556,7 @@ export const CheckoutView: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-3 text-[10px] font-mono text-neutral-400 uppercase">
                     <Truck className="h-5 w-5 text-amber-500 shrink-0" />
-                    <span>Envío Asegurado por Coordinadora</span>
+                    <span>Envío gratis y asegurado a todo Colombia</span>
                   </div>
                 </div>
 
