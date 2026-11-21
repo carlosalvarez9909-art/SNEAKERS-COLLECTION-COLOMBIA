@@ -558,7 +558,7 @@ export const CheckoutView: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-3 text-[10px] font-mono text-neutral-400 uppercase">
                     <Truck className="h-5 w-5 text-amber-500 shrink-0" />
-                    <span>Envío gratis en pares desde $179.900</span>
+                    <span>Envío gratis en pares desde $180.000</span>
                   </div>
                 </div>
 
