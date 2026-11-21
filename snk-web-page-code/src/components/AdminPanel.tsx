@@ -3,6 +3,8 @@ import { finalUnitPrice } from '../lib/price';
 import { useApp } from '../context/AppContext';
 import { Product, Brand, Coupon, HeroBanner } from '../types';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { fetchTopRankings, saveTopRanking } from '../lib/catalog';
+import { TOP_LISTS, type TopListId } from '../lib/productMetrics';
 import { fetchAdminOrders, updateOrderFulfillment, markOrderPaid, fetchCustomers, deleteCustomer, fetchProductCosts, type AdminOrder, type RegisteredCustomer } from '../lib/catalog';
 import { CustomerSignup } from './CustomerSignup';
 import { 
@@ -44,7 +46,7 @@ export const AdminPanel: React.FC = () => {
   const [isUploadingImages, setIsUploadingImages] = useState(false);
 
   // Active Admin Sub-tab state
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'customers' | 'coupons' | 'banners'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'customers' | 'top' | 'coupons' | 'banners'>('products');
 
   // Form states - Products
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -211,6 +213,39 @@ export const AdminPanel: React.FC = () => {
       setAdminMessage(published ? `${ids.length} producto(s) publicados en la tienda.` : `${ids.length} producto(s) pasaron a borrador.`);
     } catch (error) {
       setAdminMessage(error instanceof Error ? error.message : 'No se pudo cambiar el estado.');
+    }
+  };
+
+  // Top rankings elegidos a mano (5 por lista; una referencia solo puede estar en un top).
+  const [topDraft, setTopDraft] = useState<Record<TopListId, string[]>>({ sold: [], rating: [], deals: [], new: [] });
+  const [savingTop, setSavingTop] = useState<TopListId | null>(null);
+  useEffect(() => {
+    if (!isAuthenticated || activeTab !== 'top') return;
+    void fetchTopRankings().then(data =>
+      setTopDraft({ sold: data.sold ?? [], rating: data.rating ?? [], deals: data.deals ?? [], new: data.new ?? [] })
+    );
+  }, [isAuthenticated, activeTab]);
+
+  const setTopSlot = (list: TopListId, slot: number, productId: string) => {
+    setTopDraft(prev => {
+      const next = [...prev[list]];
+      while (next.length < 5) next.push('');
+      next[slot] = productId;
+      return { ...prev, [list]: next };
+    });
+  };
+
+  const saveTop = async (list: TopListId, clear = false) => {
+    setSavingTop(list);
+    try {
+      const ids = clear ? [] : topDraft[list].filter(Boolean);
+      await saveTopRanking(list, ids);
+      if (clear) setTopDraft(prev => ({ ...prev, [list]: [] }));
+      setAdminMessage(clear ? 'Top vuelto a automático.' : 'Top guardado. Ya se ve en Recomendaciones.');
+    } catch (error) {
+      setAdminMessage(error instanceof Error ? error.message : 'No se pudo guardar el top.');
+    } finally {
+      setSavingTop(null);
     }
   };
 
@@ -683,6 +718,13 @@ export const AdminPanel: React.FC = () => {
               className={`rounded-lg px-4 py-2 text-xs font-mono tracking-wider uppercase transition-colors ${activeTab === 'customers' ? 'bg-amber-500 text-neutral-950 font-bold' : 'bg-neutral-900 text-neutral-400 hover:text-white'}`}
             >
               Clientes
+            </button>
+            <button
+              id="admin-tab-top"
+              onClick={() => { setActiveTab('top'); }}
+              className={`rounded-lg px-4 py-2 text-xs font-mono tracking-wider uppercase transition-colors ${activeTab === 'top' ? 'bg-amber-500 text-neutral-950 font-bold' : 'bg-neutral-900 text-neutral-400 hover:text-white'}`}
+            >
+              Top
             </button>
             <button
               id="admin-tab-coupons"
@@ -1254,6 +1296,79 @@ export const AdminPanel: React.FC = () => {
                 <p className="mt-1 text-xs text-neutral-500">Las compras generadas aparecerán registradas aquí.</p>
               </div>
             )}
+          </div>
+        )}
+
+        {/* TOP RANKINGS MANUAL */}
+        {activeTab === 'top' && (
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-sans text-md font-bold text-white uppercase">Top rankings</h3>
+              <p className="mt-1 text-xs text-neutral-500">
+                Elige hasta 5 referencias por top, en orden. Una referencia solo puede estar en un top. Los puestos vacíos se completan solos.
+              </p>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-2">
+              {TOP_LISTS.map(list => {
+                const slots = [...topDraft[list.id]];
+                while (slots.length < 5) slots.push('');
+                const usedElsewhere = new Set(
+                  TOP_LISTS.filter(l => l.id !== list.id).flatMap(l => topDraft[l.id]).filter(Boolean)
+                );
+                return (
+                  <div key={list.id} className="rounded-2xl border border-neutral-900 bg-neutral-950 p-5">
+                    <div className="mb-4 flex items-center justify-between">
+                      <h4 className="text-sm font-black uppercase text-white">{list.label}</h4>
+                      <span className="text-[10px] uppercase text-neutral-500">{topDraft[list.id].filter(Boolean).length}/5 a mano</span>
+                    </div>
+                    <div className="space-y-2">
+                      {slots.map((value, slot) => {
+                        const selected = products.find(p => p.id === value);
+                        const takenHere = new Set(slots.filter((id, i) => id && i !== slot));
+                        return (
+                          <div key={slot} className="flex items-center gap-3">
+                            <span className="w-12 shrink-0 text-[10px] font-black uppercase text-red-500">Top {slot + 1}</span>
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-900">
+                              {selected && <img src={selected.images[0]} alt="" className="max-h-9 max-w-9 object-contain" />}
+                            </div>
+                            <select
+                              value={value}
+                              onChange={e => setTopSlot(list.id, slot, e.target.value)}
+                              className="min-w-0 flex-1 rounded-xl border border-neutral-800 bg-neutral-900 p-2.5 text-xs text-white outline-none focus:border-red-500"
+                            >
+                              <option value="">Automático</option>
+                              {products
+                                .filter(p => p.id === value || (!usedElsewhere.has(p.id) && !takenHere.has(p.id)))
+                                .map(p => (
+                                  <option key={p.id} value={p.id}>{p.name}</option>
+                                ))}
+                            </select>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-4 flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => void saveTop(list.id, true)}
+                        disabled={savingTop === list.id}
+                        className="rounded-full border border-neutral-800 px-4 py-2 text-[10px] font-bold uppercase text-neutral-400 hover:text-white disabled:opacity-50"
+                      >
+                        Volver a automático
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void saveTop(list.id)}
+                        disabled={savingTop === list.id}
+                        className="rounded-full bg-red-600 px-4 py-2 text-[10px] font-bold uppercase text-white hover:bg-red-500 disabled:opacity-50"
+                      >
+                        {savingTop === list.id ? 'Guardando…' : 'Guardar'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 

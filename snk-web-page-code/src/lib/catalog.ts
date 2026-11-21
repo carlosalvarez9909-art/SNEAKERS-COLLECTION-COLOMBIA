@@ -423,3 +423,28 @@ export async function fetchProductCosts(): Promise<Record<string, { cost: number
   if (error) return {};
   return Object.fromEntries((data ?? []).map((row: Record<string, any>) => [row.product_id, { cost: Number(row.cost), supplier: row.supplier }]));
 }
+
+// Top rankings elegidos a mano en el panel (lista → ids en orden).
+export async function fetchTopRankings(): Promise<Partial<Record<'sold' | 'rating' | 'deals' | 'new', string[]>>> {
+  if (!supabase) return {};
+  const { data, error } = await supabase.from('top_rankings').select('list_id, position, product_id').order('position');
+  if (error) return {};
+  const out: Partial<Record<'sold' | 'rating' | 'deals' | 'new', string[]>> = {};
+  for (const row of (data ?? []) as { list_id: 'sold' | 'rating' | 'deals' | 'new'; product_id: string }[]) {
+    (out[row.list_id] ??= []).push(row.product_id);
+  }
+  return out;
+}
+
+export async function saveTopRanking(listId: 'sold' | 'rating' | 'deals' | 'new', productIds: string[]) {
+  if (!supabase) throw new Error('Configura Supabase para guardar el top.');
+  const { error: delError } = await supabase.from('top_rankings').delete().eq('list_id', listId);
+  if (delError) throw delError;
+  const rows = productIds.slice(0, 5).map((product_id, i) => ({ list_id: listId, position: i + 1, product_id }));
+  if (!rows.length) return;
+  const { error } = await supabase.from('top_rankings').insert(rows);
+  if (error) {
+    if (error.code === '23505') throw new Error('Una de esas referencias ya está en otro top. Quítala de allá primero.');
+    throw error;
+  }
+}

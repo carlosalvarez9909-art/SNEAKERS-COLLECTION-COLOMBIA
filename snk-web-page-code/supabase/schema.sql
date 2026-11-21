@@ -275,3 +275,18 @@ alter table public.product_costs enable row level security;
 create policy "admin gestiona costos" on public.product_costs for all to authenticated using (public.is_admin()) with check (public.is_admin());
 revoke all on public.product_costs from anon;
 grant select, insert, update, delete on public.product_costs to authenticated;
+
+-- Top rankings elegidos a mano en el panel (una referencia solo puede estar en un top).
+create table if not exists public.top_rankings (
+  list_id text not null check (list_id in ('sold','rating','deals','new')),
+  position int not null check (position between 1 and 5),
+  product_id text not null references public.products(id) on delete cascade,
+  updated_at timestamptz not null default now(),
+  primary key (list_id, position),
+  unique (product_id)
+);
+alter table public.top_rankings enable row level security;
+create policy "Todos leen el top" on public.top_rankings for select to anon, authenticated using (true);
+create policy "Admin gestiona el top" on public.top_rankings for all to authenticated using (public.is_admin()) with check (public.is_admin());
+grant select on public.top_rankings to anon, authenticated;
+grant insert, update, delete on public.top_rankings to authenticated;

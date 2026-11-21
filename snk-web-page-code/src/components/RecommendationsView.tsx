@@ -6,7 +6,8 @@ import type { Product, ViewState } from '../types';
 import { StarRating } from './StarRating';
 import { BrandMarquee } from './BrandMarquee';
 import { WaveTitle } from './WaveTitle';
-import { TOP_LISTS, TopListId, finalPriceOf, salesScore, topProducts } from '../lib/productMetrics';
+import { TOP_LISTS, TopListId, finalPriceOf, salesScore, resolveRankings, type ManualRankings } from '../lib/productMetrics';
+import { fetchTopRankings } from '../lib/catalog';
 
 type CatalogFilters = Extract<ViewState, { type: 'catalog' }>['filters'];
 
@@ -208,10 +209,8 @@ const RANK_MS = 5000;
 const TopRankings: React.FC<{
   activeList: TopListId;
   ranking: Product[];
-  cycle: number;
-  barMs: number;
   onPick: (id: TopListId) => void;
-}> = ({ activeList, ranking, cycle, barMs, onPick }) => {
+}> = ({ activeList, ranking, onPick }) => {
   const { brands, navigateTo, formatPrice } = useApp();
 
   return (
@@ -232,14 +231,7 @@ const TopRankings: React.FC<{
                 : 'border-white/15 bg-white/[0.03] text-white/70 hover:text-white'
             }`}
           >
-            <span className="relative">{list.label}</span>
-            {activeList === list.id && (
-              <span
-                key={cycle}
-                className="rank-tab-progress pointer-events-none absolute inset-x-3 bottom-1 h-[2px] origin-left rounded-full bg-red-500"
-                style={{ animationDuration: `${barMs}ms` }}
-              />
-            )}
+            {list.label}
           </button>
         ))}
       </div>
@@ -330,8 +322,6 @@ export const RecommendationsView: React.FC = () => {
 
   // Top rankings: las pestañas rotan solas; si el cliente toca una, se queda ahí 20 s.
   const [activeList, setActiveList] = useState<TopListId>('sold');
-  const [cycle, setCycle] = useState(0);
-  const [barMs, setBarMs] = useState(RANK_MS);
   const pausedUntil = React.useRef(0);
   React.useEffect(() => {
     const timer = window.setInterval(() => {
@@ -340,18 +330,19 @@ export const RecommendationsView: React.FC = () => {
         const i = TOP_LISTS.findIndex(list => list.id === current);
         return TOP_LISTS[(i + 1) % TOP_LISTS.length].id;
       });
-      setBarMs(RANK_MS);
-      setCycle(c => c + 1);
     }, RANK_MS);
     return () => window.clearInterval(timer);
   }, []);
   const pickList = (id: TopListId) => {
     pausedUntil.current = Date.now() + 20000;
     setActiveList(id);
-    setBarMs(20000);
-    setCycle(c => c + 1);
   };
-  const ranking = useMemo(() => topProducts(products, activeList, 5), [products, activeList]);
+  const [manual, setManual] = useState<ManualRankings>({});
+  React.useEffect(() => {
+    void fetchTopRankings().then(setManual);
+  }, []);
+  const allRankings = useMemo(() => resolveRankings(products, manual), [products, manual]);
+  const ranking = allRankings[activeList] ?? [];
   const rankingIds = useMemo(() => new Set(ranking.map(p => p.id)), [ranking]);
   // Cada tarjetón muestra un tenis distinto: se escoge el primero que no haya salido en otra tarjeta.
   const lists = useMemo(
@@ -427,7 +418,7 @@ export const RecommendationsView: React.FC = () => {
           ))}
         </div>
 
-        <TopRankings activeList={activeList} ranking={ranking} cycle={cycle} barMs={barMs} onPick={pickList} />
+        <TopRankings activeList={activeList} ranking={ranking} onPick={pickList} />
       </div>
 
       <BrandMarquee />
