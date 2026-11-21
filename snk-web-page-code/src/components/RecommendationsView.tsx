@@ -79,12 +79,12 @@ const COLLECTIONS: Collection[] = [
 const CollectionCard: React.FC<{
   collection: Collection;
   items: Product[];
+  cover?: Product;
   large?: boolean;
   index: number;
-}> = ({ collection, items, large = false, index }) => {
+}> = ({ collection, items, cover, large = false, index }) => {
   const { navigateTo } = useApp();
   const Icon = collection.icon;
-  const cover = items[0];
 
   return (
     <motion.button
@@ -187,7 +187,7 @@ const ShowcaseHeader: React.FC<{ title: string; wave?: boolean; glow?: boolean; 
 };
 
 const TopRankings: React.FC = () => {
-  const { products, navigateTo, formatPrice } = useApp();
+  const { products, brands, navigateTo, formatPrice } = useApp();
   const [activeList, setActiveList] = useState<TopListId>('sold');
   const ranking = useMemo(() => topProducts(products, activeList, 5), [products, activeList]);
 
@@ -221,51 +221,75 @@ const TopRankings: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -16 }}
           transition={{ duration: 0.3 }}
-          className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5"
+          className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:grid-rows-2"
         >
           {ranking.map((product, index) => {
             const finalPrice = finalPriceOf(product);
+            const first = index === 0;
+            const brand = brands.find(b => b.id === product.brandId)?.name ?? product.brandId;
             return (
-              <li key={product.id}>
+              <motion.li
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.07 }}
+                className={first ? 'col-span-2 lg:row-span-2' : ''}
+              >
                 <button
                   type="button"
                   onClick={() => navigateTo({ type: 'product', productId: product.id })}
-                  className="group relative flex h-full w-full flex-row items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left backdrop-blur-[2px] transition-all duration-300 hover:-translate-y-1 hover:border-white/30 lg:flex-col lg:items-stretch"
+                  className={`rank-card group relative flex h-full w-full flex-col overflow-hidden rounded-3xl border text-left transition-all duration-500 hover:-translate-y-1 ${
+                    first ? 'rank-card-first border-red-600/50 p-6 sm:p-8' : 'border-white/10 p-4 sm:p-5'
+                  }`}
                 >
-                  <span className="top-rank-number pointer-events-none absolute right-3 top-1 font-sans text-6xl font-black leading-none tracking-[-0.08em] lg:text-7xl">
+                  {/* número gigante de fondo */}
+                  <span
+                    className={`rank-number pointer-events-none absolute font-black leading-none tracking-[-0.08em] ${
+                      first ? '-bottom-6 right-2 text-[11rem] sm:text-[14rem]' : '-bottom-3 right-1 text-[6.5rem]'
+                    }`}
+                  >
                     {index + 1}
                   </span>
 
-                  <div className="relative flex h-24 w-24 shrink-0 items-center justify-center lg:h-36 lg:w-full">
+                  <span
+                    className={`relative z-10 inline-flex w-fit items-center gap-1 rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] ${
+                      first ? 'bg-red-600 text-white shadow-[0_0_16px_rgba(209,10,31,0.7)]' : 'border border-white/20 text-white/80'
+                    }`}
+                  >
+                    {first && <Crown className="h-3 w-3" />}
+                    Top {index + 1}
+                  </span>
+
+                  <div className={`relative z-10 flex items-center justify-center ${first ? 'my-6 h-52 sm:h-72' : 'my-3 h-28 sm:h-32'}`}>
+                    <div className="pointer-events-none absolute inset-x-6 bottom-2 h-1/2 rounded-full bg-red-700/25 blur-2xl transition-opacity duration-500 group-hover:opacity-100 sm:opacity-60" />
                     <img
                       src={product.images[0]}
                       alt={product.name}
                       referrerPolicy="no-referrer"
-                      className="max-h-full w-full object-contain drop-shadow-[0_18px_20px_rgba(0,0,0,0.8)] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-105"
+                      draggable={false}
+                      className="relative max-h-full w-full object-contain drop-shadow-[0_24px_24px_rgba(0,0,0,0.85)] transition-transform duration-700 group-hover:-rotate-6 group-hover:scale-110"
                     />
                   </div>
 
-                  <div className="relative z-10 min-w-0 flex-1 lg:mt-3">
-                    <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-500">
-                      {product.brandId}
-                    </span>
-                    <h3 className="mt-1 line-clamp-2 text-xs font-bold uppercase tracking-[0.04em] text-white">
+                  <div className="relative z-10 mt-auto min-w-0">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-red-500">{brand}</p>
+                    <h3 className={`mt-1 line-clamp-2 font-black uppercase leading-tight text-white ${first ? 'text-xl sm:text-3xl' : 'text-[11px] sm:text-xs'}`}>
                       {product.name}
                     </h3>
-                    <div className="mt-2">
-                      <StarRating rating={product.rating} />
-                    </div>
-                    <div className="mt-2 flex flex-wrap items-baseline gap-1.5">
-                      <span className="text-sm font-black text-white">{formatPrice(finalPrice)}</span>
+                    {product.rating > 0 && (
+                      <div className="mt-2">
+                        <StarRating rating={product.rating} />
+                      </div>
+                    )}
+                    <div className="mt-2 flex flex-wrap items-baseline gap-2">
+                      <span className={`font-black text-white ${first ? 'text-2xl sm:text-3xl' : 'text-sm'}`}>{formatPrice(finalPrice)}</span>
                       {product.discount > 0 && (
-                        <span className="rounded-full bg-white/10 px-1.5 py-0.5 font-mono text-[9px] text-white/80">
-                          -{product.discount}%
-                        </span>
+                        <span className="rounded-full bg-red-600/90 px-2 py-0.5 text-[9px] font-black text-white">-{product.discount}%</span>
                       )}
                     </div>
                   </div>
                 </button>
-              </li>
+              </motion.li>
             );
           })}
         </motion.ol>
@@ -282,10 +306,16 @@ const TopRankings: React.FC = () => {
 
 export const RecommendationsView: React.FC = () => {
   const { products } = useApp();
-  const collections = COLLECTIONS.map(collection => ({
-    collection,
-    items: collection.pick(products)
-  })).filter(entry => entry.items.length > 0);
+  // Cada tarjetón muestra un tenis distinto: se escoge el primero que no haya salido en otra tarjeta.
+  const collections = useMemo(() => {
+    const used = new Set<string>();
+    return COLLECTIONS.map(collection => {
+      const items = collection.pick(products);
+      const cover = items.find(p => !used.has(p.id)) ?? products.find(p => !used.has(p.id)) ?? items[0];
+      if (cover) used.add(cover.id);
+      return { collection, items, cover };
+    }).filter(entry => entry.items.length > 0);
+  }, [products]);
 
   return (
     <div id="recommendations-page" className="relative min-h-screen bg-transparent text-white">
@@ -293,7 +323,7 @@ export const RecommendationsView: React.FC = () => {
         <ShowcaseHeader as="h1" wave line title="¿Quieres algo único?" />
 
         <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
-          {collections.map(({ collection, items }, index) => (
+          {collections.map(({ collection, items, cover }, index) => (
             <div
               key={collection.id}
               className={index < 2 ? 'sm:col-span-1 lg:col-span-3' : 'sm:col-span-1 lg:col-span-2'}
@@ -301,6 +331,7 @@ export const RecommendationsView: React.FC = () => {
               <CollectionCard
                 collection={collection}
                 items={items}
+                cover={cover}
                 large={index < 2}
                 index={index}
               />

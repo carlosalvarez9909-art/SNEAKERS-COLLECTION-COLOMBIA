@@ -3,7 +3,7 @@ import { finalUnitPrice, hasFreeShipping } from '../lib/price';
 import { motion } from 'motion/react';
 import { Product } from '../types';
 import { useApp } from '../context/AppContext';
-import { Heart, Eye } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { StarRating } from './StarRating';
 
 interface ProductCardProps {
@@ -99,11 +99,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
             event.stopPropagation();
             toggleFavorite(product.id);
           }}
-          className="absolute right-4 top-4 z-20 rounded-full border border-white/15 bg-black/60 p-2 text-white/70 backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-white/40 hover:text-white"
+          aria-label={isFav ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+          className="absolute right-4 top-4 z-20 rounded-full border border-red-600/40 bg-black/60 p-2 backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-red-500 active:scale-90"
         >
           <Heart
-            className={`h-4.5 w-4.5 transition-colors ${
-              isFav ? 'fill-white text-white' : 'text-white/70'
+            className={`h-4.5 w-4.5 text-red-500 transition-all ${
+              isFav ? 'fill-red-600 drop-shadow-[0_0_6px_rgba(224,16,42,0.9)]' : ''
             }`}
           />
         </button>
@@ -120,20 +121,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
             className="product-floating-img relative z-10 max-h-44 w-[88%] object-contain"
           />
 
-          <div className="absolute inset-x-0 bottom-2 z-20 flex justify-center opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-            <button
-              id={`quick-view-btn-${product.id}`}
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                handleCardClick();
-              }}
-              className="floating-cta flex items-center space-x-1.5 rounded-full border border-white/15 bg-white/90 px-3.5 py-1.5 text-[10px] font-bold tracking-[0.18em] text-black transition-transform hover:scale-105"
-            >
-              <Eye className="h-3.5 w-3.5" />
-              <span>VER</span>
-            </button>
-          </div>
         </div>
 
         <div className="relative z-10 mt-5 flex flex-1 flex-col justify-between px-1">

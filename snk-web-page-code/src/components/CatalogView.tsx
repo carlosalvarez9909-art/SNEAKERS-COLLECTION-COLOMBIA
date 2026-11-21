@@ -239,9 +239,9 @@ export const CatalogView: React.FC = () => {
 
         {/* Encabezado: solo el título */}
         <div className="mb-6 border-b border-white/10 pb-6">
-          <h2 className="white-glow-title luxury-title text-[2rem] font-black uppercase leading-[0.95] tracking-[-0.05em] sm:text-5xl">
-            Catálogo de
-            <br className="sm:hidden" /> Sneakers
+          <p className="red-glow-label text-[11px] font-bold uppercase tracking-[0.35em]">Top Quality Shoes</p>
+          <h2 className="white-glow-title luxury-title mt-2 text-[2.4rem] font-black uppercase leading-[0.95] tracking-[-0.05em] sm:text-6xl">
+            Sneakers World
           </h2>
         </div>
 

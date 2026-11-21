@@ -1,15 +1,33 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { finalUnitPrice } from '../lib/price';
 import { motion } from 'motion/react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
-const AUTOPLAY_MS = 3800;
+const AUTOPLAY_MS = 3000;
+const POOL_SIZE = 12;
+
+// Mezcla aleatoria para que cada visita muestre tenis distintos.
+const shuffle = <T,>(list: T[]) => {
+  const copy = [...list];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+};
 
 // Recién llegados: carrusel deslizable que siempre deja una tarjeta centrada.
 export const LatestDrops: React.FC = () => {
   const { products, brands, navigateTo, formatPrice } = useApp();
-  const drops = products.slice(0, 10);
+  // Los 6 más nuevos siempre entran; el resto del carrusel rota al azar entre todo el catálogo.
+  const productKey = products.map(p => p.id).join(',');
+  const drops = useMemo(() => {
+    const newest = products.slice(0, 6);
+    const rest = shuffle(products.slice(6)).slice(0, Math.max(0, POOL_SIZE - newest.length));
+    return shuffle([...newest, ...rest]);
+  }, [productKey]);
+  // Se repite 3 veces para que el carrusel sea infinito en ambos sentidos.
+  const loop = useMemo(() => (drops.length > 1 ? [...drops, ...drops, ...drops] : drops), [drops]);
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const pausedUntil = useRef(0);
@@ -24,6 +42,18 @@ export const LatestDrops: React.FC = () => {
     if (!card) return;
     track.scrollTo({ left: card.offsetLeft - (track.clientWidth - card.clientWidth) / 2, behavior: 'smooth' });
   }, []);
+
+  const n = drops.length;
+  const settleTimer = useRef<number | undefined>(undefined);
+
+  // Distancia entre una copia de la lista y la siguiente (para el salto invisible del loop).
+  const copyWidth = () => {
+    const track = trackRef.current;
+    if (!track || n < 2) return 0;
+    const first = track.children[0] as HTMLElement | undefined;
+    const next = track.children[n] as HTMLElement | undefined;
+    return first && next ? next.offsetLeft - first.offsetLeft : 0;
+  };
 
   // La tarjeta activa es la más cercana al centro.
   const onScroll = () => {
@@ -42,20 +72,39 @@ export const LatestDrops: React.FC = () => {
     });
     activeRef.current = best;
     setActive(best);
+
+    // Cuando el movimiento termina fuera de la copia del medio, salta sin que se note.
+    window.clearTimeout(settleTimer.current);
+    settleTimer.current = window.setTimeout(() => {
+      const t = trackRef.current;
+      if (!t || n < 2) return;
+      const idx = activeRef.current;
+      const w = copyWidth();
+      if (idx < n) {
+        t.style.scrollSnapType = 'none';
+        t.scrollLeft += w;
+        t.style.scrollSnapType = '';
+      } else if (idx >= 2 * n) {
+        t.style.scrollSnapType = 'none';
+        t.scrollLeft -= w;
+        t.style.scrollSnapType = '';
+      }
+    }, 140);
   };
 
   const pause = () => {
-    pausedUntil.current = Date.now() + 7000;
+    pausedUntil.current = Date.now() + 5000;
   };
 
-  const go = (index: number) => {
+  const go = (realIndex: number) => {
     pause();
-    scrollToCard((index + drops.length) % drops.length);
+    const base = Math.floor(activeRef.current / n) * n;
+    scrollToCard(base + realIndex);
   };
 
-  // Avanza solo; se detiene un rato cuando el cliente desliza o toca.
+  // Siempre en movimiento: avanza solo y retoma unos segundos después de que el cliente desliza.
   useEffect(() => {
-    if (drops.length < 2) return;
+    if (n < 2) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
     const timer = window.setInterval(() => {
@@ -64,16 +113,23 @@ export const LatestDrops: React.FC = () => {
       if (!track) return;
       const rect = track.getBoundingClientRect();
       if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-      scrollToCard((activeRef.current + 1) % drops.length);
+      scrollToCard(activeRef.current + 1);
     }, AUTOPLAY_MS);
     return () => window.clearInterval(timer);
-  }, [drops.length, scrollToCard]);
+  }, [n, scrollToCard]);
 
-  // Centra la primera tarjeta al cargar.
-  useEffect(() => {
+  // Arranca centrado en la copia del medio, así hay tenis a ambos lados desde el inicio.
+  useLayoutEffect(() => {
     const track = trackRef.current;
-    if (track) track.scrollLeft = 0;
-  }, [drops.length]);
+    if (!track || n < 2) return;
+    const card = track.children[n] as HTMLElement | undefined;
+    if (!card) return;
+    track.style.scrollSnapType = 'none';
+    track.scrollLeft = card.offsetLeft - (track.clientWidth - card.clientWidth) / 2;
+    track.style.scrollSnapType = '';
+    activeRef.current = n;
+    setActive(n);
+  }, [n, productKey]);
 
   if (!drops.length) return null;
 
@@ -90,24 +146,6 @@ export const LatestDrops: React.FC = () => {
           <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-red-500">Recién llegados</p>
           <h2 className="luxury-title mt-3 text-4xl font-black uppercase tracking-[-0.06em] sm:text-5xl">Últimos lanzamientos</h2>
         </div>
-        <div className="hidden shrink-0 items-center gap-2 sm:flex">
-          <button
-            type="button"
-            aria-label="Anterior"
-            onClick={() => go(active - 1)}
-            className="red-glow-hover rounded-full border border-neutral-800 p-3 text-white"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            aria-label="Siguiente"
-            onClick={() => go(active + 1)}
-            className="red-glow-hover rounded-full border border-neutral-800 p-3 text-white"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
       </motion.div>
 
       <div
@@ -118,16 +156,16 @@ export const LatestDrops: React.FC = () => {
         onWheel={pause}
         className="no-scrollbar mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-[14vw] py-6 sm:gap-6 sm:px-[calc(50%-150px)]"
       >
-        {drops.map((product, index) => {
+        {loop.map((product, index) => {
           const hasDiscount = product.discount > 0;
           const finalPrice = finalUnitPrice(product.basePrice, product.discount);
           const isActive = index === active;
 
           return (
             <button
-              key={product.id}
+              key={`${product.id}-${index}`}
               type="button"
-              onClick={() => (isActive ? navigateTo({ type: 'product', productId: product.id }) : go(index))}
+              onClick={() => (isActive ? navigateTo({ type: 'product', productId: product.id }) : (pause(), scrollToCard(index)))}
               className={`group/card relative w-[72vw] max-w-[300px] shrink-0 snap-center overflow-hidden rounded-3xl border text-left transition-all duration-500 ease-out sm:w-[300px] ${
                 isActive
                   ? 'scale-100 border-red-600/60 bg-neutral-950 opacity-100 shadow-[0_0_40px_rgba(209,10,31,0.28)]'
@@ -180,7 +218,7 @@ export const LatestDrops: React.FC = () => {
             type="button"
             aria-label={`Ir al producto ${i + 1}`}
             onClick={() => go(i)}
-            className={`h-1.5 rounded-full transition-all duration-300 ${i === active ? 'w-7 bg-red-600 shadow-[0_0_10px_rgba(209,10,31,0.8)]' : 'w-1.5 bg-neutral-700'}`}
+            className={`h-1.5 rounded-full transition-all duration-300 ${n > 0 && i === active % n ? 'w-7 bg-red-600 shadow-[0_0_10px_rgba(209,10,31,0.8)]' : 'w-1.5 bg-neutral-700'}`}
           />
         ))}
       </div>
