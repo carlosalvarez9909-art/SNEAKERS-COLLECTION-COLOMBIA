@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { Search, Heart, ShoppingBag, Settings, Sparkles, Home, LayoutGrid, Info } from 'lucide-react';
+import { Search, Heart, ShoppingBag, Settings, Sparkles, Home, LayoutGrid, Info, ChevronDown } from 'lucide-react';
 import type { ViewState } from '../types';
 import { OriginalLogo } from './OriginalLogo';
 import { COLOR_FAMILIES, STYLES, colorFamiliesOf, styleOf } from '../lib/productFacets';
@@ -24,6 +24,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart }) => {
   } = useApp();
 
   const [showSearchDrop, setShowSearchDrop] = useState(false);
+  const [openFacet, setOpenFacet] = useState<'marcas' | 'colores' | 'estilos' | null>(null);
   const [showCurrencyDrop, setShowCurrencyDrop] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const currencyRef = useRef<HTMLDivElement>(null);
@@ -241,50 +242,74 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart }) => {
                 </div>
 
                 {(() => {
-                  const chip = 'rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] font-medium text-neutral-300 transition-colors hover:border-white/30 hover:bg-white/[0.08] hover:text-white';
-                  const label = 'mb-2 px-1 text-[10px] font-mono tracking-wider text-neutral-500 uppercase';
-                  const brandList = brands.filter(b => products.some(p => p.brandId === b.id));
-                  const colorList = COLOR_FAMILIES.filter(f => products.some(p => colorFamiliesOf(p).includes(f.id)));
-                  const styleList = STYLES.filter(st => products.some(p => styleOf(p) === st.id));
+                  const facets = [
+                    {
+                      id: 'marcas' as const,
+                      label: 'Marcas',
+                      items: brands
+                        .map(b => ({ key: b.id, label: b.name, count: products.filter(p => p.brandId === b.id).length, view: { type: 'catalog', filters: { brandId: b.id } } as ViewState }))
+                        .filter(i => i.count > 0)
+                        .sort((a, b) => a.label.localeCompare(b.label))
+                    },
+                    {
+                      id: 'colores' as const,
+                      label: 'Colores',
+                      items: COLOR_FAMILIES
+                        .map(f => ({ key: f.id, label: f.label, hex: f.hex as string, count: products.filter(p => colorFamiliesOf(p).includes(f.id)).length, view: { type: 'catalog', filters: { color: f.id } } as ViewState }))
+                        .filter(i => i.count > 0)
+                    },
+                    {
+                      id: 'estilos' as const,
+                      label: 'Estilos',
+                      items: STYLES
+                        .map(st => ({ key: st.id, label: st.label, count: products.filter(p => styleOf(p) === st.id).length, view: { type: 'catalog', filters: { style: st.id } } as ViewState }))
+                        .filter(i => i.count > 0)
+                    }
+                  ].filter(f => f.items.length > 0);
                   return (
-                    <div className="mt-3 space-y-3 border-t border-neutral-900 pt-3">
-                      {brandList.length > 0 && (
-                        <div>
-                          <div className={label}>Marcas</div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {brandList.map(b => (
-                              <button key={b.id} type="button" className={chip} onClick={() => goTo({ type: 'catalog', filters: { brandId: b.id } })}>
-                                {b.name}
-                              </button>
-                            ))}
+                    <div className="mt-3 border-t border-neutral-900 pt-3">
+                      <div className="mb-1.5 px-1 text-[10px] font-mono tracking-wider text-neutral-500 uppercase">
+                        Filtrar por
+                      </div>
+                      {facets.map(facet => {
+                        const isOpen = openFacet === facet.id;
+                        return (
+                          <div key={facet.id} className="border-b border-white/5 last:border-b-0">
+                            <button
+                              type="button"
+                              aria-expanded={isOpen}
+                              onClick={() => setOpenFacet(isOpen ? null : facet.id)}
+                              className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2.5 text-sm transition-colors hover:bg-neutral-900 ${isOpen ? 'text-white' : 'text-neutral-400 hover:text-white'}`}
+                            >
+                              <span>{facet.label}</span>
+                              <span className="flex items-center gap-2">
+                                <span className="font-mono text-[10px] text-neutral-600">{facet.items.length}</span>
+                                <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                              </span>
+                            </button>
+                            {isOpen && (
+                              <div className="grid grid-cols-2 gap-1 px-1 pb-3 pt-1">
+                                {facet.items.map(item => (
+                                  <button
+                                    key={item.key}
+                                    type="button"
+                                    onClick={() => goTo(item.view)}
+                                    className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-2 text-left text-xs text-neutral-300 transition-colors hover:border-white/25 hover:bg-white/[0.07] hover:text-white"
+                                  >
+                                    <span className="flex min-w-0 items-center gap-2">
+                                      {'hex' in item && (
+                                        <span className="h-2.5 w-2.5 shrink-0 rounded-full border border-white/25" style={{ backgroundColor: item.hex }} />
+                                      )}
+                                      <span className="truncate">{item.label}</span>
+                                    </span>
+                                    <span className="shrink-0 font-mono text-[10px] text-neutral-600">{item.count}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      )}
-                      {colorList.length > 0 && (
-                        <div>
-                          <div className={label}>Colores</div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {colorList.map(f => (
-                              <button key={f.id} type="button" className={`${chip} inline-flex items-center gap-1.5`} onClick={() => goTo({ type: 'catalog', filters: { color: f.id } })}>
-                                <span className="h-2.5 w-2.5 rounded-full border border-white/25" style={{ backgroundColor: f.hex }} />
-                                {f.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      {styleList.length > 0 && (
-                        <div>
-                          <div className={label}>Estilos</div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {styleList.map(st => (
-                              <button key={st.id} type="button" className={chip} onClick={() => goTo({ type: 'catalog', filters: { style: st.id } })}>
-                                {st.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                        );
+                      })}
                     </div>
                   );
                 })()}
