@@ -4,7 +4,9 @@ import { BrandLogo } from './BrandLogo';
 
 // Carrusel infinito de marcas: cada logo lleva a la página de su marca.
 export const BrandMarquee: React.FC<{ title?: string }> = ({ title = 'Nuestras marcas' }) => {
-  const { brands, products, navigateTo } = useApp();
+  const { brands: allBrands, products, navigateTo } = useApp();
+  // Solo marcas con logo y con tenis publicados.
+  const brands = allBrands.filter(b => b.logo && products.some(p => p.brandId === b.id));
   if (!brands.length) return null;
 
   const countByBrand = new Map<string, number>();
