@@ -427,7 +427,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                   <span className="text-base font-black uppercase tracking-wider">
                     {selectedSize ? 'Comprar ahora' : 'Elegir talla y comprar'}
                   </span>
-                  <span className="rounded-full bg-black/25 px-3 py-1 text-sm font-black">{formatPrice(finalPrice * quantity)}</span>
                 </span>
               </button>
 
