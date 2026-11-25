@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useApp } from '../context/AppContext';
 import {
   ArrowLeft, ShoppingBag, Star, ShieldCheck, Truck, Headset, AlertCircle,
-  ChevronDown, ChevronLeft, ChevronRight, Minus, Plus, Check, Share2, Heart
+  ChevronDown, ChevronLeft, ChevronRight, Minus, Plus, Check, Share2, Heart, Lock, Banknote
 } from 'lucide-react';
 import { ZoomableImage } from './ZoomableImage';
 
@@ -34,6 +34,17 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
   const [shared, setShared] = useState(false);
   const [zoomed, setZoomed] = useState(false);
   const galleryRef = useRef<HTMLDivElement>(null);
+  const buyRef = useRef<HTMLDivElement>(null);
+  const [buyVisible, setBuyVisible] = useState(true);
+
+  // Barra fija de compra en celular cuando el botón principal sale de la pantalla.
+  useEffect(() => {
+    const el = buyRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setBuyVisible(e.isIntersecting || e.boundingClientRect.top > window.innerHeight));
+    io.observe(el);
+    return () => io.disconnect();
+  }, [productId]);
 
   // Al cambiar de producto se reinicia todo.
   useEffect(() => {
@@ -89,6 +100,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
   const requireSize = () => {
     if (selectedSize) return true;
     setOpenQuestion('size');
+    document.getElementById('product-steps')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     setNeedsSize(true);
     setTimeout(() => setNeedsSize(false), 600);
     return false;
@@ -134,13 +146,20 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
   // Se llama como función (no como componente) para que no se vuelva a montar en cada cambio.
   const renderQuestion = (id: Question, question: string, answer: string | null, children: React.ReactNode) => {
     const open = openQuestion === id;
+    const step = ({ size: 1, color: 2, qty: 3 } as const)[id];
+    const done = id === 'size' ? !!selectedSize : true;
     return (
       <div
         key={id}
         className={`rounded-2xl border transition-colors duration-300 ${open ? 'border-red-600/60 bg-red-950/10 shadow-[0_0_24px_rgba(209,10,31,0.18)]' : 'border-neutral-900 hover:border-neutral-700'} ${id === 'size' && needsSize ? 'nudge border-red-500' : ''}`}
       >
         <button type="button" onClick={() => toggle(id)} className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left">
-          <span className="text-sm font-bold text-white sm:text-base">{question}</span>
+          <span className="flex items-center gap-3">
+            <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black transition-colors ${done ? 'bg-red-600 text-white' : 'border border-red-600 text-red-500'}`}>
+              {done ? <Check className="h-3.5 w-3.5" /> : step}
+            </span>
+            <span className="text-sm font-bold text-white sm:text-base">{question}</span>
+          </span>
           <span className="flex shrink-0 items-center gap-2">
             {answer ? (
               <span className="flex items-center gap-1 rounded-full bg-red-600 px-3 py-1 text-[11px] font-bold uppercase text-white">
@@ -329,7 +348,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
             </motion.div>
 
             {/* 3 preguntas */}
-            <div className="mt-8 space-y-3">
+            <div id="product-steps" className="mt-8 space-y-3">
               {renderQuestion('size', '¿Qué talla los quieres?', selectedSize ? `EU ${selectedSize}` : null, <>
                 <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
                   {product.sizes.map(size => (
@@ -392,30 +411,47 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
               </>)}
             </div>
 
-            {/* Acciones: comprar arriba y tres botones iguales abajo */}
-            <div className="mt-6 space-y-3">
+            {/* Acciones: el botón de comprar guía al cliente */}
+            <div ref={buyRef} className="mt-6 space-y-3">
+              <p className={`text-center text-xs font-bold ${selectedSize ? 'text-neutral-300' : 'text-red-500'}`}>
+                {selectedSize
+                  ? `Listo: talla EU ${selectedSize}, ${color.name}, ${quantity} ${quantity === 1 ? 'par' : 'pares'}`
+                  : 'Elige tu talla en el paso 1 para continuar'}
+              </p>
               <button
                 type="button"
                 onClick={handleBuyNow}
-                className="glow-outline-button w-full rounded-full px-6 py-4 text-sm font-black uppercase tracking-widest active:scale-[0.98]"
+                className="buy-cta group relative w-full overflow-hidden rounded-full px-6 py-4 text-white active:scale-[0.98]"
               >
-                Comprar ahora
+                <span className="relative z-10 flex items-center justify-center gap-3">
+                  <span className="text-base font-black uppercase tracking-wider">
+                    {selectedSize ? 'Comprar ahora' : 'Elegir talla y comprar'}
+                  </span>
+                  <span className="rounded-full bg-black/25 px-3 py-1 text-sm font-black">{formatPrice(finalPrice * quantity)}</span>
+                </span>
               </button>
-              <div className="grid grid-cols-3 gap-3">
+
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[11px] text-neutral-400">
+                <span className="flex items-center gap-1.5"><Lock className="h-3.5 w-3.5 text-red-500" />Pago seguro con Bold</span>
+                <span className="flex items-center gap-1.5"><Banknote className="h-3.5 w-3.5 text-red-500" />Contra entrega</span>
+                <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5 text-red-500" />Llega en 1 a 3 días</span>
+              </div>
+
+              <div className="grid grid-cols-[1fr_1fr_auto] gap-3 pt-1">
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className={`flex h-16 flex-col items-center justify-center gap-1 rounded-2xl border text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 ${isAdded ? 'border-white bg-white text-neutral-950' : 'red-glow-hover border-neutral-800 text-white'}`}
+                  className={`flex h-14 items-center justify-center gap-2 rounded-2xl border text-xs font-black uppercase tracking-wider transition-all active:scale-95 ${isAdded ? 'border-white bg-white text-neutral-950' : 'border-red-600/70 text-red-500 hover:bg-red-600 hover:text-white hover:shadow-[0_0_18px_rgba(209,10,31,0.5)]'}`}
                 >
                   {isAdded ? <Check className="h-5 w-5" /> : <ShoppingBag className="h-5 w-5" />}
-                  {isAdded ? 'Agregado' : 'Carrito'}
+                  {isAdded ? 'Agregado' : 'Al carrito'}
                 </button>
                 <button
                   type="button"
                   onClick={handleWhatsAppBuy}
-                  className="flex h-16 flex-col items-center justify-center gap-1 rounded-2xl border border-emerald-600/70 bg-emerald-600/10 text-[10px] font-black uppercase tracking-wider text-white transition-all hover:bg-emerald-600/20 hover:shadow-[0_0_18px_rgba(16,185,129,0.45)] active:scale-95"
+                  className="flex h-14 items-center justify-center gap-2 rounded-2xl border border-emerald-600/70 bg-emerald-600/10 text-xs font-black uppercase tracking-wider text-white transition-all hover:bg-emerald-600/20 hover:shadow-[0_0_18px_rgba(16,185,129,0.45)] active:scale-95"
                 >
-                  <span className="flex h-5 w-5 items-center justify-center rounded-[6px] bg-[#25D366] shadow-[0_0_10px_rgba(37,211,102,0.45)]">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-[6px] bg-[#25D366]">
                     <svg className="h-3.5 w-3.5 fill-white" viewBox="0 0 24 24" aria-hidden>
                       <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zM12.04 21.5h-.01a9.4 9.4 0 0 1-4.8-1.31l-.34-.2-3.57.94.95-3.48-.22-.36a9.4 9.4 0 0 1-1.44-5.02c0-5.2 4.23-9.43 9.44-9.43 2.52 0 4.89.98 6.67 2.77a9.37 9.37 0 0 1 2.76 6.67c0 5.2-4.23 9.42-9.44 9.42z"/>
                     </svg>
@@ -425,10 +461,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                 <button
                   type="button"
                   onClick={handleShare}
-                  className="red-glow-hover flex h-16 flex-col items-center justify-center gap-1 rounded-2xl border border-neutral-800 text-[10px] font-black uppercase tracking-wider text-white transition-all active:scale-95"
+                  aria-label={shared ? 'Link copiado' : 'Compartir'}
+                  className="flex h-14 w-14 items-center justify-center rounded-2xl border border-neutral-800 text-neutral-300 transition-all hover:border-red-600 hover:text-white active:scale-95"
                 >
                   {shared ? <Check className="h-5 w-5" /> : <Share2 className="h-5 w-5" />}
-                  {shared ? 'Copiado' : 'Compartir'}
                 </button>
               </div>
             </div>
@@ -517,6 +553,32 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
           </section>
         )}
       </div>
+      {/* Barra fija de compra (celular), aparece cuando el botón principal ya no se ve */}
+      <AnimatePresence>
+        {!buyVisible && (
+          <motion.div
+            initial={{ y: 100 }}
+            animate={{ y: 0 }}
+            exit={{ y: 100 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="fixed inset-x-0 bottom-0 z-40 border-t border-red-600/40 bg-black/90 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3 backdrop-blur lg:hidden"
+          >
+            <div className="flex items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[11px] uppercase text-neutral-400">{product.name}</p>
+                <p className="text-lg font-black">{formatPrice(finalPrice * quantity)}</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleBuyNow}
+                className="buy-cta relative overflow-hidden rounded-full px-6 py-3 text-sm font-black uppercase tracking-wider text-white active:scale-95"
+              >
+                {selectedSize ? 'Comprar' : 'Elegir talla'}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
