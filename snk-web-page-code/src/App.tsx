@@ -1,4 +1,5 @@
 import { SeeMoreButton } from './components/SeeMoreButton';
+import { homeSections } from './lib/homeSections';
 import React, { useEffect, useRef, useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
@@ -594,10 +595,8 @@ function MainLayout() {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Ediciones limitadas primero; si hay pocas, se completa con el resto del catálogo.
-  const homeNewArrivals = [
-    ...products.filter(p => p.isLimited),
-    ...products.filter(p => !p.isLimited)
-  ].slice(0, 4);
+  // Sin repetir los pares de Más vendidos.
+  const homeNewArrivals = homeSections(products).house;
 
   const renderCurrentView = () => {
     switch (activeView.type) {

@@ -3,6 +3,7 @@ import { finalUnitPrice } from '../lib/price';
 import { motion } from 'motion/react';
 import { useApp } from '../context/AppContext';
 import { SeeMoreButton } from './SeeMoreButton';
+import { homeSections } from '../lib/homeSections';
 
 const AUTOPLAY_MS = 3000;
 const POOL_SIZE = 12;
@@ -23,8 +24,10 @@ export const LatestDrops: React.FC = () => {
   // Los 6 más nuevos siempre entran; el resto del carrusel rota al azar entre todo el catálogo.
   const productKey = products.map(p => p.id).join(',');
   const drops = useMemo(() => {
-    const newest = products.slice(0, 6);
-    const rest = shuffle(products.slice(6)).slice(0, Math.max(0, POOL_SIZE - newest.length));
+    // Sin los pares que ya salen en Más vendidos y La casa de los sneakers.
+    const pool = homeSections(products).remaining;
+    const newest = pool.slice(0, 6);
+    const rest = shuffle(pool.slice(6)).slice(0, Math.max(0, POOL_SIZE - newest.length));
     return shuffle([...newest, ...rest]);
   }, [productKey]);
   // Se repite 3 veces para que el carrusel sea infinito en ambos sentidos.

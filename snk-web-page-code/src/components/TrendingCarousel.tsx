@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import { Star } from 'lucide-react';
 import { Product } from '../types';
 import { SeeMoreButton } from './SeeMoreButton';
+import { homeSections } from '../lib/homeSections';
 
 const FloatingTrendCard: React.FC<{
   product: Product;
@@ -119,16 +120,7 @@ const FloatingTrendCard: React.FC<{
 export const TrendingCarousel: React.FC = () => {
   const { products, brands, navigateTo } = useApp();
 
-  const trendingProducts = useMemo(() => {
-    const trending = products.filter((product) => product.isBestSeller);
-    const mixed = [...trending, ...products];
-
-    return mixed
-      .filter((product, index, array) => {
-        return array.findIndex((item) => item.id === product.id) === index;
-      })
-      .slice(0, 4);
-  }, [products]);
+  const trendingProducts = useMemo(() => homeSections(products).trending, [products]);
 
   const brandLabel = (brandId: string) =>
     brands.find((b) => b.id === brandId)?.name ?? brandId;
