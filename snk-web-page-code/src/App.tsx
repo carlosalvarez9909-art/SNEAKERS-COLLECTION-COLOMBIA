@@ -357,10 +357,7 @@ const AboutView: React.FC = () => {
             transition={{ duration: 0.9, ease: 'easeOut' }}
             className="logo-float h-auto w-[62%] max-w-[340px] select-none"
           />
-          <motion.h1 {...reveal} className="red-glow-label mt-10 text-5xl font-black uppercase tracking-[-0.04em] sm:text-7xl">
-            Llega seguro.
-          </motion.h1>
-          <motion.p {...reveal} className="mt-6 max-w-2xl text-base leading-8 text-neutral-300 sm:text-lg">
+          <motion.p {...reveal} className="mt-10 max-w-2xl text-base leading-8 text-neutral-300 sm:text-lg">
             Somos una red de distribución y comercialización de calzado importado en Colombia.
             Nacimos en Cali y hoy llevamos sneakers de alta calidad a todo el país, tanto al
             consumidor final como a tiendas y revendedores.
@@ -587,7 +584,7 @@ const footerLinks: { label: string; view: ViewState }[] = [
   { label: 'Inicio', view: { type: 'home' } },
   { label: 'Catálogo', view: { type: 'catalog' } },
   { label: 'Recomendaciones', view: { type: 'recommendations' } },
-  { label: 'Sobre nosotros', view: { type: 'about' } },
+  { label: 'Llega seguro', view: { type: 'about' } },
   { label: 'Tus favoritos', view: { type: 'favorites' } }
 ];
 

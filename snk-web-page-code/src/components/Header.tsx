@@ -75,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart }) => {
     { id: 'home', label: 'Inicio', view: { type: 'home' }, icon: Home },
     { id: 'catalog', label: 'Catálogo', view: { type: 'catalog' }, icon: LayoutGrid },
     { id: 'recommendations', label: 'Recomendaciones', view: { type: 'recommendations' }, icon: Sparkles },
-    { id: 'about', label: 'Sobre nosotros', view: { type: 'about' }, icon: Info },
+    { id: 'about', label: 'Llega seguro', view: { type: 'about' }, icon: Info },
     { id: 'favorites', label: 'Tus favoritos', view: { type: 'favorites' }, icon: Heart, badge: favorites.length }
   ];
 
@@ -134,7 +134,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart }) => {
             onClick={() => navigateTo({ type: 'about' })}
             className={navLinkClass(activeView.type === 'about')}
           >
-            Sobre nosotros
+            Llega seguro
           </button>
         </nav>
 
