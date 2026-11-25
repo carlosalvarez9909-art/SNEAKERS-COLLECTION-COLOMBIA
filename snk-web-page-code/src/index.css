@@ -341,7 +341,7 @@ select {
 }
 
 .trend-floating-inner {
-  min-height: 470px;
+  min-height: 0;
   background: transparent;
   border: 0;
   box-shadow: none;
@@ -854,4 +854,9 @@ select {
 }
 @media (prefers-reduced-motion: reduce) {
   .buy-cta::after { animation: none; }
+}
+
+/* En pantallas medianas y grandes la tarjeta de Más vendidos recupera su altura */
+@media (min-width: 640px) {
+  .trend-floating-inner { min-height: 420px; }
 }

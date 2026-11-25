@@ -75,8 +75,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
       onMouseLeave={handleMouseLeave}
       className="product-floating-card group relative flex cursor-pointer flex-col overflow-visible p-2 outline-none"
     >
-      <div className="floating-product-shell relative flex min-h-[430px] flex-col overflow-visible px-3 pb-4 pt-3">
-        <div className="absolute left-4 top-4 z-20 flex flex-col space-y-2">
+      <div className="floating-product-shell relative flex flex-col overflow-visible px-1.5 pb-3 pt-2 sm:min-h-[430px] sm:px-3 sm:pb-4 sm:pt-3">
+        <div className="absolute left-2 top-2 z-20 sm:left-4 sm:top-4 flex flex-col space-y-2">
           {product.isLimited && (
             <span className="promo-bubble promo-bubble-white">Limitado</span>
           )}
@@ -100,7 +100,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
             toggleFavorite(product.id);
           }}
           aria-label={isFav ? 'Quitar de favoritos' : 'Añadir a favoritos'}
-          className="absolute right-4 top-4 z-20 rounded-full border border-red-600/40 bg-black/60 p-2 backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-red-500 active:scale-90"
+          className="absolute right-2 top-2 z-20 rounded-full border border-red-600/40 bg-black/60 p-1.5 sm:right-4 sm:top-4 sm:p-2 backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-red-500 active:scale-90"
         >
           <Heart
             className={`h-4.5 w-4.5 text-red-500 transition-all ${
@@ -109,7 +109,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
           />
         </button>
 
-        <div className="product-image-stage relative mt-8 flex h-56 w-full items-center justify-center overflow-visible">
+        <div className="product-image-stage relative mt-7 flex h-36 w-full sm:mt-8 sm:h-56 items-center justify-center overflow-visible">
           <div className="product-void-glow absolute inset-0" />
 
           <img
@@ -118,12 +118,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
             alt={product.name}
             referrerPolicy="no-referrer"
             draggable={false}
-            className="product-floating-img relative z-10 max-h-44 w-[88%] object-contain"
+            className="product-floating-img relative z-10 max-h-32 w-[92%] object-contain sm:max-h-44 sm:w-[88%]"
           />
 
         </div>
 
-        <div className="relative z-10 mt-5 flex flex-1 flex-col justify-between px-1">
+        <div className="relative z-10 mt-2 flex flex-1 flex-col justify-between px-1 sm:mt-5">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.16em] text-white/70">
@@ -148,7 +148,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
             </p>
           </div>
 
-          <div className="mt-4 flex items-center justify-between gap-2">
+          <div className="mt-2 flex items-center justify-between gap-2 sm:mt-4">
             <div className="flex flex-wrap items-baseline gap-1.5">
               <span className="text-base font-black text-white">
                 {formatPrice(finalPrice)}

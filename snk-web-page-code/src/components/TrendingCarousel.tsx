@@ -61,7 +61,7 @@ const FloatingTrendCard: React.FC<{
       }}
       whileInView={{
         opacity: 1,
-        y: index % 2 === 0 ? 0 : 18,
+        y: 0,
         scale: 1,
         x: 0
       }}
@@ -71,9 +71,9 @@ const FloatingTrendCard: React.FC<{
         delay: index * 0.06,
         ease: [0.22, 1, 0.36, 1]
       }}
-      className={`trend-floating-card group relative min-h-[280px] sm:min-h-[420px] cursor-pointer overflow-visible outline-none`}
+      className={`trend-floating-card group relative sm:min-h-[420px] cursor-pointer overflow-visible outline-none`}
     >
-      <div className="trend-floating-inner relative flex h-full flex-col justify-between px-2 py-3">
+      <div className="trend-floating-inner relative flex h-full flex-col justify-start px-1 py-2 sm:justify-between sm:px-2 sm:py-3">
         <div className="relative flex h-36 sm:h-56 items-center justify-center overflow-visible">
           <div className="trend-void-glow absolute inset-0" />
 
@@ -86,7 +86,7 @@ const FloatingTrendCard: React.FC<{
           />
         </div>
 
-        <div className="relative z-10 mt-3 sm:mt-6">
+        <div className="relative z-10 mt-2 sm:mt-6">
           <div className="mb-2 flex items-center justify-between gap-3">
             <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white/50">
               {brandLabel}
@@ -155,7 +155,7 @@ export const TrendingCarousel: React.FC = () => {
 
         <div
             id="trending-floating-columns"
-            className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-8 lg:grid-cols-4"
+            className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-8 sm:gap-y-10 lg:grid-cols-4"
           >
             {trendingProducts.map((product, index) => (
               <FloatingTrendCard
