@@ -1,3 +1,4 @@
+import { SeeMoreButton } from './components/SeeMoreButton';
 import React, { useEffect, useRef, useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
@@ -596,7 +597,7 @@ function MainLayout() {
   const homeNewArrivals = [
     ...products.filter(p => p.isLimited),
     ...products.filter(p => !p.isLimited)
-  ].slice(0, 5);
+  ].slice(0, 4);
 
   const renderCurrentView = () => {
     switch (activeView.type) {
@@ -613,7 +614,7 @@ function MainLayout() {
             {/* Tendencias del momento slider */}
             <TrendingCarousel />
 
-            <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+            <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
               <motion.div {...reveal} className="mb-8">
                 <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-red-500">Exclusivo</p>
                 <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.06em] luxury-title sm:text-5xl">
@@ -623,22 +624,19 @@ function MainLayout() {
 
               <div
                 id="home-new-arrivals-grid"
-                className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
+                className="grid grid-cols-2 gap-4 lg:grid-cols-4"
               >
                 {homeNewArrivals.map((p, index) => (
                   <ProductCard key={p.id} product={p} index={index} />
                 ))}
               </div>
 
-              <div className="mt-12 text-center">
-                <button
+              <div className="mt-10 text-center">
+                <SeeMoreButton
                   id="home-view-all-catalog-btn"
+                  label="Ver catálogo completo"
                   onClick={() => navigateTo({ type: 'catalog' })}
-                  className="red-glow-hover group inline-flex items-center space-x-2 rounded-full border border-white/10 bg-white/5 px-7 py-3.5 text-xs font-bold uppercase tracking-[0.22em] text-white/80 transition-all hover:text-white active:scale-95"
-                >
-                  <span>VER CATÁLOGO COMPLETO</span>
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </button>
+                />
               </div>
             </section>
 

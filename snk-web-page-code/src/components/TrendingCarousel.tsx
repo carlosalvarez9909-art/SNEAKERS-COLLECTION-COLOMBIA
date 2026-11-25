@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { useApp } from '../context/AppContext';
 import { Star } from 'lucide-react';
 import { Product } from '../types';
+import { SeeMoreButton } from './SeeMoreButton';
 
 const FloatingTrendCard: React.FC<{
   product: Product;
@@ -60,7 +61,7 @@ const FloatingTrendCard: React.FC<{
       }}
       whileInView={{
         opacity: 1,
-        y: index % 2 === 0 ? 0 : 34,
+        y: index % 2 === 0 ? 0 : 18,
         scale: 1,
         x: 0
       }}
@@ -70,10 +71,10 @@ const FloatingTrendCard: React.FC<{
         delay: index * 0.06,
         ease: [0.22, 1, 0.36, 1]
       }}
-      className={`trend-floating-card group relative min-h-[470px] cursor-pointer overflow-visible outline-none`}
+      className={`trend-floating-card group relative min-h-[280px] sm:min-h-[420px] cursor-pointer overflow-visible outline-none`}
     >
       <div className="trend-floating-inner relative flex h-full flex-col justify-between px-2 py-3">
-        <div className="relative flex h-64 items-center justify-center overflow-visible">
+        <div className="relative flex h-36 sm:h-56 items-center justify-center overflow-visible">
           <div className="trend-void-glow absolute inset-0" />
 
           <img
@@ -81,11 +82,11 @@ const FloatingTrendCard: React.FC<{
             alt={product.name}
             draggable={false}
             referrerPolicy="no-referrer"
-            className="trend-floating-img relative z-10 max-h-52 w-[94%] object-contain"
+            className="trend-floating-img relative z-10 max-h-32 sm:max-h-48 w-[94%] object-contain"
           />
         </div>
 
-        <div className="relative z-10 mt-6">
+        <div className="relative z-10 mt-3 sm:mt-6">
           <div className="mb-2 flex items-center justify-between gap-3">
             <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white/50">
               {brandLabel}
@@ -100,13 +101,13 @@ const FloatingTrendCard: React.FC<{
           </div>
 
                  <h3
-            className="product-color-glow line-clamp-2 min-h-[44px] text-base font-black uppercase leading-[1.15] text-white"
+            className="product-color-glow line-clamp-2 min-h-[36px] text-xs sm:min-h-[44px] sm:text-base font-black uppercase leading-[1.15] text-white"
             style={{ '--glow-color': product.colors?.[0]?.hex || '#ffffff' } as React.CSSProperties}
           >
             {product.name}
           </h3>
 
-          <p className="mt-3 line-clamp-2 text-xs leading-5 text-white/55">
+          <p className="mt-3 hidden line-clamp-2 text-xs leading-5 text-white/55 sm:block">
             {product.description}
           </p>
         </div>
@@ -126,7 +127,7 @@ export const TrendingCarousel: React.FC = () => {
       .filter((product, index, array) => {
         return array.findIndex((item) => item.id === product.id) === index;
       })
-      .slice(0, 8);
+      .slice(0, 4);
   }, [products]);
 
   const brandLabel = (brandId: string) =>
@@ -136,10 +137,10 @@ export const TrendingCarousel: React.FC = () => {
 
   return (
     <section
-      className="trend-wall-section relative overflow-hidden py-20"
+      className="trend-wall-section relative overflow-hidden py-10 sm:py-14"
     >
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 flex flex-col gap-5 border-b border-white/5 pb-8 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-8 flex flex-col gap-5 border-b border-white/5 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-red-500">
               Top Products
@@ -154,7 +155,7 @@ export const TrendingCarousel: React.FC = () => {
 
         <div
             id="trending-floating-columns"
-            className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4"
+            className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-8 lg:grid-cols-4"
           >
             {trendingProducts.map((product, index) => (
               <FloatingTrendCard
@@ -168,6 +169,10 @@ export const TrendingCarousel: React.FC = () => {
               />
             ))}
           </div>
+
+        <div className="mt-10 text-center">
+          <SeeMoreButton label="Ver más vendidos" onClick={() => navigateTo({ type: 'catalog' })} />
+        </div>
       </div>
     </section>
   );

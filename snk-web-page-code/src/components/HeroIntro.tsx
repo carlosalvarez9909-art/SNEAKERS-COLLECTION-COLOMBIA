@@ -24,6 +24,11 @@ export const HeroIntro: React.FC = () => {
   const currentBanner = activeBanners[currentIdx];
   const linkedProduct = products.find(p => p.id === currentBanner.productId);
   const isVideoBanner = /\.(mp4|webm)($|\?)/i.test(currentBanner.image);
+  // "AIR JORDAN 4 \"BLACK CAT\"" -> modelo arriba, apodo grande en rojo
+  const [modelName, nickname] = (() => {
+    const m = currentBanner.title.match(/^(.*?)\s*["“](.+?)["”]\s*$/);
+    return m ? [m[1], m[2]] : [currentBanner.title, ''];
+  })();
 
   const handleNext = () => {
     setCurrentIdx((prev) => (prev + 1) % activeBanners.length);
@@ -34,10 +39,10 @@ export const HeroIntro: React.FC = () => {
   };
 
   return (
-    <section className="hero-shell relative h-[85vh] w-full overflow-hidden bg-transparent flex items-center justify-center">
+    <section className="hero-shell relative h-[78svh] sm:h-[85vh] w-full overflow-hidden bg-transparent flex items-center justify-center">
       
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.82)_0%,rgba(0,0,0,0.4)_38%,rgba(0,0,0,0.28)_100%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.7),transparent_35%,rgba(0,0,0,0.18)_100%)] pointer-events-none" />
+      {/* Oscurece solo la franja inferior: el video queda limpio y el texto se lee */}
+      <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.55)_28%,transparent_55%)]" />
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -68,85 +73,61 @@ export const HeroIntro: React.FC = () => {
         </motion.div>
       </AnimatePresence>
 
-      <div className="relative z-20 mx-auto flex h-full w-full max-w-7xl items-end px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex w-full items-end justify-between gap-8">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-            className="max-w-xl text-left"
-          >
-            <motion.h2
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="luxury-title font-sans text-4xl sm:text-5xl lg:text-7xl font-black uppercase leading-[0.88] tracking-[-0.06em]"
-            >
-              {currentBanner.title.split(' "')[0]}
-              <br />
-              <span className="block luxury-accent">
-                {currentBanner.title.includes('"') ? `"${currentBanner.title.split('"')[1]}"` : ''}
+      <div className="relative z-20 mx-auto flex h-full w-full max-w-7xl items-end px-4 pb-14 sm:px-6 sm:pb-16 lg:px-8">
+        <motion.div
+          key={currentBanner.id}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          className="max-w-lg text-left"
+        >
+          {currentBanner.tag && (
+            <span className="inline-flex items-center gap-2 rounded-full border border-red-600/60 bg-black/40 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-red-500 backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-70 motion-reduce:hidden" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-red-600" />
               </span>
-            </motion.h2>
+              {currentBanner.tag}
+            </span>
+          )}
 
-            <motion.p 
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="mt-5 max-w-md text-sm sm:text-base text-neutral-200/80 font-sans leading-relaxed"
+          <h2 className="mt-4 font-sans font-black uppercase leading-[0.9] tracking-[-0.05em] drop-shadow-[0_6px_24px_rgba(0,0,0,0.8)]">
+            <span className="block text-lg text-white/85 sm:text-2xl">{modelName}</span>
+            {nickname && <span className="red-glow-label mt-1 block text-4xl sm:text-6xl">{nickname}</span>}
+          </h2>
+
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/80 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] sm:text-base">
+            {currentBanner.subtitle}
+          </p>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              id="hero-view-ref-btn"
+              onClick={() => navigateTo({ type: 'product', productId: currentBanner.productId })}
+              className="glow-button group inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold uppercase tracking-[0.16em]"
             >
-              {currentBanner.subtitle}
-            </motion.p>
-
+              Descúbrelo
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </button>
+            <button
+              id="hero-go-catalog-btn"
+              onClick={() => navigateTo({ type: 'catalog' })}
+              className="rounded-full border border-red-600/70 bg-black/40 px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-red-500 backdrop-blur-sm transition-all hover:border-red-500 hover:text-white hover:shadow-[0_0_22px_rgba(209,10,31,0.5)]"
+            >
+              Ver catálogo
+            </button>
             {linkedProduct && (
-              <motion.div
-                initial={{ y: 15, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.35 }}
-                className="mt-6 flex items-baseline gap-3"
-              >
-                <span className="luxury-price text-2xl sm:text-4xl font-sans font-black tracking-[-0.04em]">
+              <span className="ml-1 flex items-baseline gap-2">
+                <span className="luxury-price text-xl font-black tracking-[-0.03em] sm:text-2xl">
                   {formatPrice(finalUnitPrice(linkedProduct.basePrice, linkedProduct.discount))}
                 </span>
                 {linkedProduct.discount > 0 && (
-                  <>
-                    <span className="text-base font-sans text-neutral-300/70 line-through">
-                      {formatPrice(linkedProduct.basePrice)}
-                    </span>
-                    <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-sans font-extrabold text-white/80 uppercase tracking-[0.18em]">
-                      -{linkedProduct.discount}%
-                    </span>
-                  </>
+                  <span className="text-xs text-white/50 line-through">{formatPrice(linkedProduct.basePrice)}</span>
                 )}
-              </motion.div>
+              </span>
             )}
-
-            <motion.div 
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.42 }}
-              className="mt-8 flex items-center gap-3"
-            >
-              <button
-                id="hero-view-ref-btn"
-                onClick={() => navigateTo({ type: 'product', productId: currentBanner.productId })}
-                className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 text-[10px] font-bold tracking-[0.22em] text-white backdrop-blur-sm transition-all duration-300 hover:border-white/40 hover:bg-white/10"
-              >
-                <span>VER REFERENCIA</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </button>
-              
-              <button
-                id="hero-go-catalog-btn"
-                onClick={() => navigateTo({ type: 'catalog' })}
-                className="rounded-full border border-white/10 bg-black/30 px-5 py-3 text-[10px] font-bold tracking-[0.22em] text-white/80 transition-colors hover:border-white/25 hover:text-white"
-              >
-                EXPLORAR
-              </button>
-            </motion.div>
-          </motion.div>
-
-        </div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Manual Sliders Left/Right arrows */}
@@ -155,14 +136,14 @@ export const HeroIntro: React.FC = () => {
           <button
             id="hero-prev-arrow"
             onClick={handlePrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-neutral-900 bg-neutral-950/80 p-2.5 text-neutral-400 transition-colors hover:border-neutral-800 hover:text-white z-30"
+            className="absolute left-4 top-1/2 z-30 hidden -translate-y-1/2 rounded-full border border-red-600/50 bg-black/50 p-2.5 text-red-500 transition-all hover:border-red-500 hover:text-white hover:shadow-[0_0_18px_rgba(209,10,31,0.5)] sm:block"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
           <button
             id="hero-next-arrow"
             onClick={handleNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-neutral-900 bg-neutral-950/80 p-2.5 text-neutral-400 transition-colors hover:border-neutral-800 hover:text-white z-30"
+            className="absolute right-4 top-1/2 z-30 hidden -translate-y-1/2 rounded-full border border-red-600/50 bg-black/50 p-2.5 text-red-500 transition-all hover:border-red-500 hover:text-white hover:shadow-[0_0_18px_rgba(209,10,31,0.5)] sm:block"
           >
             <ArrowRight className="h-4 w-4" />
           </button>
@@ -177,7 +158,7 @@ export const HeroIntro: React.FC = () => {
               id={`hero-bullet-${idx}`}
               key={idx}
               onClick={() => setCurrentIdx(idx)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${currentIdx === idx ? 'w-6 bg-amber-500' : 'w-1.5 bg-neutral-700 hover:bg-neutral-500'}`}
+              className={`h-1.5 rounded-full transition-all duration-300 ${currentIdx === idx ? 'w-6 bg-red-600 shadow-[0_0_10px_rgba(209,10,31,0.8)]' : 'w-1.5 bg-neutral-700 hover:bg-neutral-500'}`}
             />
           ))}
         </div>

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { finalUnitPrice } from '../lib/price';
 import { motion } from 'motion/react';
 import { useApp } from '../context/AppContext';
+import { SeeMoreButton } from './SeeMoreButton';
 
 const AUTOPLAY_MS = 3000;
 const POOL_SIZE = 12;
@@ -134,7 +135,7 @@ export const LatestDrops: React.FC = () => {
   if (!drops.length) return null;
 
   return (
-    <section className="relative overflow-hidden bg-transparent py-16">
+    <section className="relative overflow-hidden bg-transparent py-10 sm:py-12">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -154,7 +155,7 @@ export const LatestDrops: React.FC = () => {
         onTouchStart={pause}
         onPointerDown={pause}
         onWheel={pause}
-        className="no-scrollbar mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-[14vw] py-6 sm:gap-6 sm:px-[calc(50%-150px)]"
+        className="no-scrollbar mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-[14vw] py-6 sm:gap-6 sm:px-[calc(50%-150px)]"
       >
         {loop.map((product, index) => {
           const hasDiscount = product.discount > 0;
@@ -224,14 +225,7 @@ export const LatestDrops: React.FC = () => {
       </div>
 
       <div className="mt-8 flex justify-center">
-        <button
-          type="button"
-          onClick={() => navigateTo({ type: 'catalog' })}
-          className="group flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-400 transition-colors hover:text-white"
-        >
-          Ver todo
-          <span className="text-red-500 transition-transform duration-300 group-hover:translate-x-2">→</span>
-        </button>
+        <SeeMoreButton label="Ver más lanzamientos" onClick={() => navigateTo({ type: 'catalog' })} />
       </div>
     </section>
   );
