@@ -6,6 +6,7 @@ import {
   ArrowLeft, ShoppingBag, Star, ShieldCheck, Truck, Headset, AlertCircle,
   ChevronDown, ChevronLeft, ChevronRight, Minus, Plus, Check, Share2, Heart
 } from 'lucide-react';
+import { ZoomableImage } from './ZoomableImage';
 
 interface ProductDetailProps {
   productId: string;
@@ -31,6 +32,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
   const [needsSize, setNeedsSize] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
   const [shared, setShared] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
   const galleryRef = useRef<HTMLDivElement>(null);
 
   // Al cambiar de producto se reinicia todo.
@@ -40,6 +42,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
     setSelectedColor(product?.colors[0]);
     setQuantity(1);
     setOpenQuestion('size');
+    setZoomed(false);
     galleryRef.current?.scrollTo({ left: 0 });
   }, [productId]);
 
@@ -69,7 +72,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
     const el = galleryRef.current;
     if (!el) return;
     const idx = Math.round(el.scrollLeft / el.clientWidth);
-    if (idx !== activeImgIdx) setActiveImgIdx(idx);
+    if (idx !== activeImgIdx) {
+      setActiveImgIdx(idx);
+      setZoomed(false);
+    }
   };
   const goToImage = (idx: number) => {
     const el = galleryRef.current;
@@ -77,6 +83,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
     const next = (idx + images.length) % images.length;
     el.scrollTo({ left: next * el.clientWidth, behavior: 'smooth' });
     setActiveImgIdx(next);
+    setZoomed(false);
   };
 
   const requireSize = () => {
@@ -187,20 +194,24 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
               <div
                 ref={galleryRef}
                 onScroll={onGalleryScroll}
-                className="no-scrollbar relative flex aspect-square w-full snap-x snap-mandatory overflow-x-auto"
+                className={`no-scrollbar relative flex aspect-square w-full snap-x snap-mandatory ${zoomed ? 'overflow-x-hidden' : 'overflow-x-auto'}`}
               >
                 {images.map((img, idx) => (
                   <div key={idx} className="flex h-full w-full shrink-0 snap-center items-center justify-center p-2 sm:p-6">
-                    <motion.img
-                      src={img}
-                      alt={`${product.name} ${idx + 1}`}
-                      referrerPolicy="no-referrer"
-                      draggable={false}
+                    <motion.div
                       initial={{ opacity: 0, scale: 0.92, rotate: -4 }}
                       animate={{ opacity: 1, scale: 1, rotate: 0 }}
                       transition={{ duration: 0.6, ease: 'easeOut' }}
-                      className="max-h-full max-w-full select-none object-contain drop-shadow-[0_30px_35px_rgba(0,0,0,0.65)]"
-                    />
+                      className="flex h-full w-full items-center justify-center"
+                    >
+                      <ZoomableImage
+                        src={img}
+                        alt={`${product.name} ${idx + 1}`}
+                        zoomed={zoomed && idx === activeImgIdx}
+                        onZoomChange={setZoomed}
+                        className="drop-shadow-[0_30px_35px_rgba(0,0,0,0.65)]"
+                      />
+                    </motion.div>
                   </div>
                 ))}
               </div>
