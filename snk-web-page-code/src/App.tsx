@@ -209,10 +209,11 @@ const evidenceVideos = [
   { src: '/evidencia/video-3.mp4', poster: '/evidencia/video-3.jpg', title: 'Listos', caption: 'Rumbo al cliente' }
 ];
 
-const evidencePhotos = [
-  { src: '/evidencia/foto-1.jpg', title: 'NB 9060', caption: 'Full black' },
-  { src: '/evidencia/foto-2.jpg', title: 'Campus 00s', caption: 'Adidas' },
-  { src: '/evidencia/foto-3.jpg', title: 'Tommy', caption: 'Hilfiger' }
+// Videos de los banners (segunda fila de evidencia)
+const bannerVideos: { src: string; poster?: string; title: string; caption: string }[] = [
+  { src: '/models/1182726603991655.mp4', title: 'Black Cat', caption: 'Jordan 4' },
+  { src: '/models/1484357129391172.mp4', title: 'Lost & Found', caption: 'Jordan 1' },
+  { src: '/models/1494530822373557.mp4', title: 'En detalle', caption: 'Sneakers Collection' }
 ];
 
 const EvidenceCaption: React.FC<{ title: string; caption: string; kind: 'video' | 'photo' }> = ({ title, caption, kind }) => (
@@ -229,7 +230,7 @@ const EvidenceCaption: React.FC<{ title: string; caption: string; kind: 'video' 
 );
 
 // Video que se reproduce solo cuando está en pantalla (ahorra datos en celular).
-const EvidenceVideo: React.FC<(typeof evidenceVideos)[number]> = ({ src, poster, title, caption }) => {
+const EvidenceVideo: React.FC<{ src: string; poster?: string; title: string; caption: string }> = ({ src, poster, title, caption }) => {
   const ref = useRef<HTMLVideoElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
 
@@ -249,7 +250,7 @@ const EvidenceVideo: React.FC<(typeof evidenceVideos)[number]> = ({ src, poster,
         muted
         loop
         playsInline
-        preload="none"
+        preload={poster ? 'none' : 'metadata'}
         className="h-full w-full object-cover"
       />
       <EvidenceCaption title={title} caption={caption} kind="video" />
@@ -417,7 +418,7 @@ const AboutView: React.FC = () => {
           </div>
         </section>
 
-        {/* Evidencia: videos arriba y fotos abajo */}
+        {/* Evidencia: videos de pedidos arriba y videos de los banners abajo */}
         <section className="pb-24">
           <motion.h2
             {...reveal}
@@ -433,19 +434,8 @@ const AboutView: React.FC = () => {
           </motion.div>
 
           <motion.div {...reveal} className="mt-2 grid grid-cols-3 gap-2 sm:mt-4 sm:gap-4">
-            {evidencePhotos.map(photo => (
-              <div
-                key={photo.src}
-                className="glow-card group relative aspect-[3/4] overflow-hidden rounded-xl border border-white/10 bg-neutral-900 sm:rounded-2xl"
-              >
-                <img
-                  src={photo.src}
-                  alt={photo.title}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <EvidenceCaption title={photo.title} caption={photo.caption} kind="photo" />
-              </div>
+            {bannerVideos.map(video => (
+              <EvidenceVideo key={video.src} {...video} />
             ))}
           </motion.div>
 
