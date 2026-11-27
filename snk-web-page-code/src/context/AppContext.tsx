@@ -15,6 +15,7 @@ import {
   removeBrand as removeBrandFromDatabase,
   removeCoupon as removeCouponFromDatabase,
   removeProduct as removeProductFromDatabase,
+  removeProducts as removeProductsFromDatabase,
   upsertBanner,
   upsertBrand,
   upsertCoupon,
@@ -72,6 +73,7 @@ export interface AppContextType {
   addProduct: (product: Product) => Promise<void>;
   updateProduct: (product: Product) => Promise<void>;
   deleteProduct: (productId: string) => Promise<void>;
+  deleteProducts: (productIds: string[]) => Promise<void>;
   importInitialProducts: () => Promise<void>;
   addBrand: (brand: Brand) => Promise<void>;
   deleteBrand: (brandId: string) => Promise<void>;
@@ -338,6 +340,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     saveToLocal('snk_favorites', newFavorites);
   };
 
+  const deleteProducts = async (productIds: string[]) => {
+    if (!productIds.length) return;
+    await removeProductsFromDatabase(productIds);
+    const gone = new Set(productIds);
+    setProducts(allProducts.filter(p => !gone.has(p.id)));
+    setBanners(banners.filter(banner => !gone.has(banner.productId)));
+    setReviews(reviews.filter(review => !gone.has(review.productId)));
+    const newCart = cart.filter(item => !gone.has(item.product.id));
+    setCart(newCart);
+    saveToLocal('snk_cart', newCart);
+    const newFavorites = favorites.filter(id => !gone.has(id));
+    setFavorites(newFavorites);
+    saveToLocal('snk_favorites', newFavorites);
+  };
+
   // Vuelve a leer el catálogo (al entrar como admin trae también los borradores).
   const refreshCatalog = async () => {
     const catalog = await fetchCatalog();
@@ -487,6 +504,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addProduct,
       updateProduct,
       deleteProduct,
+      deleteProducts,
       importInitialProducts,
       addBrand,
       deleteBrand,

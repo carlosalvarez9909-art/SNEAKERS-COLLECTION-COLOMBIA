@@ -27,6 +27,7 @@ export const AdminPanel: React.FC = () => {
     addProduct, 
     updateProduct, 
     deleteProduct, 
+    deleteProducts,
     importInitialProducts,
     addCoupon, 
     deleteCoupon, 
@@ -213,6 +214,18 @@ export const AdminPanel: React.FC = () => {
       setAdminMessage(published ? `${ids.length} producto(s) publicados en la tienda.` : `${ids.length} producto(s) pasaron a borrador.`);
     } catch (error) {
       setAdminMessage(error instanceof Error ? error.message : 'No se pudo cambiar el estado.');
+    }
+  };
+
+  const deleteSelected = async (ids: string[]) => {
+    if (!ids.length) return;
+    if (!confirm(`¿Eliminar ${ids.length} zapatilla(s) del catálogo? Esta acción no se puede deshacer.`)) return;
+    try {
+      await deleteProducts(ids);
+      setSelectedIds([]);
+      setAdminMessage(`${ids.length} producto(s) eliminados.`);
+    } catch (error) {
+      setAdminMessage(error instanceof Error ? error.message : 'No se pudieron eliminar los productos.');
     }
   };
 
@@ -1090,6 +1103,14 @@ export const AdminPanel: React.FC = () => {
                     className="rounded-full border border-neutral-700 px-4 py-2 text-[10px] font-bold uppercase text-neutral-300 hover:text-white"
                   >
                     Pasar a borrador
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void deleteSelected(selectedIds)}
+                    className="flex items-center gap-1.5 rounded-full border border-red-600/70 bg-red-600/10 px-4 py-2 text-[10px] font-bold uppercase text-red-500 hover:bg-red-600 hover:text-white"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Eliminar {selectedIds.length}
                   </button>
                 </div>
               )}

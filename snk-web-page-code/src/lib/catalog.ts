@@ -287,6 +287,15 @@ export async function removeProduct(productId: string) {
   if (error) throw error;
 }
 
+export async function removeProducts(productIds: string[]) {
+  if (!supabase) throw new Error('Configura Supabase para borrar productos.');
+  // En tandas para no pasar el límite de la URL.
+  for (let i = 0; i < productIds.length; i += 100) {
+    const { error } = await supabase.from('products').delete().in('id', productIds.slice(i, i + 100));
+    if (error) throw error;
+  }
+}
+
 export async function upsertBrand(brand: Brand) {
   if (!supabase) throw new Error('Configura Supabase para guardar marcas.');
   const { error } = await supabase.from('brands').upsert(toBrandRow(brand));
