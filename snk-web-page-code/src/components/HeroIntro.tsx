@@ -39,10 +39,10 @@ export const HeroIntro: React.FC = () => {
   };
 
   return (
-    <section className="hero-shell relative h-[78svh] sm:h-[85vh] w-full overflow-hidden bg-transparent flex items-center justify-center">
+    <section className="hero-shell relative h-[85svh] sm:h-[85vh] lg:h-[88vh] w-full overflow-hidden bg-transparent flex items-center justify-center">
       
       {/* Oscurece solo la franja inferior: el video queda limpio y el texto se lee */}
-      <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.55)_28%,transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.55)_28%,transparent_55%)] lg:bg-[linear-gradient(90deg,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.4)_45%,transparent_65%)]" />
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -53,6 +53,7 @@ export const HeroIntro: React.FC = () => {
           transition={{ duration: 0.8, ease: 'easeInOut' }}
           className="absolute inset-0 z-0"
         >
+          {/* Fondo: el mismo video, ampliado y desenfocado, para llenar los lados sin recortar */}
           {isVideoBanner ? (
             <video
               src={currentBanner.image}
@@ -60,20 +61,43 @@ export const HeroIntro: React.FC = () => {
               muted
               loop
               playsInline
-              className="h-full w-full object-cover"
+              aria-hidden
+              className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl"
             />
           ) : (
             <img
               src={currentBanner.image}
-              alt={currentBanner.title}
+              alt=""
+              aria-hidden
               referrerPolicy="no-referrer"
-              className="h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl"
             />
           )}
+
+          {/* Video completo: en celular centrado, en PC a la derecha del texto */}
+          <div className="absolute inset-0 flex items-center justify-center lg:justify-end lg:pr-[8%]">
+            {isVideoBanner ? (
+              <video
+                src={currentBanner.image}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="h-full w-full object-contain lg:w-auto lg:rounded-3xl lg:shadow-[0_0_60px_rgba(209,10,31,0.25)]"
+              />
+            ) : (
+              <img
+                src={currentBanner.image}
+                alt={currentBanner.title}
+                referrerPolicy="no-referrer"
+                className="h-full w-full object-contain lg:w-auto"
+              />
+            )}
+          </div>
         </motion.div>
       </AnimatePresence>
 
-      <div className="relative z-20 mx-auto flex h-full w-full max-w-7xl items-end px-4 pb-14 sm:px-6 sm:pb-16 lg:px-8">
+      <div className="relative z-20 mx-auto flex h-full w-full max-w-7xl items-end px-4 pb-14 sm:px-6 sm:pb-16 lg:items-center lg:px-8 lg:pb-0">
         <motion.div
           key={currentBanner.id}
           initial={{ opacity: 0, y: 24 }}
